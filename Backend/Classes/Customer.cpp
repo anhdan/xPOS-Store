@@ -31,7 +31,7 @@ xpError_t Customer::addPayment( const double _additive )
  */
 xpError_t Customer::rewardPoint( const Point &_rewardedPoint )
 {
-    if( _rewardedPoint < 0 )
+    if( (Point)_rewardedPoint < 0 )
         return xpErrorInvalidValues;
     m_point = m_point + _rewardedPoint;
     return xpSuccess;
@@ -43,8 +43,10 @@ xpError_t Customer::rewardPoint( const Point &_rewardedPoint )
  */
 xpError_t Customer::usePoint( const Point &_usedPoint )
 {
-    if( (_usedPoint < 0) || (_usedPoint > m_point) )
+    if( ((Point)_usedPoint < 0) || ((Point)_usedPoint > m_point) )
+    {
         return xpErrorInvalidValues;
+    }
     m_point = m_point - _usedPoint;
     return xpSuccess;
 }

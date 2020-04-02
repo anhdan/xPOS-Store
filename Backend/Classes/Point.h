@@ -4,6 +4,9 @@
 namespace xpos_store
 {
 
+// Initialize static member
+double Point::point2MoneyRate = 1000.0;
+
 class Point
 {
 public:
@@ -17,6 +20,11 @@ public:
     Point( const int _p )
     {
         m_point = _p;
+    }
+
+    Point( const Point &_p )
+    {
+        m_point = _p.m_point;
     }
 
     ~Point() {}
@@ -130,8 +138,7 @@ private:
     int m_point;
 };
 
-// Initialize static member
-double Point::point2MoneyRate = 1000.0;
+
 
 }
 

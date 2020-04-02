@@ -17,7 +17,8 @@ SOURCES += \
     Backend/Classes/Customer.cpp \
     Backend/Classes/Product.cpp \
     Backend/Classes/SellingRecord.cpp \
-    Backend/Classes/Invoice.cpp
+    Backend/Classes/Invoice.cpp \
+    Backend/Classes/WorkShift.cpp
 
 RESOURCES += qml.qrc
 
@@ -40,4 +41,5 @@ HEADERS += \
     Backend/Classes/Person.h \
     Backend/Classes/Staff.h \
     Backend/Classes/SellingRecord.h \
-    Backend/Classes/Invoice.h
+    Backend/Classes/Invoice.h \
+    Backend/Classes/WorkShift.h

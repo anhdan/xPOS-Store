@@ -26,7 +26,7 @@ public:
     SellingRecord( const uint64_t _billId, const std::string _productCode, const uint32_t _quantity, const double _totalPrice )
         : m_billId(_billId), m_productCode(_productCode), m_quantity(_quantity), m_totalPrice(_totalPrice) {}
 
-    SellingRecord( const SellingRecord _record )
+    SellingRecord( const SellingRecord &_record )
         : m_billId(_record.m_billId), m_productCode(_record.m_productCode),
           m_quantity(_record.m_quantity), m_totalPrice(_record.m_totalPrice) {}
 
@@ -42,6 +42,8 @@ public:
 
     void setProduct( const std::string _productCode, const uint32_t _quantity, const double _totalPrice );
     void getProduct( std::string *_productCode, uint32_t *_quantity, double *_totalPrice );
+
+    //TODO: Implement methods to connect, write to and read record from database
 
 private:
     uint64_t m_billId;          /**< Id of the bill to which this selling record belongs to */

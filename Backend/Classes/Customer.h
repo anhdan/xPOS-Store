@@ -1,7 +1,6 @@
 #ifndef CUSTOMER_H
 #define CUSTOMER_H
 
-#include "xPos.h"
 #include "Person.h"
 #include "Point.h"
 
@@ -37,6 +36,8 @@ public:
     xpError_t rewardPoint( const Point &_rewardedPoint );
     xpError_t usePoint( const Point &_usedPoint );
     inline Point getPoint() { return m_point; }
+
+    //TODO: Implement methods to connect, write to and read record from database
 
 
 private:

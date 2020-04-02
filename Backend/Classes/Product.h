@@ -82,6 +82,8 @@ public:
     //
     xpError_t sell( const int _quantity );
 
+    //TODO: Implement methods to connect, write to and read record from database
+
 private:
     std::string m_code;                 /**< Barcode/2D code string of the product */
     std::string m_name;                 /**< Product name */

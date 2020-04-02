@@ -65,4 +65,6 @@ private:
     int m_birthYear;
 };
 
+}
+
 #endif // PERSON_H
