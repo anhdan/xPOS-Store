@@ -13,6 +13,7 @@
 #include <float.h>
 #include <time.h>
 #include <vector>
+#include <list>
 
 
 /***************************************************
@@ -40,7 +41,8 @@ enum xpError_enum
     xpErrorInvalidValues = -2,
     xpErrorNotAllocated = -3,
     xpErrorNotCompatible = -4,
-    xpErrorProcessFailure = -5
+    xpErrorProcessFailure = -5,
+    xpErrorNotPermited = -6
 };
 
 typedef int xpError_t;
@@ -55,6 +57,17 @@ enum class Gender : int
     FEMALE,
     OTHER,
     UNKNOWN
+};
+
+
+/**
+ * @brief The Privilege enum
+ */
+enum class Privilege : int
+{
+    OWNER = 0,
+    CASHIER,
+    GUEST
 };
 
 #endif // XPOS_H

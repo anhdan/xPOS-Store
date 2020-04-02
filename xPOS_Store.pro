@@ -13,7 +13,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        main.cpp
+        main.cpp \
+    Backend/Classes/Customer.cpp \
+    Backend/Classes/Product.cpp \
+    Backend/Classes/SellingRecord.cpp \
+    Backend/Classes/Invoice.cpp
 
 RESOURCES += qml.qrc
 
@@ -32,4 +36,8 @@ HEADERS += \
     Backend/Classes/Product.h \
     xPos.h \
     Backend/Classes/Customer.h \
-    Backend/Classes/Point.h
+    Backend/Classes/Point.h \
+    Backend/Classes/Person.h \
+    Backend/Classes/Staff.h \
+    Backend/Classes/SellingRecord.h \
+    Backend/Classes/Invoice.h
