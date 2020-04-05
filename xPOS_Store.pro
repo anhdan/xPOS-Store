@@ -18,7 +18,8 @@ SOURCES += \
     Backend/Classes/Product.cpp \
     Backend/Classes/SellingRecord.cpp \
     Backend/Classes/Invoice.cpp \
-    Backend/Classes/WorkShift.cpp
+    Backend/Classes/WorkShift.cpp \
+    Backend/Classes/Point.cpp
 
 RESOURCES += qml.qrc
 

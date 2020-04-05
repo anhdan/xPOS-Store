@@ -4,9 +4,6 @@
 namespace xpos_store
 {
 
-// Initialize static member
-double Point::point2MoneyRate = 1000.0;
-
 class Point
 {
 public:
@@ -137,8 +134,6 @@ public:
 private:
     int m_point;
 };
-
-
 
 }
 
