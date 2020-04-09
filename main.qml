@@ -1,6 +1,7 @@
 import QtQuick 2.9
 import QtQuick.Window 2.2
 import QtQuick.VirtualKeyboard 2.2
+import "Frontend"
 
 Window {
     id: window
@@ -8,6 +9,10 @@ Window {
     width: 1280
     height: 720
     title: qsTr("Hello World")
+
+    Inventory {
+        anchors.fill: parent
+    }
 
     InputPanel {
         id: inputPanel
