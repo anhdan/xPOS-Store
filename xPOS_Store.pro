@@ -14,12 +14,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-    Backend/Classes/Customer.cpp \
-    Backend/Classes/Product.cpp \
-    Backend/Classes/SellingRecord.cpp \
-    Backend/Classes/Invoice.cpp \
-    Backend/Classes/WorkShift.cpp \
-    Backend/Classes/Point.cpp
+    Backend/Containers/Customer.cpp \
+    Backend/Containers/Product.cpp \
+    Backend/Containers/SellingRecord.cpp \
+    Backend/Containers/Invoice.cpp \
+    Backend/Containers/WorkShift.cpp \
+    Backend/Containers/Point.cpp
 
 RESOURCES += qml.qrc
 
@@ -35,12 +35,12 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    Backend/Classes/Product.h \
+    Backend/Containers/Product.h \
     xPos.h \
-    Backend/Classes/Customer.h \
-    Backend/Classes/Point.h \
-    Backend/Classes/Person.h \
-    Backend/Classes/Staff.h \
-    Backend/Classes/SellingRecord.h \
-    Backend/Classes/Invoice.h \
-    Backend/Classes/WorkShift.h
+    Backend/Containers/Customer.h \
+    Backend/Containers/Point.h \
+    Backend/Containers/Person.h \
+    Backend/Containers/Staff.h \
+    Backend/Containers/SellingRecord.h \
+    Backend/Containers/Invoice.h \
+    Backend/Containers/WorkShift.h
