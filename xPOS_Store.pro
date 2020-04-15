@@ -19,7 +19,9 @@ SOURCES += \
     Backend/Containers/SellingRecord.cpp \
     Backend/Containers/Invoice.cpp \
     Backend/Containers/WorkShift.cpp \
-    Backend/Containers/Point.cpp
+    Backend/Containers/Point.cpp \
+    Backend/Containers/Database.cpp \
+    Backend/3rd/tinyxml2.cpp
 
 RESOURCES += qml.qrc
 
@@ -43,4 +45,14 @@ HEADERS += \
     Backend/Containers/Staff.h \
     Backend/Containers/SellingRecord.h \
     Backend/Containers/Invoice.h \
-    Backend/Containers/WorkShift.h
+    Backend/Containers/WorkShift.h \
+    Backend/Containers/Database.h \
+    Backend/3rd/tinyxml2.h
+
+
+#======== SQLite Database Lib
+LIBS += -lsqlite3
+
+DISTFILES += \
+    Backend/Configs/invoice_data.xml \
+    Backend/Configs/store_data.xml

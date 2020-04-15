@@ -15,6 +15,8 @@
 #include <vector>
 #include <list>
 
+#include <sqlite3.h>
+
 
 /***************************************************
  *              Macros
