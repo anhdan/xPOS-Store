@@ -156,6 +156,38 @@ Database* Database::createByTemplate(const std::string &_dbPath, const std::stri
 
 
 /**
+ * @brief Database::connect
+ */
+Database* Database::connect(const std::string &_dbPath)
+{
+    // Check the existance
+    if( access(_dbPath.c_str(), F_OK) == -1 )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: The database file is not exist\n",
+                 xpErrorNotExist, __FILE__, __LINE__ );
+        return nullptr;
+    }
+    Database *db = new Database;
+    db->m_dbPath = _dbPath;
+
+    // Try opening the database
+    int rc = sqlite3_open( _dbPath.c_str(), &db->m_dbPtr );
+    if( rc )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Attemp to open the database failed\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__ );
+        delete db;
+    }
+    else {
+        sqlite3_close( db->m_dbPtr );
+    }
+
+    return db;
+
+}
+
+
+/**
  * @brief Database::open
  */
 xpError_t Database::open()

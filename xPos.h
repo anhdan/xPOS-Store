@@ -6,6 +6,8 @@
 #include <fstream>
 #include <ctime>
 #include <chrono>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +46,8 @@ enum xpError_enum
     xpErrorNotAllocated = -3,
     xpErrorNotCompatible = -4,
     xpErrorProcessFailure = -5,
-    xpErrorNotPermited = -6
+    xpErrorNotPermited = -6,
+    xpErrorNotExist = -7
 };
 
 typedef int xpError_t;

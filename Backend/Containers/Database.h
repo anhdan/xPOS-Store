@@ -44,8 +44,8 @@ public:
 
 public:
     static Database* createByTemplate( const std::string &_dbPath, const std::string &_tmplPath );
+    static Database* connect( const std::string &_dbPath );
 
-    xpError_t connect( const std::string &_dbPath );
     xpError_t open();
     xpError_t close();
     Table* getTableByName( const std::string &_tableName );
