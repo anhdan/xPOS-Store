@@ -1,7 +1,7 @@
 #ifndef XPOS_H
 #define XPOS_H
 
-
+#include <iostream>
 #include <string>
 #include <fstream>
 #include <ctime>

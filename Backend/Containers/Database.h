@@ -2,6 +2,7 @@
 #define DATABASE_H
 
 #include "xPos.h"
+#include "Backend/3rd/tinyxml2.h"
 
 namespace xpos_store
 {
@@ -47,9 +48,12 @@ public:
     xpError_t connect( const std::string &_dbPath );
     xpError_t open();
     xpError_t close();
-    Table getTableByName( const std::string &_tableName );
+    Table* getTableByName( const std::string &_tableName );
 
     inline bool isOpen() { return m_isOpen; }
+
+private:
+    xpError_t getTableCallback( void *data, int argc, char **fieldNames, char **fieldValues );
 
 private:
     std::string m_dbPath;
