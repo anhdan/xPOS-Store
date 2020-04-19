@@ -47,7 +47,8 @@ HEADERS += \
     Backend/Containers/Invoice.h \
     Backend/Containers/WorkShift.h \
     Backend/Containers/Database.h \
-    Backend/3rd/tinyxml2.h
+    Backend/3rd/tinyxml2.h \
+    Backend/Configs/sqlitecmdFormat.h
 
 
 #======== SQLite Database Lib

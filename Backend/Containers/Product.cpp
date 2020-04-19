@@ -137,4 +137,386 @@ xpError_t Product::sell(const int _quantity)
     return xpSuccess;
 }
 
+
+//TODO: Implement methods to connect, write to and read record from database
+//
+//===== Database interface
+//
+
+/**
+ * @brief Product::searchCallBack
+ */
+xpError_t Product::searchCallBack(void *data, int fieldsNum, char **fieldName, char **fieldVal)
+{
+    Product* product = (Product*)data;
+    std::string vendorIDsStr("");
+    for( int fieldId = 0; fieldId < fieldsNum; fieldId++ )
+    {
+        if( !strcmp(fieldName[fieldId], "CODE") )
+        {
+            product->m_code = fieldVal[fieldId];
+        }
+        else if( !strcmp(fieldName[fieldId], "NAME") )
+        {
+            product->m_name = fieldVal[fieldId];
+        }
+        else if( !strcmp(fieldName[fieldId], "CATEGORY") )
+        {
+            product->m_category = fieldVal[fieldId];
+        }
+        else if( !strcmp(fieldName[fieldId], "DESCRIPTION") )
+        {
+            product->m_description = fieldVal[fieldId];
+        }
+        else if( !strcmp(fieldName[fieldId], "UNIT_NAME") )
+        {
+            product->m_unitName = fieldVal[fieldId];
+        }
+        else if( !strcmp(fieldName[fieldId], "UNIT_PRICE") )
+        {
+            product->m_unitPrice = fieldVal[fieldId] ? atof( fieldVal[fieldId] ) : 0.0;
+        }
+        else if( !strcmp(fieldName[fieldId], "DISCOUNT_PRICE") )
+        {
+            product->m_discountPrice = fieldVal[fieldId] ? atof( fieldVal[fieldId] ) : 0.0;
+        }
+        else if( !strcmp(fieldName[fieldId], "DISCOUNT_START") )
+        {
+            product->m_discountStartTime = fieldVal[fieldId] ? (time_t)atol( fieldVal[fieldId] ) : 0;
+        }
+        else if( !strcmp(fieldName[fieldId], "DISCOUNT_END") )
+        {
+            product->m_discountEndTime = fieldVal[fieldId] ? (time_t)atol( fieldVal[fieldId] ) : 0;
+        }
+        else if( !strcmp(fieldName[fieldId], "QUANTITY_INSTOCK") )
+        {
+            product->m_quantityInstock = fieldVal[fieldId] ? (uint32_t)atoi( fieldVal[fieldId] ) : 0;
+        }
+        else if( !strcmp(fieldName[fieldId], "QUANTITY_SOLD") )
+        {
+            product->m_quantitySold = fieldVal[fieldId] ? (uint32_t)atoi( fieldVal[fieldId] ) : 0;
+        }
+        else if( !strcmp(fieldName[fieldId], "VENDOR_IDS") )
+        {
+            vendorIDsStr = std::string( fieldVal[fieldId] );
+        }
+        else
+        {
+            LOG_MSG( "[ERR:%d] %s:%d: Invalid field name\n", xpErrorProcessFailure, __FILE__, __LINE__ );
+            product->setDefault();
+            return xpErrorProcessFailure;
+        }
+    }
+
+    if( vendorIDsStr != "" )
+    {
+        product->m_vendorIDs.clear();
+        std::stringstream ss( vendorIDsStr );
+        while( ss.good() )
+        {
+            std::string subStr;
+            std::getline( ss, subStr, ',' );
+            uint64_t vendorId = 0;
+            try
+            {
+                vendorId = std::stoi( subStr );
+                product->m_vendorIDs.push_back( (uint64_t)vendorId );
+            }
+            catch( std::exception &e )
+            {
+                LOG_MSG( "[ERR:%d] %s:%d:%s: An invalid vendor IDs is encountered\n",
+                         xpErrorProcessFailure, __FILE__, __LINE__, e.what() );
+                return xpErrorProcessFailure;
+            }
+        }
+    }
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief Product::searchInDatabase
+ */
+Product* Product::searchInDatabase(const Table *_productTable, const std::string &_productCode)
+{
+    if(_productTable == nullptr )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Null database table\n",
+                 xpErrorNotAllocated, __FILE__, __LINE__ );
+        return nullptr;
+    }
+
+    // Execute SQLITE command to search for record
+    Product product;
+    std::string sqliteCmd = "SELECT * from " + _productTable->name + " where CODE='" + _productCode + "';";
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd.c_str(), searchCallBack, (void*)&product, &sqliteMsg );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        return nullptr;
+    }
+
+    if( product.getCode() == "" )
+    {
+        LOG_MSG( "[WAR] The searched entry does not exist in the given database\n" );
+        return nullptr;
+    }
+
+    return &product;
+}
+
+
+/**
+ * @brief Product::insertToDatabase
+ */
+xpError_t Product::insertToDatabase(const Table *_productTable)
+{
+    if( m_code == "" )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Invalid product info\n",
+                 xpErrorInvalidParameters, __FILE__, __LINE__ );
+        return xpErrorInvalidParameters;
+    }
+
+    if(_productTable == nullptr )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Null database table\n",
+                 xpErrorNotAllocated, __FILE__, __LINE__ );
+        return xpErrorNotAllocated;
+    }
+
+    std::string vendorIdsStr ="";
+    for(int id = 0; id < m_vendorIDs.size()-1; id++ )
+    {
+        vendorIdsStr = vendorIdsStr + std::to_string(m_vendorIDs[id]) + ",";
+    }
+    if( m_vendorIDs.size() > 0 )
+    {
+        vendorIdsStr = vendorIdsStr + std::to_string(m_vendorIDs[m_vendorIDs.size()-1]);
+    }
+
+    char *sqliteCmd;
+    sprintf( sqliteCmd, FMT_PRODUCT_INSERT,
+             _productTable->name, m_code.c_str(), m_name.c_str(), m_category.c_str(), m_description.c_str(), m_unitName.c_str(), std::to_string(m_unitPrice),
+             std::to_string(m_discountPrice), std::to_string(m_discountStartTime), std::to_string(m_discountEndTime),
+             std::to_string(m_quantityInstock), std::to_string(m_quantitySold), vendorIdsStr.c_str() );
+
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );
+    free( sqliteCmd );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        return xpErrorProcessFailure;
+    }
+
+    return xpSuccess;
+}
+
+/**
+ * @brief Product::deleteFromDatabase
+ */
+xpError_t Product::deleteFromDatabase(const Table *_productTable)
+{
+    if( m_code == "" )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Invalid product info\n",
+                 xpErrorInvalidParameters, __FILE__, __LINE__ );
+        return xpErrorInvalidParameters;
+    }
+
+    if(_productTable == nullptr )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Null database table\n",
+                 xpErrorNotAllocated, __FILE__, __LINE__ );
+        return xpErrorNotAllocated;
+    }
+
+    char *sqliteCmd;
+    sprintf( sqliteCmd, FMT_PRODUCT_DELETE,
+             _productTable->name, m_code.c_str() );
+
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );
+    free( sqliteCmd );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        return xpErrorProcessFailure;
+    }
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief Product::updateBasicInfoInDB
+ */
+xpError_t Product::updateBasicInfoInDB(const Table *_productTable)
+{
+    if( m_code == "" )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Invalid product info\n",
+                 xpErrorInvalidParameters, __FILE__, __LINE__ );
+        return xpErrorInvalidParameters;
+    }
+
+    if(_productTable == nullptr )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Null database table\n",
+                 xpErrorNotAllocated, __FILE__, __LINE__ );
+        return xpErrorNotAllocated;
+    }
+
+    char *sqliteCmd;
+    sprintf( sqliteCmd, FMT_PRODUCT_UPDATE_BASIC,
+             _productTable->name, m_name.c_str(), m_category.c_str(), m_description.c_str(), m_unitName.c_str(), m_code.c_str()  );
+
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );
+    free( sqliteCmd );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        return xpErrorProcessFailure;
+    }
+
+    return xpSuccess;
+}
+
+
+
+/**
+ * @brief Product::updatePriceInDB
+ */
+xpError_t Product::updatePriceInDB(const Table *_productTable)
+{
+    if( m_code == "" )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Invalid product info\n",
+                 xpErrorInvalidParameters, __FILE__, __LINE__ );
+        return xpErrorInvalidParameters;
+    }
+
+    if(_productTable == nullptr )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Null database table\n",
+                 xpErrorNotAllocated, __FILE__, __LINE__ );
+        return xpErrorNotAllocated;
+    }
+
+    char *sqliteCmd;
+    sprintf( sqliteCmd, FMT_PRODUCT_UPDATE_PRICE,
+             _productTable->name, std::to_string(m_unitPrice), std::to_string(m_discountPrice), std::to_string(m_discountStartTime), std::to_string(m_discountEndTime), m_code.c_str()  );
+
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );
+    free( sqliteCmd );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        return xpErrorProcessFailure;
+    }
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief Product::updateQuantityInDB
+ */
+xpError_t Product::updateQuantityInDB(const Table *_productTable)
+{
+    if( m_code == "" )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Invalid product info\n",
+                 xpErrorInvalidParameters, __FILE__, __LINE__ );
+        return xpErrorInvalidParameters;
+    }
+
+    if(_productTable == nullptr )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Null database table\n",
+                 xpErrorNotAllocated, __FILE__, __LINE__ );
+        return xpErrorNotAllocated;
+    }
+
+    char *sqliteCmd;
+    sprintf( sqliteCmd, FMT_PRODUCT_UPDATE_QUANTITY,
+             _productTable->name, std::to_string(m_quantityInstock), std::to_string(m_quantitySold), m_code.c_str()  );
+
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );
+    free( sqliteCmd );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        return xpErrorProcessFailure;
+    }
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief Product::updateVendorsInDB
+ */
+xpError_t Product::updateVendorsInDB(const Table *_productTable)
+{
+    if( m_code == "" )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Invalid product info\n",
+                 xpErrorInvalidParameters, __FILE__, __LINE__ );
+        return xpErrorInvalidParameters;
+    }
+
+    if(_productTable == nullptr )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Null database table\n",
+                 xpErrorNotAllocated, __FILE__, __LINE__ );
+        return xpErrorNotAllocated;
+    }
+
+    std::string vendorIdsStr ="";
+    for(int id = 0; id < m_vendorIDs.size()-1; id++ )
+    {
+        vendorIdsStr = vendorIdsStr + std::to_string(m_vendorIDs[id]) + ",";
+    }
+    if( m_vendorIDs.size() > 0 )
+    {
+        vendorIdsStr = vendorIdsStr + std::to_string(m_vendorIDs[m_vendorIDs.size()-1]);
+    }
+
+    char *sqliteCmd;
+    sprintf( sqliteCmd, FMT_PRODUCT_UPDATE_VENDORS,
+             _productTable->name, vendorIdsStr.c_str(), m_code.c_str()  );
+
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );
+    free( sqliteCmd );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        return xpErrorProcessFailure;
+    }
+
+    return xpSuccess;
+}
+
 }

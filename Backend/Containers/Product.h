@@ -2,17 +2,14 @@
 #define PRODUCT_H
 
 #include "xPos.h"
+#include "Database.h"
+#include "Backend/Configs/sqlitecmdFormat.h"
 
 namespace xpos_store
 {
 
 class Product
 {
-protected:
-    /**
-     * @brief setDefault
-     */
-    void setDefault();
 
 public:
     Product()
@@ -29,6 +26,12 @@ public:
     ~Product(){}
 
 public:
+    /**
+     * @brief setDefault
+     */
+    void setDefault();
+
+
     //
     //===== Basic info Methods
     //
@@ -82,7 +85,20 @@ public:
     //
     xpError_t sell( const int _quantity );
 
-    //TODO: Implement methods to connect, write to and read record from database
+
+    //
+    //===== Database interface
+    //
+    static Product* searchInDatabase( const Table* _productTable, const std::string &_productCode );
+    xpError_t insertToDatabase( const Table* _productTable );
+    xpError_t deleteFromDatabase( const Table* _productTable );
+    xpError_t updateBasicInfoInDB( const Table* _productTable );
+    xpError_t updatePriceInDB( const Table* _productTable );
+    xpError_t updateQuantityInDB( const Table* _productTable );
+    xpError_t updateVendorsInDB( const Table* _productTable );
+
+private:
+    static xpError_t searchCallBack( void* data, int fieldsNum, char** fieldName, char **fieldVal );
 
 private:
     std::string m_code;                 /**< Barcode/2D code string of the product */
