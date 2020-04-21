@@ -1,6 +1,11 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.2
 
+//
+//===== Import backend Qobject-inherited class to interface
+//
+import xpos.store.inventory 1.0
+
 Rectangle {
     id: root
     width: 1280
@@ -8,6 +13,15 @@ Rectangle {
     color: "#3f444d"
     border.color: "#00000000"
     property alias lbProdName2: lbProdName2
+
+    InventoryProcess
+    {
+        id: inventory
+        onSigSearchCompleted:
+        {
+
+        }
+    }
 
     Label {
         id: label
