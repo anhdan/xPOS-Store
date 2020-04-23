@@ -7,6 +7,7 @@
 namespace xpos_store
 {
 
+
 /**
  * @brief The Table class
  */
@@ -61,8 +62,10 @@ private:
     bool m_isOpen;
 };
 
-
 }
+
+
+extern xpos_store::Database *glbProductDB;
 
 
 

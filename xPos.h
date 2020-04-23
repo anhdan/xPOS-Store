@@ -77,4 +77,5 @@ enum class Privilege : int
     GUEST
 };
 
+
 #endif // XPOS_H

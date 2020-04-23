@@ -5,12 +5,13 @@
 
 #include "xPos.h"
 #include "Backend/Containers/Product.h"
+#include "Backend/Containers/Database.h"
 
 class InventoryProcess : public QObject
 {
     Q_OBJECT
 public:
-    explicit InventoryProcess(QObject *parent = nullptr);
+    explicit InventoryProcess(QObject *parent = nullptr);    
 
     //
     //===== Declare invokable callbacks to process signals from Inventory GUI

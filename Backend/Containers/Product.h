@@ -30,6 +30,7 @@ public:
      * @brief setDefault
      */
     void setDefault();
+    void copyTo( Product &_product );
 
 
     //
@@ -80,9 +81,6 @@ public:
     inline uint32_t getQuantityInstock( ) { return m_quantityInstock; }
     inline uint32_t getQuantitySold( ) { return m_quantitySold; }
 
-    //
-    //===== Selling methods
-    //
     xpError_t sell( const int _quantity );
 
 

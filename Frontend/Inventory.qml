@@ -19,7 +19,7 @@ Rectangle {
         id: inventory
         onSigSearchCompleted:
         {
-
+            lblName.text = "Completed";
         }
     }
 

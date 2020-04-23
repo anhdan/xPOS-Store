@@ -1,5 +1,6 @@
 #include "Database.h"
 
+
 namespace xpos_store
 {
 
@@ -68,7 +69,7 @@ Database* Database::createByTemplate(const std::string &_dbPath, const std::stri
     }
 
     // Try to open database
-    sqliteErr = sqlite3_open( "test.db", &db->m_dbPtr );
+    sqliteErr = sqlite3_open( _dbPath.c_str(), &db->m_dbPtr );
     if( sqliteErr )
     {
         LOG_MSG( "[ERR:%d] %s:%d: Failed to open database file by given path\n",

@@ -26,6 +26,28 @@ void Product::setDefault()
 
 
 /**
+ * @brief Product::copyTo
+ */
+void Product::copyTo(Product &_product)
+{
+    _product.m_code = m_code;
+    _product.m_name = m_name;
+    _product.m_category = m_category;
+    _product.m_description = m_description;
+    _product.m_unitName = m_unitName;
+
+    _product.m_unitPrice = m_unitPrice;
+    _product.m_discountPrice = m_discountPrice;
+    _product.m_discountStartTime = m_discountStartTime;
+    _product.m_discountEndTime = m_discountEndTime;
+
+    _product.m_quantityInstock = m_quantityInstock;
+    _product.m_quantitySold = m_quantitySold;
+    _product.m_vendorIDs = m_vendorIDs;
+}
+
+
+/**
  * @brief Product::runDiscountProgram
  */
 xpError_t Product::runDiscountProgram( const double _discountPrice, const time_t _startTime, const time_t _endTime )
