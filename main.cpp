@@ -18,13 +18,13 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
 
-    QQmlApplicationEngine engine;
-
     //
     //===== Register a QObject-inherited C++ class to the interface
     //
     qmlRegisterType<InventoryProcess>( "xpos.store.inventory", 1, 0, "InventoryProcess" );
 
+
+    QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;
@@ -41,6 +41,8 @@ int main(int argc, char *argv[])
         LOG_MSG( "[ERR:%d] %s:%d: Failed to connect to database\n", xpErrorProcessFailure, __FILE__, __LINE__);
         exit( xpErrorProcessFailure );
     }
+
+    glbProductDB->close();
 
     return app.exec();
 }

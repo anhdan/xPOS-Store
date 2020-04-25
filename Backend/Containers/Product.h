@@ -42,14 +42,14 @@ public:
     inline void setName( const std::string &_name ) { m_name = _name; }
     inline std::string getName( ) { return m_name; }
 
-    inline void setCategory( const std::string &_category ) { m_category = _category; }
-    inline std::string getCategory( ) { return m_category; }
+    inline void setCategory( const int _category ) { m_category = _category; }
+    inline int getCategory( ) { return m_category; }
 
     inline void setDescription( const std::string &_description ) { m_description = _description; }
     inline std::string getDescription( ) { return m_description; }
 
-    inline void setUnitName( const std::string &_unitName ) { m_unitName = _unitName; }
-    inline std::string getUnitName( ) { return m_unitName; }
+    inline void setUnit( const int _unitName ) { m_unit = _unitName; }
+    inline int getUnit( ) { return m_unit; }
 
     inline void setUnitPrice( const double _unitPrice ) { m_unitPrice = _unitPrice; }
     inline double getUnitPrice( ) { return m_unitPrice; }    
@@ -101,9 +101,9 @@ private:
 private:
     std::string m_code;                 /**< Barcode/2D code string of the product */
     std::string m_name;                 /**< Product name */
-    std::string m_category;             /**< Product category */
+    int m_category;         /**< Product category */
     std::string m_description;          /**< Product description or notice */
-    std::string m_unitName;             /**< Unit of quantity. E.g. pcs/kg/bottle */
+    int m_unit;                 /**< Unit of quantity. E.g. pcs/kg/bottle */
 
     // Price attributes
     double m_unitPrice;                 /**< Unit price */

@@ -19,7 +19,16 @@ Rectangle {
         id: inventory
         onSigSearchCompleted:
         {
-            lblName.text = "Completed";
+            console.log( "=============> I'm here" );
+            txtProdName.text = code
+            txtDesc.text = description
+            txtUnitPrice.text = Number(14.5678).toFixed(2)
+            cbxUnitName.currentIndex = unitName
+            cbxCategory.currentIndex = category
+            lblDiscountPrice.text = discountPrice
+            lblStartDate.text = discountStart
+            lblEndDate.text = discountEnd
+            lblQuantityInStock = quantityInstock
         }
     }
 
@@ -69,6 +78,10 @@ Rectangle {
             anchors.leftMargin: 0
             anchors.top: parent.top
             anchors.topMargin: 0
+
+            onClicked: {
+                inventory.invokSearch( cbxSearchCode.currentText )
+            }
         }
 
         Label {
@@ -94,21 +107,6 @@ Rectangle {
         }
 
         Label {
-            id: lblUnit
-            y: 250
-            width: 120
-            height: 40
-            text: qsTr("")
-            anchors.left: parent.left
-            anchors.leftMargin: 0
-            background: Rectangle {
-                color: "#337798"
-            }
-            font.pixelSize: 20
-            verticalAlignment: Text.AlignVCenter
-        }
-
-        Label {
             x: 156
             y: 222
             width: 200
@@ -118,20 +116,6 @@ Rectangle {
             anchors.right: parent.right
             anchors.rightMargin: 0
             font.pixelSize: 20
-        }
-
-        ComboBox {
-            id: cbxCategory
-            x: 156
-            y: 250
-            width: 200
-            height: 40
-            anchors.right: parent.right
-            anchors.rightMargin: 0
-            font.pixelSize: 20
-            background: Rectangle {
-                color: "#337798"
-            }
         }
 
         Label {
@@ -145,40 +129,10 @@ Rectangle {
             font.pixelSize: 20
         }
 
-        Label {
-            id: lblDescription
-            y: 361
-            width: 356
-            height: 100
-            text: qsTr("")
-            anchors.left: parent.left
-            anchors.leftMargin: 0
-            background: Rectangle {
-                color: "#337798"
-            }
-            font.pixelSize: 20
-            verticalAlignment: Text.AlignVCenter
-        }
-
-        Label {
-            id: lblName
-            x: 0
-            y: 132
-            width: 356
-            height: 40
-            background: Rectangle {
-                color: "#337798"
-            }
-
-            text: qsTr("")
-            font.pixelSize: 20
-            verticalAlignment: Text.AlignVCenter
-        }
-
         Button {
             id: btnAddProvider
             x: 0
-            y: 503
+            y: 490
             width: 140
             height: 60
             text: qsTr("Thêm nhà \n cung cấp")
@@ -192,7 +146,7 @@ Rectangle {
         Button {
             id: btnDeleteProvider
             x: 216
-            y: 503
+            y: 490
             width: 140
             height: 60
             text: qsTr("Xóa nhà \n cung cấp")
@@ -201,6 +155,68 @@ Rectangle {
                 radius: 10
             }
             font.pixelSize: 20
+        }
+
+        TextField {
+            id: txtProdName
+            x: 0
+            y: 132
+            width: 356
+            text: qsTr("")
+        }
+
+        TextField {
+            id: txtDesc
+            x: 0
+            y: 361
+            width: 356
+            height: 100
+            text: qsTr("")
+        }
+
+        ComboBox {
+            id: cbxUnitName
+            y: 250
+            width: 120
+            height: 40
+            anchors.left: parent.left
+            anchors.leftMargin: 0
+            model: ["NONE", "GOI/TUI", "HOP/THUNG", "CHAI/LO", "LON"]
+        }
+
+        ComboBox {
+            id: cbxCategory
+            x: 156
+            y: 250
+            width: 200
+            anchors.right: parent.right
+            anchors.margins: 0
+            model: ["NONE", "DO AN", "NUOC UONG", "BOT GIAT/NUOC RUA", "SUA TAM/ XA PHONG/ DAU GOI", "MY/ PHO"]
+        }
+
+        Button {
+            id: btnUpdate
+            x: 108
+            y: 564
+            width: 140
+            height: 60
+            text: qsTr("Update")
+            background: Rectangle {
+                color: "#ffffff"
+                radius: 10
+            }
+            font.pixelSize: 20
+
+            onClicked:
+            {
+                inventory.code = cbxSearchCode.currentText
+                inventory.name = txtProdName.text
+                inventory.description = txtDesc.text
+                inventory.unitName = cbxUnitName.currentIndex
+                inventory.category = cbxCategory.currentIndex
+                inventory.unitPrice = Number(txtUnitPrice.text)
+                inventory.invokUpdate()
+            }
         }
     }
 
@@ -243,22 +259,6 @@ Rectangle {
             anchors.leftMargin: 0
             font.pixelSize: 20
             anchors.left: parent.left
-        }
-
-        Label {
-            id: lblUnit1
-            x: 4
-            y: 28
-            width: 200
-            height: 40
-            text: qsTr("")
-            anchors.leftMargin: 0
-            background: Rectangle {
-                color: "#337798"
-            }
-            font.pixelSize: 20
-            anchors.left: parent.left
-            verticalAlignment: Text.AlignVCenter
         }
 
         Rectangle {
@@ -406,6 +406,13 @@ Rectangle {
                 }
             }
         }
+
+        TextField {
+            id: txtUnitPrice
+            x: 4
+            y: 28
+            text: qsTr("")
+        }
     }
 
     Rectangle {
@@ -421,6 +428,7 @@ Rectangle {
         anchors.bottom: parent.bottom
 
         Label {
+            id: lbnQuant
             width: 356
             height: 22
             color: "#2c93f2"
@@ -435,12 +443,11 @@ Rectangle {
         Label {
             id: lblQuantityInStock
             x: 0
-            y: 28
             width: 356
             height: 40
             text: qsTr("")
-            anchors.top: lblTest.bottom
-            anchors.topMargin: 5
+            anchors.top: lbnQuant.bottom
+            anchors.topMargin: 6
             font.pixelSize: 20
             background: Rectangle {
                 color: "#337798"

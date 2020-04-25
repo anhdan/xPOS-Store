@@ -10,9 +10,9 @@ void Product::setDefault()
 {
     m_code = "";
     m_name = "";
-    m_category ="";
+    m_category = XP_PRODUCT_CATEGORY_NONE;
     m_description ="";
-    m_unitName ="";
+    m_unit = XP_PRODUCT_UNIT_NONE;
 
     m_unitPrice = 0.0;
     m_discountPrice = 0.0;
@@ -34,7 +34,7 @@ void Product::copyTo(Product &_product)
     _product.m_name = m_name;
     _product.m_category = m_category;
     _product.m_description = m_description;
-    _product.m_unitName = m_unitName;
+    _product.m_unit = m_unit;
 
     _product.m_unitPrice = m_unitPrice;
     _product.m_discountPrice = m_discountPrice;
@@ -184,7 +184,7 @@ xpError_t Product::searchCallBack(void *data, int fieldsNum, char **fieldName, c
         }
         else if( !strcmp(fieldName[fieldId], "CATEGORY") )
         {
-            product->m_category = fieldVal[fieldId];
+            product->m_category = fieldVal[fieldId] ? atoi( fieldVal[fieldId] ) : 0;
         }
         else if( !strcmp(fieldName[fieldId], "DESCRIPTION") )
         {
@@ -192,7 +192,7 @@ xpError_t Product::searchCallBack(void *data, int fieldsNum, char **fieldName, c
         }
         else if( !strcmp(fieldName[fieldId], "UNIT_NAME") )
         {
-            product->m_unitName = fieldVal[fieldId];
+            product->m_unit = fieldVal[fieldId] ? atoi( fieldVal[fieldId] ) : 0;
         }
         else if( !strcmp(fieldName[fieldId], "UNIT_PRICE") )
         {
@@ -323,7 +323,7 @@ xpError_t Product::insertToDatabase(const Table *_productTable)
 
     char *sqliteCmd;
     sprintf( sqliteCmd, FMT_PRODUCT_INSERT,
-             _productTable->name, m_code.c_str(), m_name.c_str(), m_category.c_str(), m_description.c_str(), m_unitName.c_str(), std::to_string(m_unitPrice),
+             _productTable->name, m_code.c_str(), m_name.c_str(), std::to_string( (int)m_category ), m_description.c_str(), std::to_string( (int)m_unit), std::to_string(m_unitPrice),
              std::to_string(m_discountPrice), std::to_string(m_discountStartTime), std::to_string(m_discountEndTime),
              std::to_string(m_quantityInstock), std::to_string(m_quantitySold), vendorIdsStr.c_str() );
 
@@ -400,7 +400,7 @@ xpError_t Product::updateBasicInfoInDB(const Table *_productTable)
 
     char *sqliteCmd;
     sprintf( sqliteCmd, FMT_PRODUCT_UPDATE_BASIC,
-             _productTable->name, m_name.c_str(), m_category.c_str(), m_description.c_str(), m_unitName.c_str(), m_code.c_str()  );
+             _productTable->name, m_name.c_str(), std::to_string((int)m_category), m_description.c_str(), std::to_string((int)m_unit), m_code.c_str()  );
 
     char *sqliteMsg;
     xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );

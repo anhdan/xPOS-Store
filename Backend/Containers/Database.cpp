@@ -180,7 +180,7 @@ Database* Database::connect(const std::string &_dbPath)
         delete db;
     }
     else {
-        sqlite3_close( db->m_dbPtr );
+        db->m_isOpen = true;
     }
 
     return db;
@@ -243,7 +243,7 @@ Table* Database::getTableByName(const std::string &_tableName)
 {
     if( !m_isOpen )
     {
-        LOG_MSG( "[ERR:%d] %s:%d: The database is being closed\n",
+        LOG_MSG( "[ERR:%d] %s:%d: The database is has not been opened\n",
                  xpErrorNotPermited, __FILE__, __LINE__ );
         return nullptr;
     }

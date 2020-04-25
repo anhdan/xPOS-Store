@@ -78,4 +78,30 @@ enum class Privilege : int
 };
 
 
+/**
+ * @brief The int enum
+ */
+enum XP_PRODUCT_UNIT_t
+{
+    XP_PRODUCT_UNIT_NONE = 0,
+    XP_PRODUCT_UNIT_GT,          // Goi, tui
+    XP_PRODUCT_UNIT_HT,          // Hop, thung
+    XP_PRODUCT_UNIT_CL,          // Chai, lo
+    XP_PRODUCT_UNIT_L,           // Lon
+};
+
+/**
+ * @brief The int enum
+ */
+enum XP_PRODUCT_CATEGORY_t
+{
+    XP_PRODUCT_CATEGORY_NONE = 0,
+    XP_PRODUCT_CATEGORY_DA,          // Do an
+    XP_PRODUCT_CATEGORY_NUBR,        // Nuoc uong, bia ruou
+    XP_PRODUCT_CATEGORY_BGNR,        // Bot giat, nuoc rua
+    XP_PRODUCT_CATEGORY_STXPDG,      // Sua tam, xa phong, dau goi
+    XP_PRODUCT_CATEGORY_MP,          // My Pho
+    XP_PRODUCT_CATEGORY_K            // Khac
+};
+
 #endif // XPOS_H
