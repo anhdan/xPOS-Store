@@ -22,13 +22,13 @@ Rectangle {
             console.log( "=============> I'm here" );
             txtProdName.text = code
             txtDesc.text = description
-            txtUnitPrice.text = Number(14.5678).toFixed(2)
+            txtUnitPrice.text = Number(unitPrice).toFixed(2)
             cbxUnitName.currentIndex = unitName
             cbxCategory.currentIndex = category
             lblDiscountPrice.text = discountPrice
             lblStartDate.text = discountStart
             lblEndDate.text = discountEnd
-            lblQuantityInStock = quantityInstock
+            lblQuantityInStock.text = quantityInstock
         }
     }
 
@@ -80,7 +80,7 @@ Rectangle {
             anchors.topMargin: 0
 
             onClicked: {
-                inventory.invokSearch( cbxSearchCode.currentText )
+                inventory.invokSearch( cbxSearchCode.editText )
             }
         }
 
@@ -209,7 +209,7 @@ Rectangle {
 
             onClicked:
             {
-                inventory.code = cbxSearchCode.currentText
+//                inventory.code = cbxSearchCode.editText
                 inventory.name = txtProdName.text
                 inventory.description = txtDesc.text
                 inventory.unitName = cbxUnitName.currentIndex

@@ -216,7 +216,6 @@ QString InventoryProcess::quantitySold()
  */
 int InventoryProcess::invokSearch(QString _code)
 {
-    LOG_MSG( "===========> Invock Search\n" );
     if( !glbProductDB->isOpen() )
     {
         glbProductDB->open();
@@ -232,14 +231,19 @@ int InventoryProcess::invokSearch(QString _code)
     xpos_store::Product *prod = xpos_store::Product::searchInDatabase( table, _code.toStdString() );
     if( prod == nullptr )
     {
+        m_found = false;
         m_currProduct.setDefault();
         m_currProduct.setCode( _code.toStdString() );
     }
     else
     {
+        m_found = true;
         prod->copyTo( m_currProduct );
         delete prod;
     }
+
+    LOG_MSG( "In Search\n" );
+    m_currProduct.printInfo();
 
     glbProductDB->close();
     emit sigSearchCompleted();
@@ -253,5 +257,47 @@ int InventoryProcess::invokSearch(QString _code)
  */
 int InventoryProcess::invokUpdate()
 {
+    if( !glbProductDB->isOpen() )
+    {
+        glbProductDB->open();
+    }
+    xpos_store::Table *table = glbProductDB->getTableByName( "PRODUCT" );
+    if( table == nullptr )
+    {
+        glbProductDB->close();
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to connect to database\n", xpErrorNotExist, __FILE__, __LINE__);
+        return xpErrorNotExist;
+    }
+
+    LOG_MSG( " In InvokUpdate\n" );
+    m_currProduct.printInfo();
+
+    xpError_t err = xpSuccess;
+    if( m_found )
+    {
+        // Update info
+        std::cout << "===========> 1\n";
+        err |= m_currProduct.updateBasicInfoInDB( table );
+        std::cout << "===========> 2\n";
+        err |= m_currProduct.updatePriceInDB( table );
+        std::cout << "===========> 3\n";
+        err |= m_currProduct.updateQuantityInDB( table );
+        std::cout << "===========> 4\n";
+        err |= m_currProduct.updateVendorsInDB( table );
+        std::cout << "===========> 5\n";
+    }
+    else
+    {
+        std::cout << "===========> 1\n";
+        err |= m_currProduct.insertToDatabase( table );
+        std::cout << "===========> 2\n";
+    }
+
+    if( err != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to update info of product to database\n", xpErrorProcessFailure, __FILE__, __LINE__);
+        return xpErrorProcessFailure;
+    }
+
     return xpSuccess;
 }

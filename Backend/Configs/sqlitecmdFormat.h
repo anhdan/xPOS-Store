@@ -5,7 +5,7 @@
 
 
 #define FMT_PRODUCT_INSERT          "INSERT INTO %s (CODE, NAME, CATEGORY, DESCRIPTION, UNIT_NAME, UNIT_PRICE, DISCOUNT_PRICE, DISCOUNT_START, DISCOUNT_END, QUANTITY_INSTOCK, QUANTITY_SOLD, VENDOR_IDS) " \
-                                    "VALUES('%s', '%s', '%s', '%s', '%s', %s, %s, %s, %s, %s, %s, '%s');"
+                                    "VALUES('%s', '%s', '%s', '%s', '%s', %f, %f, %d, %d, %d, %d, '%s');"
 
 #define FMT_PRODUCT_DELETE          "DELETE FROM %s WHERE CODE = '%s'"
 

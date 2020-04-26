@@ -2,5 +2,7 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>Frontend/Inventory.qml</file>
+        <file>Frontend/ErrorDialog.qml</file>
+        <file>Frontend/ErrorDialogForm.ui.qml</file>
     </qresource>
 </RCC>

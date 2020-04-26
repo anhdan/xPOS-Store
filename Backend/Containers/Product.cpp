@@ -48,6 +48,27 @@ void Product::copyTo(Product &_product)
 
 
 /**
+ * @brief Product::printInfo
+ */
+void Product::printInfo()
+{
+    LOG_MSG( "\n---------Product---------\n" );
+    LOG_MSG( ". CODE:           %s\n", m_code.c_str() );
+    LOG_MSG( ". NAME:           %s\n", m_name.c_str() );
+    LOG_MSG( ". CATEGORY:       %d\n", m_category );
+    LOG_MSG( ". DESCRIPTION:    %s\n", m_description.c_str() );
+    LOG_MSG( ". UNIT:           %d\n", m_unit );
+    LOG_MSG( ". UNIT PRICE:     %f\n", m_unitPrice );
+    LOG_MSG( ". DISCOUNT PRICE: %f\n", m_discountPrice );
+    LOG_MSG( ". DISCOUNT START: %d\n", m_discountStartTime );
+    LOG_MSG( ". DISCOUNT END:   %d\n", m_discountEndTime );
+    LOG_MSG( ". # INSTOCK:      %d\n", m_quantityInstock );
+    LOG_MSG( ". # SOLD:         %d\n", m_quantitySold );
+    LOG_MSG( "-------------------------\n" );
+}
+
+
+/**
  * @brief Product::runDiscountProgram
  */
 xpError_t Product::runDiscountProgram( const double _discountPrice, const time_t _startTime, const time_t _endTime )
@@ -311,25 +332,36 @@ xpError_t Product::insertToDatabase(const Table *_productTable)
         return xpErrorNotAllocated;
     }
 
+    std::cout << "===========> 1.1 " << m_vendorIDs.size() << std::endl;
+
     std::string vendorIdsStr ="";
-    for(int id = 0; id < m_vendorIDs.size()-1; id++ )
+    int id = 0;
+    while( id < ((int)m_vendorIDs.size()-1))
     {
         vendorIdsStr = vendorIdsStr + std::to_string(m_vendorIDs[id]) + ",";
+        id++;
     }
     if( m_vendorIDs.size() > 0 )
     {
         vendorIdsStr = vendorIdsStr + std::to_string(m_vendorIDs[m_vendorIDs.size()-1]);
     }
 
-    char *sqliteCmd;
+    std::cout << "===========> 1.2  " << _productTable->name;
+
+    char sqliteCmd[1000];
+    std::cout <<  FMT_PRODUCT_INSERT << std::endl;
     sprintf( sqliteCmd, FMT_PRODUCT_INSERT,
-             _productTable->name, m_code.c_str(), m_name.c_str(), std::to_string( (int)m_category ), m_description.c_str(), std::to_string( (int)m_unit), std::to_string(m_unitPrice),
-             std::to_string(m_discountPrice), std::to_string(m_discountStartTime), std::to_string(m_discountEndTime),
-             std::to_string(m_quantityInstock), std::to_string(m_quantitySold), vendorIdsStr.c_str() );
+             _productTable->name.c_str(), m_code.c_str(), m_name.c_str(), std::to_string( (double)m_category ), m_description.c_str(), std::to_string( (double)m_unit), m_unitPrice,
+             m_discountPrice, m_discountStartTime, m_discountEndTime, m_quantityInstock, m_quantitySold, vendorIdsStr.c_str() );
+
+    std::cout << "===========> 1.3" << std::string( sqliteCmd ) << std::endl;
 
     char *sqliteMsg;
     xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );
-    free( sqliteCmd );
+    std::cout << "===========> 1.4\n";
+
+//    free( sqliteCmd );
+    std::cout << "===========> 1.5\n";
     if( sqliteErr != SQLITE_OK )
     {
         LOG_MSG( "[ERR:%d] %s:%d: %s\n",
@@ -337,6 +369,7 @@ xpError_t Product::insertToDatabase(const Table *_productTable)
         sqlite3_free( sqliteMsg );
         return xpErrorProcessFailure;
     }
+    std::cout << "===========> 1.6\n";
 
     return xpSuccess;
 }

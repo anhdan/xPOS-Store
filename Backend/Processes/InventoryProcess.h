@@ -77,6 +77,7 @@ public slots:
 
 private:
     xpos_store::Product m_currProduct;
+    bool m_found = false;
     std::deque<xpos_store::Product> m_recentProducts;
 };
 

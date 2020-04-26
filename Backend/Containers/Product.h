@@ -31,6 +31,7 @@ public:
      */
     void setDefault();
     void copyTo( Product &_product );
+    void printInfo();
 
 
     //
