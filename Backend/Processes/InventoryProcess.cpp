@@ -288,9 +288,7 @@ int InventoryProcess::invokUpdate()
     }
     else
     {
-        std::cout << "===========> 1\n";
         err |= m_currProduct.insertToDatabase( table );
-        std::cout << "===========> 2\n";
     }
 
     if( err != xpSuccess )

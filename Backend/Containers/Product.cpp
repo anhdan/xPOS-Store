@@ -189,7 +189,7 @@ xpError_t Product::sell(const int _quantity)
 /**
  * @brief Product::searchCallBack
  */
-xpError_t Product::searchCallBack(void *data, int fieldsNum, char **fieldName, char **fieldVal)
+xpError_t Product::searchCallBack(void *data, int fieldsNum, char **fieldVal, char **fieldName)
 {
     Product* product = (Product*)data;
     std::string vendorIDsStr("");
@@ -291,10 +291,10 @@ Product* Product::searchInDatabase(const Table *_productTable, const std::string
     }
 
     // Execute SQLITE command to search for record
-    Product product;
+    Product *product = new Product;
     std::string sqliteCmd = "SELECT * from " + _productTable->name + " where CODE='" + _productCode + "';";
     char *sqliteMsg;
-    xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd.c_str(), searchCallBack, (void*)&product, &sqliteMsg );
+    xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd.c_str(), searchCallBack, (void*)product, &sqliteMsg );
     if( sqliteErr != SQLITE_OK )
     {
         LOG_MSG( "[ERR:%d] %s:%d: %s\n",
@@ -303,13 +303,13 @@ Product* Product::searchInDatabase(const Table *_productTable, const std::string
         return nullptr;
     }
 
-    if( product.getCode() == "" )
+    if( product->getCode() == "" )
     {
         LOG_MSG( "[WAR] The searched entry does not exist in the given database\n" );
         return nullptr;
     }
 
-    return &product;
+    return product;
 }
 
 
@@ -332,8 +332,6 @@ xpError_t Product::insertToDatabase(const Table *_productTable)
         return xpErrorNotAllocated;
     }
 
-    std::cout << "===========> 1.1 " << m_vendorIDs.size() << std::endl;
-
     std::string vendorIdsStr ="";
     int id = 0;
     while( id < ((int)m_vendorIDs.size()-1))
@@ -346,22 +344,15 @@ xpError_t Product::insertToDatabase(const Table *_productTable)
         vendorIdsStr = vendorIdsStr + std::to_string(m_vendorIDs[m_vendorIDs.size()-1]);
     }
 
-    std::cout << "===========> 1.2  " << _productTable->name;
-
     char sqliteCmd[1000];
-    std::cout <<  FMT_PRODUCT_INSERT << std::endl;
     sprintf( sqliteCmd, FMT_PRODUCT_INSERT,
-             _productTable->name.c_str(), m_code.c_str(), m_name.c_str(), std::to_string( (double)m_category ), m_description.c_str(), std::to_string( (double)m_unit), m_unitPrice,
-             m_discountPrice, m_discountStartTime, m_discountEndTime, m_quantityInstock, m_quantitySold, vendorIdsStr.c_str() );
+             _productTable->name.c_str(), m_code.c_str(), m_name.c_str(), m_category, m_description.c_str(), m_unit, m_unitPrice,
+             m_discountPrice, (long)m_discountStartTime, (long)m_discountEndTime, m_quantityInstock, m_quantitySold, vendorIdsStr.c_str() );
+    LOG_MSG( "SQLITE CMD: %s\n", sqliteCmd );
 
-    std::cout << "===========> 1.3" << std::string( sqliteCmd ) << std::endl;
 
     char *sqliteMsg;
     xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );
-    std::cout << "===========> 1.4\n";
-
-//    free( sqliteCmd );
-    std::cout << "===========> 1.5\n";
     if( sqliteErr != SQLITE_OK )
     {
         LOG_MSG( "[ERR:%d] %s:%d: %s\n",
@@ -393,13 +384,12 @@ xpError_t Product::deleteFromDatabase(const Table *_productTable)
         return xpErrorNotAllocated;
     }
 
-    char *sqliteCmd;
+    char sqliteCmd[1000];
     sprintf( sqliteCmd, FMT_PRODUCT_DELETE,
-             _productTable->name, m_code.c_str() );
+             _productTable->name.c_str(), m_code.c_str() );
 
     char *sqliteMsg;
     xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );
-    free( sqliteCmd );
     if( sqliteErr != SQLITE_OK )
     {
         LOG_MSG( "[ERR:%d] %s:%d: %s\n",
@@ -431,13 +421,13 @@ xpError_t Product::updateBasicInfoInDB(const Table *_productTable)
         return xpErrorNotAllocated;
     }
 
-    char *sqliteCmd;
+    char sqliteCmd[1000];
     sprintf( sqliteCmd, FMT_PRODUCT_UPDATE_BASIC,
-             _productTable->name, m_name.c_str(), std::to_string((int)m_category), m_description.c_str(), std::to_string((int)m_unit), m_code.c_str()  );
+             _productTable->name.c_str(), m_name.c_str(), m_category, m_description.c_str(), m_unit, m_code.c_str()  );
+    std::cout << "Update basic info cmd: " << sqliteCmd << std::endl;
 
     char *sqliteMsg;
     xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );
-    free( sqliteCmd );
     if( sqliteErr != SQLITE_OK )
     {
         LOG_MSG( "[ERR:%d] %s:%d: %s\n",
@@ -470,13 +460,13 @@ xpError_t Product::updatePriceInDB(const Table *_productTable)
         return xpErrorNotAllocated;
     }
 
-    char *sqliteCmd;
+    char sqliteCmd[1000];
     sprintf( sqliteCmd, FMT_PRODUCT_UPDATE_PRICE,
-             _productTable->name, std::to_string(m_unitPrice), std::to_string(m_discountPrice), std::to_string(m_discountStartTime), std::to_string(m_discountEndTime), m_code.c_str()  );
+             _productTable->name.c_str(), m_unitPrice, m_discountPrice, m_discountStartTime, m_discountEndTime, m_code.c_str()  );
+    std::cout << "Update price info cmd: " << sqliteCmd << std::endl;
 
     char *sqliteMsg;
     xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );
-    free( sqliteCmd );
     if( sqliteErr != SQLITE_OK )
     {
         LOG_MSG( "[ERR:%d] %s:%d: %s\n",
@@ -508,13 +498,13 @@ xpError_t Product::updateQuantityInDB(const Table *_productTable)
         return xpErrorNotAllocated;
     }
 
-    char *sqliteCmd;
+    char sqliteCmd[1000];
     sprintf( sqliteCmd, FMT_PRODUCT_UPDATE_QUANTITY,
-             _productTable->name, std::to_string(m_quantityInstock), std::to_string(m_quantitySold), m_code.c_str()  );
+             _productTable->name.c_str(), m_quantityInstock, m_quantitySold, m_code.c_str()  );
+    std::cout << "Update quantity info cmd: " << sqliteCmd << std::endl;
 
     char *sqliteMsg;
     xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );
-    free( sqliteCmd );
     if( sqliteErr != SQLITE_OK )
     {
         LOG_MSG( "[ERR:%d] %s:%d: %s\n",
@@ -547,7 +537,7 @@ xpError_t Product::updateVendorsInDB(const Table *_productTable)
     }
 
     std::string vendorIdsStr ="";
-    for(int id = 0; id < m_vendorIDs.size()-1; id++ )
+    for(int id = 0; id < (int)m_vendorIDs.size()-1; id++ )
     {
         vendorIdsStr = vendorIdsStr + std::to_string(m_vendorIDs[id]) + ",";
     }
@@ -556,13 +546,13 @@ xpError_t Product::updateVendorsInDB(const Table *_productTable)
         vendorIdsStr = vendorIdsStr + std::to_string(m_vendorIDs[m_vendorIDs.size()-1]);
     }
 
-    char *sqliteCmd;
+    char sqliteCmd[1000];
     sprintf( sqliteCmd, FMT_PRODUCT_UPDATE_VENDORS,
-             _productTable->name, vendorIdsStr.c_str(), m_code.c_str()  );
+             _productTable->name.c_str(), vendorIdsStr.c_str(), m_code.c_str()  );
+    std::cout << "Update vendor info cmd: " << sqliteCmd << std::endl;
 
     char *sqliteMsg;
-    xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );
-    free( sqliteCmd );
+    xpError_t sqliteErr = sqlite3_exec( _productTable->db, sqliteCmd, nullptr, nullptr, &sqliteMsg );    
     if( sqliteErr != SQLITE_OK )
     {
         LOG_MSG( "[ERR:%d] %s:%d: %s\n",

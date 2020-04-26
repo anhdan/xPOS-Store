@@ -97,7 +97,7 @@ public:
     xpError_t updateVendorsInDB( const Table* _productTable );
 
 private:
-    static xpError_t searchCallBack( void* data, int fieldsNum, char** fieldName, char **fieldVal );
+    static xpError_t searchCallBack( void* data, int fieldsNum, char **fieldVal, char** fieldName );
 
 private:
     std::string m_code;                 /**< Barcode/2D code string of the product */
