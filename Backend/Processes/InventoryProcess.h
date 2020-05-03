@@ -59,7 +59,6 @@ public:
 signals:
     void sigSearchCompleted();
     void sigUpdateCompleted();
-
     void codeChanged();
     void nameChanged();
     void categoryChanged();

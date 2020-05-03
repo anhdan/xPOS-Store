@@ -348,7 +348,6 @@ xpError_t Product::insertToDatabase(const Table *_productTable)
     sprintf( sqliteCmd, FMT_PRODUCT_INSERT,
              _productTable->name.c_str(), m_code.c_str(), m_name.c_str(), m_category, m_description.c_str(), m_unit, m_unitPrice,
              m_discountPrice, (long)m_discountStartTime, (long)m_discountEndTime, m_quantityInstock, m_quantitySold, vendorIdsStr.c_str() );
-    LOG_MSG( "SQLITE CMD: %s\n", sqliteCmd );
 
 
     char *sqliteMsg;
@@ -360,7 +359,6 @@ xpError_t Product::insertToDatabase(const Table *_productTable)
         sqlite3_free( sqliteMsg );
         return xpErrorProcessFailure;
     }
-    std::cout << "===========> 1.6\n";
 
     return xpSuccess;
 }

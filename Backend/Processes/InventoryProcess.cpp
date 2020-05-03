@@ -276,15 +276,10 @@ int InventoryProcess::invokUpdate()
     if( m_found )
     {
         // Update info
-        std::cout << "===========> 1\n";
         err |= m_currProduct.updateBasicInfoInDB( table );
-        std::cout << "===========> 2\n";
         err |= m_currProduct.updatePriceInDB( table );
-        std::cout << "===========> 3\n";
         err |= m_currProduct.updateQuantityInDB( table );
-        std::cout << "===========> 4\n";
         err |= m_currProduct.updateVendorsInDB( table );
-        std::cout << "===========> 5\n";
     }
     else
     {

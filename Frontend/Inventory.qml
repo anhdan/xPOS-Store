@@ -5,6 +5,7 @@ import QtQuick.Controls 2.2
 //===== Import backend Qobject-inherited class to interface
 //
 import xpos.store.inventory 1.0
+import "."
 
 Rectangle {
     id: root
@@ -19,8 +20,7 @@ Rectangle {
         id: inventory
         onSigSearchCompleted:
         {
-            console.log( "=============> I'm here" );
-            txtProdName.text = code
+            txtProdName.text = name
             txtDesc.text = description
             txtUnitPrice.text = Number(unitPrice).toFixed(2)
             cbxUnitName.currentIndex = unitName
@@ -29,6 +29,26 @@ Rectangle {
             lblStartDate.text = discountStart
             lblEndDate.text = discountEnd
             lblQuantityInStock.text = quantityInstock
+
+            // Display pop-up if the product is not found in database
+            if( name == "" )
+            {
+                var compo = Qt.createComponent( "qrc:/Frontend/ErrorDialog.qml" );
+                var diaErrFrom = compo.createObject(parent, {
+//                                                        "x": 100,
+//                                                        "y": 100,
+                                                        "anchors.horizontalCenter": parent.horizontalCenter,
+                                                        "anchors.horizontalCenterOffset": 0,
+                                                        "anchors.verticalCenter": parent.verticalCenter,
+                                                        "anchors.verticalCenterOffset": 0,
+                                                        "z": 20
+                                                    });
+                diaErrFrom.showMsg( "Product is not found in database" );
+                diaErrFrom.sigOKClicked.connect(function (code){
+                    diaErrFrom.destroy();
+                    compo.destroy();
+                })
+            }
         }
     }
 
@@ -215,7 +235,29 @@ Rectangle {
                 inventory.unitName = cbxUnitName.currentIndex
                 inventory.category = cbxCategory.currentIndex
                 inventory.unitPrice = Number(txtUnitPrice.text)
-                inventory.invokUpdate()
+                var ret = inventory.invokUpdate()
+                var compo = Qt.createComponent( "qrc:/Frontend/ErrorDialog.qml" );
+                var diaErrFrom = compo.createObject(root, {
+//                                                        "x": 100,
+//                                                        "y": 100,
+                                                        "anchors.horizontalCenter": root.horizontalCenter,
+                                                        "anchors.horizontalCenterOffset": 0,
+                                                        "anchors.verticalCenter": root.verticalCenter,
+                                                        "anchors.verticalCenterOffset": 0,
+                                                        "z": 20
+                                                    });
+                if( ret === 0 )
+                {
+                    diaErrFrom.showMsg( "Update Product Complete" );
+                }
+                else
+                {
+                    diaErrFrom.showMsg( "Update product failed" );
+                }
+                diaErrFrom.sigOKClicked.connect(function (code){
+                    diaErrFrom.destroy();
+                    compo.destroy();
+                })
             }
         }
     }
