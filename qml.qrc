@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>Frontend/Inventory.qml</file>
         <file>Frontend/ErrorDialog.qml</file>
+        <file>Frontend/Signin.qml</file>
     </qresource>
 </RCC>
