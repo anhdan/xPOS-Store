@@ -22,7 +22,9 @@ SOURCES += \
     Backend/Containers/Point.cpp \
     Backend/Containers/Database.cpp \
     Backend/3rd/tinyxml2.cpp \
-    Backend/Processes/InventoryProcess.cpp
+    Backend/Processes/InventoryProcess.cpp \
+    Backend/Processes/WorkShitProcess.cpp \
+    Backend/Containers/Staff.cpp
 
 RESOURCES += qml.qrc
 
@@ -50,7 +52,8 @@ HEADERS += \
     Backend/Containers/Database.h \
     Backend/3rd/tinyxml2.h \
     Backend/Configs/sqlitecmdFormat.h \
-    Backend/Processes/InventoryProcess.h
+    Backend/Processes/InventoryProcess.h \
+    Backend/Processes/WorkShiftProcess.h
 
 
 #======== SQLite Database Lib

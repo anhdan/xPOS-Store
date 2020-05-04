@@ -5,19 +5,23 @@ Rectangle {
     id: formSignin
     width: 1280
     height: 720
-    color: blueMed
+    color: grayNeutral
     border.color: "#00000000"
 
     property string greenInvoice: "#7abd6f"
     property string blueDark: "#003c8f"
-    property string blueMed: "#1565c0"
+    property string blueNeutral: "#1565c0"
     property string blueLight: "#5e92f3"
+
+    property string grayDark: "#aeaeae"
+    property string grayNeutral: "#e0e0e0"
+    property string grayLight: "#ffffff"
 
     Label {
         id: titXpos
         width: 193
         height: 56
-        color: "#ffffff"
+        color: blueNeutral
         text: qsTr("xPOS")
         anchors.top: parent.top
         anchors.topMargin: 133
@@ -73,7 +77,7 @@ Rectangle {
         y: 143
         width: 673
         height: 113
-        color: "#ffffff"
+        color: blueNeutral
         text: qsTr("Quản lý bán hàng thật dễ dàng và thuận tiện ")
         wrapMode: Text.WordWrap
         textFormat: Text.AutoText
@@ -84,7 +88,6 @@ Rectangle {
         id: btnLogin
         width: 140
         height: 55
-//        text: qsTr("Đăng nhập")
         Text {
             text: qsTr("Đăng nhập")
             color: "#ffffff"

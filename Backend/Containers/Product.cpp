@@ -306,7 +306,7 @@ Product* Product::searchInDatabase(const Table *_productTable, const std::string
     if( product->getCode() == "" )
     {
         LOG_MSG( "[WAR] The searched entry does not exist in the given database\n" );
-        return nullptr;
+        delete product;
     }
 
     return product;

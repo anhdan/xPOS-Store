@@ -197,13 +197,23 @@
 
         <TABLE>
                 <NAME>STAFF</NAME>
+
                 <FIELD>
-                        <NAME>ID</NAME>
+                        <NAME>LOGIN_NAME</NAME>
                         <TYPE>TEXT</TYPE>
-                        <PRIMARYKEY>YES</PRIMARYKEY>
+                        <PRIMARYKEY>NO</PRIMARYKEY>
                         <NOTNULL>YES</NOTNULL>
                         <AUTOINCREMENT>NO</AUTOINCREMENT>
                         <UNIQUE>YES</UNIQUE>
+                </FIELD>
+
+                <FIELD>
+                        <NAME>PASSWORD</NAME>
+                        <TYPE>TEXT</TYPE>
+                        <PRIMARYKEY>NO</PRIMARYKEY>
+                        <NOTNULL>YES</NOTNULL>
+                        <AUTOINCREMENT>NO</AUTOINCREMENT>
+                        <UNIQUE>NO</UNIQUE>
                 </FIELD>
 
                 <FIELD>
@@ -258,25 +268,7 @@
                         <NOTNULL>YES</NOTNULL>
                         <AUTOINCREMENT>NO</AUTOINCREMENT>
                         <UNIQUE>NO</UNIQUE>
-                </FIELD>
-
-                <FIELD>
-                        <NAME>LOGIN_NAME</NAME>
-                        <TYPE>TEXT</TYPE>
-                        <PRIMARYKEY>NO</PRIMARYKEY>
-                        <NOTNULL>YES</NOTNULL>
-                        <AUTOINCREMENT>NO</AUTOINCREMENT>
-                        <UNIQUE>YES</UNIQUE>
-                </FIELD>
-
-                <FIELD>
-                        <NAME>PASSWORD</NAME>
-                        <TYPE>TEXT</TYPE>
-                        <PRIMARYKEY>NO</PRIMARYKEY>
-                        <NOTNULL>YES</NOTNULL>
-                        <AUTOINCREMENT>NO</AUTOINCREMENT>
-                        <UNIQUE>NO</UNIQUE>
-                </FIELD>
+                </FIELD>                
         </TABLE>
 
         <TABLE>

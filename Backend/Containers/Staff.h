@@ -3,6 +3,8 @@
 
 #include "xPos.h"
 #include "Person.h"
+#include "Database.h"
+#include "Backend/Configs/sqlitecmdFormat.h"
 
 namespace xpos_store
 {
@@ -41,6 +43,15 @@ public:
 
     inline void setLoginPwd( const std::string _loginPwd ) { m_loginPwd = _loginPwd; }
     inline std::string getLoginPwd( ) { return m_loginPwd; }
+
+    //
+    //===== Database interface
+    //
+    static Staff* authenticate( const Table* _staffTable, const std::string &_staffName, const std::string &_staffPwd );
+    xpError_t insertNewStaff( const Table* _staffTable, const Staff* _newStaff );
+
+private:
+    static xpError_t searchCallBack( void* data, int fieldsNum, char **fieldVal, char** fieldName );
 
 private:
     Privilege m_privilege;
