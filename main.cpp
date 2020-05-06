@@ -4,6 +4,7 @@
 #include "xPos.h"
 #include "Backend/Containers/Database.h"
 #include "Backend/Processes/InventoryProcess.h"
+#include "Backend/Processes/WorkShiftProcess.h"
 
 
 xpos_store::Database *glbProductDB = nullptr;
@@ -22,7 +23,7 @@ int main(int argc, char *argv[])
     //===== Register a QObject-inherited C++ class to the interface
     //
     qmlRegisterType<InventoryProcess>( "xpos.store.inventory", 1, 0, "InventoryProcess" );
-
+    qmlRegisterType<WorkShiftProcess>( "xpos.store.workshift", 1, 0, "WorkShiftProcess" );
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
@@ -32,7 +33,6 @@ int main(int argc, char *argv[])
     glbProductDB = xpos_store::Database::connect( "200423_product.db" );
     if( (glbProductDB && glbProductDB->getTableByName( "PRODUCT" )->db == nullptr) || (glbProductDB == nullptr) )
     {
-        std::cout << "===========> I'm here\n";
         glbProductDB = xpos_store::Database::createByTemplate( "200423_product.db", "../Backend/Configs/store_data.xml" );
     }
 

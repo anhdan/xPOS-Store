@@ -201,7 +201,7 @@
                 <FIELD>
                         <NAME>LOGIN_NAME</NAME>
                         <TYPE>TEXT</TYPE>
-                        <PRIMARYKEY>NO</PRIMARYKEY>
+                        <PRIMARYKEY>YES</PRIMARYKEY>
                         <NOTNULL>YES</NOTNULL>
                         <AUTOINCREMENT>NO</AUTOINCREMENT>
                         <UNIQUE>YES</UNIQUE>

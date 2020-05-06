@@ -15,6 +15,12 @@ Rectangle {
     border.color: "#00000000"
     property alias lbProdName2: lbProdName2
 
+    signal sigEnableInterface()
+    function enabelInteface()
+    {
+        root.sigEnableInterface()
+    }
+
     InventoryProcess
     {
         id: inventory

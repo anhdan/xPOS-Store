@@ -23,8 +23,8 @@ SOURCES += \
     Backend/Containers/Database.cpp \
     Backend/3rd/tinyxml2.cpp \
     Backend/Processes/InventoryProcess.cpp \
-    Backend/Processes/WorkShitProcess.cpp \
-    Backend/Containers/Staff.cpp
+    Backend/Containers/Staff.cpp \
+    Backend/Processes/WorkShiftProcess.cpp
 
 RESOURCES += qml.qrc
 

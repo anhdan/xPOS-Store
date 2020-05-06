@@ -11,14 +11,6 @@ namespace xpos_store
 
 class Staff : public Person
 {
-protected:
-    void setDefault()
-    {
-        m_privilege = Privilege::GUEST;
-        m_loginName = "";
-        m_loginPwd  = "";
-    }
-
 public:
     Staff()
     {
@@ -43,6 +35,15 @@ public:
 
     inline void setLoginPwd( const std::string _loginPwd ) { m_loginPwd = _loginPwd; }
     inline std::string getLoginPwd( ) { return m_loginPwd; }
+
+    void setDefault()
+    {
+        m_privilege = Privilege::GUEST;
+        m_loginName = "";
+        m_loginPwd  = "";
+    }
+    void printInfo();
+    void copyTo( Staff &_staff );
 
     //
     //===== Database interface

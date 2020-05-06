@@ -241,8 +241,6 @@ int InventoryProcess::invokSearch(QString _code)
         prod->copyTo( m_currProduct );
         delete prod;
     }
-
-    LOG_MSG( "In Search\n" );
     m_currProduct.printInfo();
 
     glbProductDB->close();

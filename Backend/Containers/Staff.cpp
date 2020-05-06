@@ -3,6 +3,40 @@
 namespace xpos_store
 {
 
+
+void Staff::printInfo()
+{
+    LOG_MSG( "\n---------Staff---------\n" );
+    LOG_MSG( ". ID:             %d\n", m_id );
+    LOG_MSG( ". NAME:           %s\n", m_name.c_str() );
+    LOG_MSG( ". PHONE:          %s\n", m_phoneNumber.c_str() );
+    LOG_MSG( ". EMAIL:          %s\n", m_email.c_str() );
+    LOG_MSG( ". GENDER:         %d\n", (int)m_gender );
+    LOG_MSG( ". BIRTH YEAR:     %d\n", m_birthYear );
+    LOG_MSG( ". PRIVILEGE:      %d\n", (int)m_privilege );
+    LOG_MSG( ". LOGIN NAME:     %s\n", m_loginName.c_str() );
+    LOG_MSG( ". LOGIN PWD:      %s\n", m_loginPwd.c_str() );
+    LOG_MSG( "-------------------------\n" );
+}
+
+
+/**
+ * @brief Staff::copyTo
+ * @param _staff
+ */
+void Staff::copyTo(Staff &_staff)
+{
+    _staff.m_id = m_id;
+    _staff.m_name = m_name;
+    _staff.m_phoneNumber = m_phoneNumber;
+    _staff.m_email = m_email;
+    _staff.m_birthYear = m_birthYear;
+    _staff.m_gender = m_gender;
+    _staff.m_loginName = m_loginName;
+    _staff.m_loginPwd = m_loginPwd;
+    _staff.m_privilege = m_privilege;
+}
+
 /**
  * @brief Staff::authenticate
  */
@@ -27,6 +61,8 @@ Staff* Staff::authenticate(const Table *_staffTable, const std::string &_staffNa
         sqlite3_free( sqliteMsg );
         return nullptr;
     }
+
+    staff->printInfo();
 
     if( staff->getLoginName() == "" || (staff->getLoginPwd() != _staffPwd) )
     {

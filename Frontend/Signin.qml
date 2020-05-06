@@ -1,12 +1,16 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.2
 
+import xpos.store.workshift 1.0
+
 Rectangle {
-    id: formSignin
+    id: root
     width: 1280
     height: 720
     color: grayNeutral
     border.color: "#00000000"
+
+    signal sigAuthenticated()
 
     property string greenInvoice: "#7abd6f"
     property string blueDark: "#003c8f"
@@ -16,6 +20,11 @@ Rectangle {
     property string grayDark: "#aeaeae"
     property string grayNeutral: "#e0e0e0"
     property string grayLight: "#ffffff"
+
+    WorkShiftProcess
+    {
+        id: workshift
+    }
 
     Label {
         id: titXpos
@@ -104,6 +113,16 @@ Rectangle {
         background: Rectangle {
             radius: 9
             color: blueLight
+        }
+
+        onClicked:
+        {
+            var ret = workshift.invokLogin( txtUserName.text, txtUserPwd.text );
+            if( ret === 0 )
+            {
+                console.log( "Login successfully" );
+                root.sigAuthenticated();
+            }
         }
     }
 

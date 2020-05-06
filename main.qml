@@ -8,11 +8,31 @@ Window {
     visible: true
     width: 1280
     height: 720
-    title: qsTr("Hello World")
+    title: qsTr("Hello World")        
 
     Inventory {
+        id: inventoryForm
         anchors.fill: parent
+        visible: false
+        onSigEnableInterface:
+        {
+            setVisible( true )
+        }
     }
+
+
+    Signin
+    {
+        id: signInForm
+        anchors.fill: parent
+        visible: true
+        onSigAuthenticated:
+        {
+            setVisible( false )
+            inventoryForm.enabelInteface()
+        }
+    }
+
 
     InputPanel {
         id: inputPanel

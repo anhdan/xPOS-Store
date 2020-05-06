@@ -56,7 +56,7 @@ public:
     inline int getBirthYear() { return m_birthYear; }
 
 
-private:
+protected:
     uint64_t m_id;
     std::string m_name;
     std::string m_phoneNumber;

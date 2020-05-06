@@ -24,7 +24,7 @@ signals:
 
 private:
     xpos_store::Staff m_currStaff;
-
+    bool m_loggedIn = false;
 };
 
 #endif // WorkShiftProcess_H
