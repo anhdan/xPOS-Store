@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     //===== Register a QObject-inherited C++ class to the interface
     //
     qmlRegisterType<InventoryProcess>( "xpos.store.inventory", 1, 0, "InventoryProcess" );
-    qmlRegisterType<WorkShiftProcess>( "xpos.store.workshift", 1, 0, "WorkShiftProcess" );
+    qmlRegisterType<WorkShiftProcess>( "xpos.store.workshift", 1, 0, "WorkShiftProcess" );    
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));

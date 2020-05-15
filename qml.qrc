@@ -4,5 +4,6 @@
         <file>Frontend/Inventory.qml</file>
         <file>Frontend/ErrorDialog.qml</file>
         <file>Frontend/Signin.qml</file>
+        <file>Frontend/Invoice.qml</file>
     </qresource>
 </RCC>
