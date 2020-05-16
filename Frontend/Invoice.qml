@@ -12,13 +12,14 @@ Rectangle {
     id: root
     width:  1280
     height: 720
-    color: "#3f444d"
+    color: "#BDBDBD"
     border.width: 0
 
     property string veryGreen: "#00d315"
     property string mileGray: "#c9c9c9"
-    property string numKeyColor: "#c9c9c9"
+    property string numKeyColor: "#607d8b"
     property string borderColor: "white"
+    property int keySize: 95
 
     signal sigEnableInterface()
     function enabelInteface()
@@ -51,6 +52,14 @@ Rectangle {
                 border.width: 0.5
                 implicitWidth: Math.max(text.width + 4, 200)
                 implicitHeight: 60
+                Rectangle {
+                    width: parent.width
+                    height: 5
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    color: styleData.selected ? "#ff9800" : "#00000000"
+                }
+
                 Text {
                     id: text
                     anchors.centerIn: parent
@@ -253,6 +262,7 @@ Rectangle {
         id: pnInvoiceButtons
         width: 120
         anchors.top: pnPriceScreen.bottom
+        anchors.topMargin: 5
         anchors.left: pnPriceScreen.left
         anchors.bottom: parent.bottom
 
@@ -355,6 +365,252 @@ Rectangle {
                         font.pixelSize: 22
                         color: "white"
                         horizontalAlignment: Text.AlignHCenter
+                    }
+                }
+            }
+        }
+    }
+
+
+    //
+    //===== Keyboard
+    //
+    Item {
+        id: pnKeyboard
+        anchors.right: parent.right
+        anchors.rightMargin: 35
+        anchors.top: pnPriceScreen.bottom
+        anchors.topMargin: 5
+        width: 320
+        height: 420
+
+        Column {
+            spacing: 5
+            Row {
+                spacing: 15
+                Button {
+                    id: btnOne
+                    width: keySize
+                    height: keySize
+                    Rectangle {
+                        anchors.fill: parent
+                        color: numKeyColor
+                        radius: 5
+                        Text {
+                            text: qsTr("1")
+                            anchors.centerIn: parent
+                            color: "black"
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: 42
+                        }
+                    }
+                }
+
+                Button {
+                    id: btnTwo
+                    width: keySize
+                    height: keySize
+                    Rectangle {
+                        anchors.fill: parent
+                        color: numKeyColor
+                        radius: 5
+                        Text {
+                            text: qsTr("2")
+                            anchors.centerIn: parent
+                            color: "black"
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: 42
+                        }
+                    }
+                }
+
+                Button {
+                    id: btnThree
+                    width: keySize
+                    height: keySize
+                    Rectangle {
+                        anchors.fill: parent
+                        color: numKeyColor
+                        radius: 5
+                        Text {
+                            text: qsTr("3")
+                            anchors.centerIn: parent
+                            color: "black"
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: 42
+                        }
+                    }
+                }
+            }
+
+
+            Row {
+                spacing: 15
+                Button {
+                    id: btnFour
+                    width: keySize
+                    height: keySize
+                    Rectangle {
+                        anchors.fill: parent
+                        color: numKeyColor
+                        radius: 5
+                        Text {
+                            text: qsTr("4")
+                            anchors.centerIn: parent
+                            color: "black"
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: 42
+                        }
+                    }
+                }
+
+                Button {
+                    id: btnFive
+                    width: keySize
+                    height: keySize
+                    Rectangle {
+                        anchors.fill: parent
+                        color: numKeyColor
+                        radius: 5
+                        Text {
+                            text: qsTr("5")
+                            anchors.centerIn: parent
+                            color: "black"
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: 42
+                        }
+                    }
+                }
+
+                Button {
+                    id: btnSix
+                    width: keySize
+                    height: keySize
+                    Rectangle {
+                        anchors.fill: parent
+                        color: numKeyColor
+                        radius: 5
+                        Text {
+                            text: qsTr("6")
+                            anchors.centerIn: parent
+                            color: "black"
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: 42
+                        }
+                    }
+                }
+            }
+
+            Row {
+                spacing: 15
+                Button {
+                    id: btnSeven
+                    width: keySize
+                    height: keySize
+                    Rectangle {
+                        anchors.fill: parent
+                        color: numKeyColor
+                        radius: 5
+                        Text {
+                            text: qsTr("7")
+                            anchors.centerIn: parent
+                            color: "black"
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: 42
+                        }
+                    }
+                }
+
+                Button {
+                    id: btnEight
+                    width: keySize
+                    height: keySize
+                    Rectangle {
+                        anchors.fill: parent
+                        color: numKeyColor
+                        radius: 5
+                        Text {
+                            text: qsTr("8")
+                            anchors.centerIn: parent
+                            color: "black"
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: 42
+                        }
+                    }
+                }
+
+                Button {
+                    id: btnNine
+                    width: keySize
+                    height: keySize
+                    Rectangle {
+                        anchors.fill: parent
+                        color: numKeyColor
+                        radius: 5
+                        Text {
+                            text: qsTr("9")
+                            anchors.centerIn: parent
+                            color: "black"
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: 42
+                        }
+                    }
+                }
+            }
+
+            Row {
+                spacing: 15
+                Button {
+                    id: btnClear
+                    width: keySize
+                    height: keySize
+                    Rectangle {
+                        anchors.fill: parent
+                        color: numKeyColor
+                        radius: 5
+                        Text {
+                            text: qsTr("C")
+                            anchors.centerIn: parent
+                            color: "black"
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: 42
+                        }
+                    }
+                }
+
+                Button {
+                    id: btnZero
+                    width: keySize
+                    height: keySize
+                    Rectangle {
+                        anchors.fill: parent
+                        color: numKeyColor
+                        radius: 5
+                        Text {
+                            text: qsTr("0")
+                            anchors.centerIn: parent
+                            color: "black"
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: 42
+                        }
+                    }
+                }
+
+                Button {
+                    id: btnEnter
+                    width: keySize
+                    height: keySize
+                    Rectangle {
+                        anchors.fill: parent
+                        color: numKeyColor
+                        radius: 5
+                        Text {
+                            text: qsTr("Nhập")
+                            anchors.centerIn: parent
+                            color: "black"
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: 30
+                        }
                     }
                 }
             }
