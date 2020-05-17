@@ -52,6 +52,7 @@ Rectangle {
                 border.width: 0.5
                 implicitWidth: Math.max(text.width + 4, 200)
                 implicitHeight: 60
+
                 Rectangle {
                     width: parent.width
                     height: 5
@@ -150,7 +151,6 @@ Rectangle {
                             }
                         }
                     }
-
                 }
             }
         }
