@@ -70,88 +70,9 @@ Rectangle {
                 }
             }
 
-            frame: Rectangle {
-                id: tabRoot
+            frame: ItemsListView {
+                id: itemListView
                 anchors.fill: parent
-                color: "#00000000"
-                Rectangle {
-                    id: pnTitleBar
-                    width: 760
-                    height: 40
-                    anchors.left: parent.left
-                    anchors.leftMargin: 0
-                    anchors.top: parent.top
-                    anchors.topMargin: 0
-                    color: mileGray
-
-                    Row {
-                        spacing: 0
-                        anchors.fill: parent
-                        Rectangle {
-                            width: 45
-                            height: 40
-                            color: "#00000000"
-                            border.color: borderColor
-                            border.width: 0.5
-                            Text {
-                                text: qsTr("#")
-                                font.pixelSize: 22
-                                color: "#000000"
-                                horizontalAlignment: Text.AlignHCenter
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        Rectangle {
-                            width: 460
-                            height: 40
-                            color: "#00000000"
-                            border.color: borderColor
-                            border.width: 0.5
-                            Text {
-                                text: qsTr("Thông tin sản phẩm")
-                                font.pixelSize: 22
-                                color: "#000000"
-                                horizontalAlignment: Text.AlignHCenter
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        Rectangle {
-                            width: 105
-                            height: 40
-                            color: "#00000000"
-                            border.color: borderColor
-                            border.width: 0.5
-                            Text {
-                                text: qsTr("Số lượng")
-                                font.pixelSize: 22
-                                color: "#000000"
-                                horizontalAlignment: Text.AlignHCenter
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        Rectangle {
-                            width: 150
-                            height: 40
-                            color: "#00000000"
-                            border.color: borderColor
-                            border.width: 1
-                            Text {
-                                text: qsTr("Thành tiền")
-                                font.pixelSize: 22
-                                color: "#000000"
-                                horizontalAlignment: Text.AlignHCenter
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-                    }
-                }
             }
         }
 
