@@ -27,6 +27,7 @@ Rectangle {
         root.sigEnableInterface()
     }
 
+    //=============== ITEM LIST TAB VIEW ====================
     TabView {
         id: invoiceFrame
         width: 760
@@ -37,11 +38,13 @@ Rectangle {
         Tab {
             id: tab1
             title: "Hóa Đơn 1"
+            source: "ItemsListView.qml"
         }
 
         Tab {
             id: tab2
             title: "Hóa Đơn 2"
+            source: "ItemsListView.qml"
         }
 
         style: TabViewStyle {
@@ -69,13 +72,7 @@ Rectangle {
                     font.pixelSize: 22
                 }
             }
-
-            frame: ItemsListView {
-                id: itemListView
-                anchors.fill: parent
-            }
         }
-
     }
 
 
@@ -207,6 +204,13 @@ Rectangle {
                         color: "white"
                         horizontalAlignment: Text.AlignHCenter
                     }
+                }
+
+                onClicked: {
+                    var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
+                    var item = {'_itemInfo': "test 3", '_itemNum': 5, '_itemPrice': "50000"}
+                    console.log( item )
+                    tab.item.addItem( item )
                 }
             }
 

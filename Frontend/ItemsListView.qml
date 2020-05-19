@@ -16,29 +16,32 @@ ListView {
     model: itemModel
     clip: true
     cacheBuffer: 50
+    anchors.fill: parent
 
-    ListModel {
-        id: itemModel
+    //====================== Signals ============================
+    signal itemAdded()
 
-        ListElement {
-            _itemCount: 1
-            _itemInfo: "test"
-            _itemNum: 10
-            _itemPrice: "1000000.00"
-        }
-
-        ListElement {
-            _itemCount: 2
-            _itemInfo: "test2"
-            _itemNum: 10
-            _itemPrice: "1000000.00"
-        }
+    //====================== Functions ==========================
+    function addItem( item )
+    {
+        var itemFull =  item
+        itemFull["_itemCount"] = itemModel.count + 1
+        itemModel.append( item )
+        root.currentIndex++
     }
 
+    //====================== List model =========================
+    ListModel {
+        id: itemModel
+    }
+
+    //==================== Listview Delegate ====================
     delegate: Rectangle {
+        id: itemDelegate
         width: parent.width
         height: 70
         border.color: mileGray
+        color: "white"
         border.width: 1
         Row {
             anchors.fill: parent
@@ -53,11 +56,6 @@ ListView {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 color: "black"
-
-                background: Rectangle {
-                    anchors.fill: parent
-                    color: "white"
-                }
             }
 
             Label {
@@ -71,9 +69,9 @@ ListView {
                 verticalAlignment: Text.AlignVCenter
                 color: "black"
 
-                background: Rectangle {
+                MouseArea {
                     anchors.fill: parent
-                    color: "white"
+                    onClicked: root.currentIndex = index
                 }
             }
 
@@ -87,11 +85,6 @@ ListView {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 color: "black"
-
-                background: Rectangle {
-                    anchors.fill: parent
-                    color: "white"
-                }
             }
 
             Label {
@@ -104,29 +97,16 @@ ListView {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 color: "black"
-
-                background: Rectangle {
-                    anchors.fill: parent
-                    color: "white"
-                }
             }
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: root.currentIndex = index
-        }
+        }        
     }
 
 
+    //================= Listview Header ========================
     header: Rectangle {
         id: pnTitleBar
         width: parent.width
         height: 40
-        anchors.left: parent.left
-        anchors.leftMargin: 0
-        anchors.top: parent.top
-        anchors.topMargin: 0
         color: mileGray
 
         Row {
@@ -200,22 +180,21 @@ ListView {
     headerPositioning: ListView.OverlayHeader
 
 
+    //================== List item highlight animation ==========
     Component {
-        id: highlight
+        id: highlightBar
         Rectangle {
-            width: 760; height: 70
-            color: "lightsteelblue"
-            y: root.currentItem.y
-            Behavior on y {
-                SpringAnimation {
-                    spring: 3
-                    damping: 0.2
-                }
-            }
+            width: 760
+            height: 70
+            anchors.left: root.left
+            color: "#FFFF88"
+            opacity: 0.5
+            y: root.currentItem.y;
+            z: root.currentItem.z + 1;
+//            Behavior on y { SpringAnimation { spring: 2; damping: 0.1 } }
         }
     }
 
-    highlight: highlight
+    highlight: highlightBar
     highlightFollowsCurrentItem: false
-    focus: true
 }
