@@ -76,9 +76,7 @@ Rectangle {
     }
 
 
-    //
-    //===== Price Screen
-    //
+    //=================== PRICE SCREEN =======================
     Rectangle {
         id: pnPriceScreen
         x: 760
@@ -173,9 +171,7 @@ Rectangle {
     }
 
 
-    //
-    //===== Invoice Edit Buttons Panel
-    //
+    //=============== Invoice Edit Buttons Panel =============
     Item {
         id: pnInvoiceButtons
         width: 120
@@ -209,7 +205,6 @@ Rectangle {
                 onClicked: {
                     var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
                     var item = {'_itemInfo': "test 3", '_itemNum': 5, '_itemPrice': "50000"}
-                    console.log( item )
                     tab.item.addItem( item )
                 }
             }
@@ -231,6 +226,14 @@ Rectangle {
                         color: "white"
                         horizontalAlignment: Text.AlignHCenter
                     }
+                }
+
+                onClicked: {
+                    var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
+                    var currItem = tab.item.currentItem
+//                    var quant = currItem["_itemNum"] + 1
+//                    console.log( "quant = " + quant )
+                    tab.item.updateCurrItemQuantity( 0 )
                 }
             }
 

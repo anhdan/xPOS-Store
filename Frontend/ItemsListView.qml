@@ -10,6 +10,8 @@ ListView {
     property string mileGray: "#c9c9c9"
     property string numKeyColor: "#607d8b"
     property string borderColor: "white"
+    property string itemNormalColor: "white"
+    property string itemHighlightColor: "#2196f3"
     property int keySize: 95
 
     id: root
@@ -20,6 +22,8 @@ ListView {
 
     //====================== Signals ============================
     signal itemAdded()
+    signal currItemQuantityUpdated()
+
 
     //====================== Functions ==========================
     function addItem( item )
@@ -27,7 +31,30 @@ ListView {
         var itemFull =  item
         itemFull["_itemCount"] = itemModel.count + 1
         itemModel.append( item )
+        changeHighLight( root.currentIndex + 1 )
         root.currentIndex++
+        itemAdded()
+    }
+
+    function updateCurrItemQuantity( newQuant )
+    {
+        var currItem = itemModel.get( root.currentIndex )
+        console.log( currItem["_itemNum"] )
+        currItem["_itemNum"] = newQuant
+        currItemQuantityUpdated()
+    }
+
+    function changeHighLight( newIndex )
+    {
+        var currItem
+        if( root.currentIndex !== -1)
+        {
+            currItem = root.currentItem
+            currItem.color = itemNormalColor
+        }
+        root.currentIndex = newIndex
+        currItem = root.currentItem
+        currItem.color = itemHighlightColor
     }
 
     //====================== List model =========================
@@ -44,6 +71,7 @@ ListView {
         color: "white"
         border.width: 1
         Row {
+            id: itemRow
             anchors.fill: parent
             spacing: 0
             Label {
@@ -70,8 +98,15 @@ ListView {
                 color: "black"
 
                 MouseArea {
+                    id: itemMouse
                     anchors.fill: parent
-                    onClicked: root.currentIndex = index
+                    onClicked: {
+                        var currItem = root.currentItem
+                        currItem.color = "white"
+                        root.currentIndex = index
+                        currItem = root.currentItem
+                        currItem.color = "#c9c9c9"
+                    }
                 }
             }
 
@@ -85,6 +120,12 @@ ListView {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 color: "black"
+
+                background: Rectangle {
+                    anchors.fill: parent
+                    border.width: 0
+                    opacity: 0
+                }
             }
 
             Label {
@@ -98,7 +139,7 @@ ListView {
                 verticalAlignment: Text.AlignVCenter
                 color: "black"
             }
-        }        
+        }
     }
 
 
@@ -186,7 +227,6 @@ ListView {
         Rectangle {
             width: 760
             height: 70
-            anchors.left: root.left
             color: "#FFFF88"
             opacity: 0.5
             y: root.currentItem.y;
@@ -195,6 +235,6 @@ ListView {
         }
     }
 
-    highlight: highlightBar
+//    highlight: highlightBar
     highlightFollowsCurrentItem: false
 }
