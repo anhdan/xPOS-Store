@@ -23,6 +23,7 @@ ListView {
     //====================== Signals ============================
     signal itemAdded()
     signal currItemQuantityUpdated()
+    signal itemRemoved()
 
 
     //====================== Functions ==========================
@@ -31,30 +32,61 @@ ListView {
         var itemFull =  item
         itemFull["_itemCount"] = itemModel.count + 1
         itemModel.append( item )
-        changeHighLight( root.currentIndex + 1 )
-        root.currentIndex++
+        var newIndex = itemModel.count - 1
+        changeHighLight( newIndex )
         itemAdded()
+    }
+
+    function getCurrItemQuantity()
+    {
+        if( currentIndex == - 1 )
+        {
+            return 0
+        }
+        var currItem = itemModel.get( root.currentIndex )
+        return currItem["_itemNum"]
     }
 
     function updateCurrItemQuantity( newQuant )
     {
-        var currItem = itemModel.get( root.currentIndex )
-        console.log( currItem["_itemNum"] )
+        if( currentIndex == -1 )
+        {
+            return
+        }
+
+        var currItem = itemModel.get( root.currentIndex )        
         currItem["_itemNum"] = newQuant
         currItemQuantityUpdated()
     }
 
     function changeHighLight( newIndex )
-    {
-        var currItem
-        if( root.currentIndex !== -1)
+    {        
+        if( root.currentIndex > -1 && currentIndex < itemModel.count )
         {
-            currItem = root.currentItem
-            currItem.color = itemNormalColor
+            var prevDelegate = root.currentItem
+            prevDelegate.color = itemNormalColor
         }
         root.currentIndex = newIndex
-        currItem = root.currentItem
-        currItem.color = itemHighlightColor
+        var currDelegate = root.currentItem
+        currDelegate.color = itemHighlightColor
+    }
+
+    function removeCurrItem()
+    {
+        if( currentIndex > -1 )
+        {
+            for( var i = currentIndex+1; i < itemModel.count; i++ )
+            {
+                itemModel.setProperty( i, "_itemCount", i )
+            }
+            itemModel.remove( currentIndex )
+            if( currentIndex >= itemModel.count )
+            {
+                currentIndex = itemModel.count - 1
+            }
+            changeHighLight( currentIndex )
+            itemRemoved()
+        }
     }
 
     //====================== List model =========================
@@ -101,11 +133,12 @@ ListView {
                     id: itemMouse
                     anchors.fill: parent
                     onClicked: {
-                        var currItem = root.currentItem
-                        currItem.color = "white"
-                        root.currentIndex = index
-                        currItem = root.currentItem
-                        currItem.color = "#c9c9c9"
+//                        var currItem = root.currentItem
+//                        currItem.color = "white"
+//                        root.currentIndex = index
+//                        currItem = root.currentItem
+//                        currItem.color = itemHighlightColor
+                        changeHighLight( index )
                     }
                 }
             }
@@ -120,11 +153,27 @@ ListView {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 color: "black"
+//                activeFocus: true
 
                 background: Rectangle {
+                    id: bgrItemNum
                     anchors.fill: parent
                     border.width: 0
                     opacity: 0
+                }
+
+                onPressed: {
+//                    root.currentIndex = root.indexAt( txtItemNum.x, txtItemNum.y )
+                    changeHighLight( index )
+                    bgrItemNum.color = itemNormalColor
+                    width *= 1.25
+                    height *= 1.25
+                }
+
+                onEditingFinished: {
+                    bgrItemNum.color = itemHighlightColor
+                    width *= 0.8
+                    height *=- 0.8
                 }
             }
 

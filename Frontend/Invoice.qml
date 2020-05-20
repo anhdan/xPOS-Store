@@ -204,8 +204,9 @@ Rectangle {
 
                 onClicked: {
                     var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
-                    var item = {'_itemInfo': "test 3", '_itemNum': 5, '_itemPrice': "50000"}
-                    tab.item.addItem( item )
+                    var currItemQuant = tab.item.getCurrItemQuantity()
+                    currItemQuant++
+                    tab.item.updateCurrItemQuantity( currItemQuant )
                 }
             }
 
@@ -230,10 +231,12 @@ Rectangle {
 
                 onClicked: {
                     var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
-                    var currItem = tab.item.currentItem
-//                    var quant = currItem["_itemNum"] + 1
-//                    console.log( "quant = " + quant )
-                    tab.item.updateCurrItemQuantity( 0 )
+                    var currItemQuant = tab.item.getCurrItemQuantity()
+                    if( currItemQuant > 0 )
+                    {
+                        currItemQuant--
+                    }
+                    tab.item.updateCurrItemQuantity( currItemQuant )
                 }
             }
 
@@ -255,6 +258,12 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                     }
                 }
+
+                onClicked: {
+                    var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
+                    var item = {'_itemInfo': "test 3", '_itemNum': 5, '_itemPrice': "50000"}
+                    tab.item.addItem( item )
+                }
             }
 
             Button {
@@ -274,6 +283,12 @@ Rectangle {
                         color: "white"
                         horizontalAlignment: Text.AlignHCenter
                     }
+                }
+
+                onClicked:
+                {
+                    var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
+                    tab.item.removeCurrItem()
                 }
             }
 
