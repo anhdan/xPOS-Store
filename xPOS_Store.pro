@@ -61,4 +61,5 @@ LIBS += -lsqlite3
 
 DISTFILES += \
     Backend/Configs/invoice_data.xml \
-    Backend/Configs/store_data.xml
+    Backend/Configs/store_data.xml \
+    tips.md

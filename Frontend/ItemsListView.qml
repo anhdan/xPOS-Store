@@ -1,3 +1,4 @@
+import QtQml 2.2
 import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Controls 2.2
@@ -14,6 +15,8 @@ ListView {
     property string itemHighlightColor: "#2196f3"
     property int keySize: 95
 
+    property real latestCost: 0
+
     id: root
     model: itemModel
     clip: true
@@ -24,6 +27,7 @@ ListView {
     signal itemAdded()
     signal currItemQuantityUpdated()
     signal itemRemoved()
+    signal costCalculated( var cost )
 
 
     //====================== Functions ==========================
@@ -35,6 +39,7 @@ ListView {
         var newIndex = itemModel.count - 1
         changeHighLight( newIndex )
         itemAdded()
+        calculateCost()
     }
 
     function getCurrItemQuantity()
@@ -57,6 +62,7 @@ ListView {
         var currItem = itemModel.get( root.currentIndex )        
         currItem["_itemNum"] = newQuant
         currItemQuantityUpdated()
+        calculateCost()
     }
 
     function changeHighLight( newIndex )
@@ -86,7 +92,21 @@ ListView {
             }
             changeHighLight( currentIndex )
             itemRemoved()
+            calculateCost()
         }
+    }
+
+    function calculateCost()
+    {
+        console.log( "====> calculateCost")
+        var cost = 0
+        for( var idx = 0; idx < itemModel.count; idx++ )
+        {
+            var item = itemModel.get( idx )
+            cost += Number( item["_itemPrice"] ) * Number(item["_itemNum"])
+        }
+        latestCost = cost
+        costCalculated( cost )
     }
 
     //====================== List model =========================
@@ -102,6 +122,7 @@ ListView {
         border.color: mileGray
         color: "white"
         border.width: 1
+        property alias bgrItemNumColor: bgrItemNum.color
         Row {
             id: itemRow
             anchors.fill: parent
@@ -133,11 +154,6 @@ ListView {
                     id: itemMouse
                     anchors.fill: parent
                     onClicked: {
-//                        var currItem = root.currentItem
-//                        currItem.color = "white"
-//                        root.currentIndex = index
-//                        currItem = root.currentItem
-//                        currItem.color = itemHighlightColor
                         changeHighLight( index )
                     }
                 }
@@ -153,7 +169,6 @@ ListView {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 color: "black"
-//                activeFocus: true
 
                 background: Rectangle {
                     id: bgrItemNum
@@ -163,17 +178,15 @@ ListView {
                 }
 
                 onPressed: {
-//                    root.currentIndex = root.indexAt( txtItemNum.x, txtItemNum.y )
+                    console.log( "=====> onPressed" )
                     changeHighLight( index )
-                    bgrItemNum.color = itemNormalColor
-                    width *= 1.25
-                    height *= 1.25
+                    var currDelegate = root.currentItem
+                    currDelegate.bgrItemNumColor = itemNormalColor
                 }
 
                 onEditingFinished: {
-                    bgrItemNum.color = itemHighlightColor
-                    width *= 0.8
-                    height *=- 0.8
+                    var currDelegate = root.currentItem
+                    currDelegate.bgrItemNumColor = itemHighlightColor
                 }
             }
 
@@ -182,7 +195,7 @@ ListView {
                 width: parent.width * 150 / 760
                 height: parent.height
 
-                text: _itemPrice
+                text: (_itemNum * _itemPrice).toLocaleString( Qt.locale(), 'f', 0 )
                 font.pixelSize: 22
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -271,19 +284,18 @@ ListView {
 
 
     //================== List item highlight animation ==========
-    Component {
-        id: highlightBar
-        Rectangle {
-            width: 760
-            height: 70
-            color: "#FFFF88"
-            opacity: 0.5
-            y: root.currentItem.y;
-            z: root.currentItem.z + 1;
-//            Behavior on y { SpringAnimation { spring: 2; damping: 0.1 } }
-        }
-    }
-
+//    Component {
+//        id: highlightBar
+//        Rectangle {
+//            width: 760
+//            height: 70
+//            color: "#FFFF88"
+//            opacity: 0.5
+//            y: root.currentItem.y;
+//            z: root.currentItem.z + 1;
+////            Behavior on y { SpringAnimation { spring: 2; damping: 0.1 } }
+//        }
+//    }
 //    highlight: highlightBar
-    highlightFollowsCurrentItem: false
+//    highlightFollowsCurrentItem: false
 }

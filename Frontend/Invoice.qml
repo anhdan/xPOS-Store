@@ -1,4 +1,5 @@
-import QtQuick 2.0
+import QtQml 2.2
+import QtQuick 2.2
 import QtQuick.Window 2.2
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.0
@@ -27,6 +28,14 @@ Rectangle {
         root.sigEnableInterface()
     }
 
+    function showCost( cost )
+    {
+        console.log( "=====> showCost" )
+        var vietnam = Qt.locale( )
+        lblSumBeforeTax.text = Number(cost).toLocaleString( vietnam, "f", 0 ) + " vnd"
+        lblSumFinal.text = lblSumBeforeTax.text
+    }
+
     //=============== ITEM LIST TAB VIEW ====================
     TabView {
         id: invoiceFrame
@@ -39,13 +48,19 @@ Rectangle {
             id: tab1
             title: "Hóa Đơn 1"
             source: "ItemsListView.qml"
-        }
+            onLoaded: {
+                item.costCalculated.connect( root.showCost )
+            }
+        }                
 
         Tab {
             id: tab2
             title: "Hóa Đơn 2"
             source: "ItemsListView.qml"
-        }
+            onLoaded: {
+                item.costCalculated.connect( root.showCost )
+            }
+        }                
 
         style: TabViewStyle {
             frameOverlap: 1
@@ -73,6 +88,11 @@ Rectangle {
                 }
             }
         }
+
+        onCurrentIndexChanged: {
+            var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
+            showCost( tab.item.latestCost )
+        }
     }
 
 
@@ -89,44 +109,44 @@ Rectangle {
         anchors.rightMargin: 0
 
         Column {
-            spacing: 22
+            spacing: 14
             anchors.fill: parent
             Row {
                 spacing: 0
                 Label {
                     id: titSumBeforeTax
+                    width: pnPriceScreen.width / 2
                     text: qsTr( "Tổng chưa thuế: " )
-                    font.pixelSize: 22
+                    font.pixelSize: 26
                     color: veryGreen
                 }
 
                 Label {
                     id: lblSumBeforeTax
-                    text: qsTr( "" )
+                    width: pnPriceScreen.width / 2
+                    text: qsTr( "0 vnd" )
                     horizontalAlignment: Text.AlignRight
-                    font.pixelSize: 22
+                    font.pixelSize: 26
                     color: veryGreen
                 }
             }
 
             Row {
                 spacing: 0
-                anchors.left: parent.left
-                anchors.leftMargin: 0
-                anchors.right: parent.right
-                anchors.rightMargin: 0
                 Label {
                     id: titTax
+                    width: pnPriceScreen.width / 2
                     text: qsTr( "Thuế: " )
-                    font.pixelSize: 22
+                    font.pixelSize: 26
                     color: veryGreen
                 }
 
                 Label {
                     id: lblTax
-                    text: qsTr( "Test" )
+                    width: pnPriceScreen.width / 2
+                    text: qsTr( "0 vnd" )
                     horizontalAlignment: Text.AlignRight
-                    font.pixelSize: 22
+                    font.pixelSize: 26
                     color: veryGreen
                 }
             }
@@ -135,16 +155,18 @@ Rectangle {
                 spacing: 0
                 Label {
                     id: titDiscount
+                    width: pnPriceScreen.width / 2
                     text: qsTr( "Khuyến mãi: " )
-                    font.pixelSize: 22
+                    font.pixelSize: 26
                     color: veryGreen
                 }
 
                 Label {
                     id: lblDiscount
-                    text: qsTr( "" )
+                    width: pnPriceScreen.width / 2
+                    text: qsTr( "0 vnd" )
                     horizontalAlignment: Text.AlignRight
-                    font.pixelSize: 22
+                    font.pixelSize: 26
                     color: veryGreen
                 }
             }
@@ -153,16 +175,18 @@ Rectangle {
                 spacing: 0
                 Label {
                     id: titSumFinal
+                    width: pnPriceScreen.width / 2
                     text: qsTr( "Tổng tiền: " )
-                    font.pixelSize: 22
+                    font.pixelSize: 26
                     color: veryGreen
                 }
 
                 Label {
                     id: lblSumFinal
-                    text: qsTr( "" )
+                    width: pnPriceScreen.width / 2
+                    text: qsTr( "0.00 vnd" )
                     horizontalAlignment: Text.AlignRight
-                    font.pixelSize: 22
+                    font.pixelSize: 26
                     color: veryGreen
                 }
             }
@@ -252,7 +276,7 @@ Rectangle {
                     color: "#7ABD6F"
                     Text {
                         anchors.centerIn: parent
-                        text: "Khuyến mãi"
+                        text: "Thêm\nsản phẩm"
                         font.pixelSize: 22
                         color: "white"
                         horizontalAlignment: Text.AlignHCenter
@@ -261,7 +285,7 @@ Rectangle {
 
                 onClicked: {
                     var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
-                    var item = {'_itemInfo': "test 3", '_itemNum': 5, '_itemPrice': "50000"}
+                    var item = {'_itemInfo': "test 3", '_itemNum': 5, '_itemPrice': 50000}
                     tab.item.addItem( item )
                 }
             }
