@@ -1,10 +1,12 @@
 #include <QGuiApplication>
+#include <QQmlContext>
 #include <QQmlApplicationEngine>
 
 #include "xPos.h"
 #include "Backend/Containers/Database.h"
 #include "Backend/Processes/InventoryProcess.h"
 #include "Backend/Processes/WorkShiftProcess.h"
+#include "Backend/3rd/key_emitter.h"
 
 
 xpos_store::Database *glbProductDB = nullptr;
@@ -12,7 +14,7 @@ xpos_store::Database *glbProductDB = nullptr;
 
 int main(int argc, char *argv[])
 {
-    qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
+//    qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
 
     // Multi resolution
 //    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -23,9 +25,15 @@ int main(int argc, char *argv[])
     //===== Register a QObject-inherited C++ class to the interface
     //
     qmlRegisterType<InventoryProcess>( "xpos.store.inventory", 1, 0, "InventoryProcess" );
-    qmlRegisterType<WorkShiftProcess>( "xpos.store.workshift", 1, 0, "WorkShiftProcess" );    
+    qmlRegisterType<WorkShiftProcess>( "xpos.store.workshift", 1, 0, "WorkShiftProcess" );
 
     QQmlApplicationEngine engine;
+
+    // Key emiter for simulating physical keyboard press when clicking button
+    KeyEmitter keyEmitter( &engine );
+    QQmlContext *ctx = engine.rootContext();
+    ctx->setContextProperty( "keyEmitter", &keyEmitter );
+
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;

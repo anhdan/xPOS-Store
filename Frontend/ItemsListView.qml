@@ -163,6 +163,7 @@ ListView {
                 id: txtItemNum
                 width: parent.width * 105 / 760
                 height: parent.height
+                focus: false
 
                 text: _itemNum
                 font.pixelSize: 22
