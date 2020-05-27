@@ -24,7 +24,8 @@ SOURCES += \
     Backend/3rd/tinyxml2.cpp \
     Backend/Processes/InventoryProcess.cpp \
     Backend/Containers/Staff.cpp \
-    Backend/Processes/WorkShiftProcess.cpp
+    Backend/Processes/WorkShiftProcess.cpp \
+    Backend/3rd/key_emitter.cpp
 
 RESOURCES += qml.qrc
 
@@ -53,7 +54,8 @@ HEADERS += \
     Backend/3rd/tinyxml2.h \
     Backend/Configs/sqlitecmdFormat.h \
     Backend/Processes/InventoryProcess.h \
-    Backend/Processes/WorkShiftProcess.h
+    Backend/Processes/WorkShiftProcess.h \
+    Backend/3rd/key_emitter.h
 
 
 #======== SQLite Database Lib

@@ -1,9 +1,9 @@
 import QtQml 2.2
 import QtQuick 2.4
-//import QtQuick.Window 2.2
-import QtQuick.Layouts 1.0
+import QtQuick.Window 2.2
 import QtQuick.Controls 1.4
 import QtQuick.Controls 2.2
+import QtQuick.Layouts 1.0
 import QtQuick.Controls.Styles 1.4
 
 
@@ -23,6 +23,10 @@ Rectangle {
     property int keySize: 95
     property int zLayer2: 10
 
+    property int zlayer0: 0
+    property int zlayer1: 10
+    property int zlayer2: 20
+
     signal sigEnableInterface()
     function enabelInteface()
     {
@@ -35,7 +39,7 @@ Rectangle {
         var vietnam = Qt.locale( )
         lblSumBeforeTax.text = Number(cost).toLocaleString( vietnam, "f", 0 ) + " vnd"
         lblSumFinal.text = lblSumBeforeTax.text
-    }
+    }    
 
     //=============== ITEM LIST TAB VIEW ====================
     TabView {
@@ -94,8 +98,7 @@ Rectangle {
             var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
             showCost( tab.item.latestCost )
         }
-    }
-
+    }    
 
     //=================== PRICE SCREEN =======================
     Rectangle {
@@ -285,8 +288,8 @@ Rectangle {
                 }                
 
                 onClicked: {
-                    frameCodeInput.visible = true
-                    frameCodeInput.txtFocus = true
+                    frameSearchProduct.visible = true
+                    txtProductCodeInput.focus = true
                     var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
                     var item = {'_itemInfo': "test 3", '_itemNum': 5, '_itemPrice': 50000}
                     tab.item.addItem( item )
@@ -339,59 +342,63 @@ Rectangle {
                 }
             }
         }
-    }       
+    }           
 
-    // Edit text for typing in product code
+    // Frame that shows up when pressing "Thêm sản phẩm" button
     Item {
-        property alias txtFocus: txtCodeInput.focus
-        id: frameCodeInput
-        x: 0
-        y: 0
-        z: zLayer2
+        id: frameSearchProduct
         width: invoiceFrame.width + pnInvoiceButtons.width
-        height: parent.height
+        height: root.height
+        anchors.top: root.top
+        anchors.left: root.left
+        z: zlayer1
         visible: false
 
         MouseArea {
-            id: maCodeInput
+            id: mouseSearchFrame
             anchors.fill: parent
+
             onClicked: {
-                frameCodeInput.visible = false
-                focus = false
+                frameSearchProduct.visible = false
             }
         }
 
-        TextField {
-            id: txtCodeInput
-            anchors.verticalCenter: parent.verticalCenter
-            x: 380 - width / 2
-            z: zLayer2 + 1
+        Rectangle {
+            id: pnSearchInput
             width: 400
-            height: 60
-            placeholderText: "Nhap ma san pham"
-            font.pixelSize: 26
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            focus: true
-
-            background: Rectangle {
-                anchors.fill: parent
-                radius: 20
-                border.width: 3
-                border.color: numKeyColor
+            height: 150
+            z: zlayer1 + 1
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            radius: 5
+            color: "#7ABD6F"
+//            opacity: 0.6
+            Label {
+                id: titProductCodeInput
+                text: "Nhập mã sản phẩm"
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: txtProductCodeInput.top
+                anchors.bottomMargin: 5
                 color: "white"
+                font.pixelSize: 22
             }
 
-            Keys.onPressed: {
-                console.log(event.key)
-                if( event.key === Qt.Key_B )
-                {
-                    console.log( txtCodeInput.text )
-                }
+            TextField {
+                id: txtProductCodeInput
+                width: 300
+                height: 60
+                anchors.centerIn: parent
+                focus: true
+                font.pixelSize: 26
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
 
+                background: Rectangle {
+                    anchors.fill: parent
+                    radius: 5
+                }
             }
         }
-
     }
 
     //
@@ -426,6 +433,11 @@ Rectangle {
                             font.pixelSize: 42
                         }
                     }
+
+                    onClicked: {
+                        console.log( "press key 1" )
+                        keyEmitter.emitKey( Qt.Key_1 )
+                    }
                 }
 
                 Button {
@@ -443,6 +455,11 @@ Rectangle {
                             horizontalAlignment: Text.AlignHCenter
                             font.pixelSize: 42
                         }
+                    }
+
+                    onClicked: {
+                        console.log( "press key 2" )
+                        keyEmitter.emitKey( Qt.Key_2 )
                     }
                 }
 
@@ -638,5 +655,4 @@ Rectangle {
             }
         }
     }
-
 }
