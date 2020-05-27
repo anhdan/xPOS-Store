@@ -1,9 +1,9 @@
 import QtQml 2.2
-import QtQuick 2.2
-import QtQuick.Window 2.2
-import QtQuick.Controls 2.2
+import QtQuick 2.4
+//import QtQuick.Window 2.2
 import QtQuick.Layouts 1.0
 import QtQuick.Controls 1.4
+import QtQuick.Controls 2.2
 import QtQuick.Controls.Styles 1.4
 
 
@@ -21,6 +21,7 @@ Rectangle {
     property string numKeyColor: "#607d8b"
     property string borderColor: "white"
     property int keySize: 95
+    property int zLayer2: 10
 
     signal sigEnableInterface()
     function enabelInteface()
@@ -265,7 +266,7 @@ Rectangle {
             }
 
             Button {
-                id: btnDiscount
+                id: btnAddProduct
                 anchors.left: parent.left
                 anchors.right:  parent.right
                 height: 95
@@ -281,9 +282,11 @@ Rectangle {
                         color: "white"
                         horizontalAlignment: Text.AlignHCenter
                     }
-                }
+                }                
 
                 onClicked: {
+                    frameCodeInput.visible = true
+                    frameCodeInput.txtFocus = true
                     var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
                     var item = {'_itemInfo': "test 3", '_itemNum': 5, '_itemPrice': 50000}
                     tab.item.addItem( item )
@@ -336,8 +339,60 @@ Rectangle {
                 }
             }
         }
-    }
+    }       
 
+    // Edit text for typing in product code
+    Item {
+        property alias txtFocus: txtCodeInput.focus
+        id: frameCodeInput
+        x: 0
+        y: 0
+        z: zLayer2
+        width: invoiceFrame.width + pnInvoiceButtons.width
+        height: parent.height
+        visible: false
+
+        MouseArea {
+            id: maCodeInput
+            anchors.fill: parent
+            onClicked: {
+                frameCodeInput.visible = false
+                focus = false
+            }
+        }
+
+        TextField {
+            id: txtCodeInput
+            anchors.verticalCenter: parent.verticalCenter
+            x: 380 - width / 2
+            z: zLayer2 + 1
+            width: 400
+            height: 60
+            placeholderText: "Nhap ma san pham"
+            font.pixelSize: 26
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            focus: true
+
+            background: Rectangle {
+                anchors.fill: parent
+                radius: 20
+                border.width: 3
+                border.color: numKeyColor
+                color: "white"
+            }
+
+            Keys.onPressed: {
+                console.log(event.key)
+                if( event.key === Qt.Key_B )
+                {
+                    console.log( txtCodeInput.text )
+                }
+
+            }
+        }
+
+    }
 
     //
     //===== Keyboard

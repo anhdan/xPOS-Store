@@ -178,7 +178,6 @@ ListView {
                 }
 
                 onPressed: {
-                    console.log( "=====> onPressed" )
                     changeHighLight( index )
                     var currDelegate = root.currentItem
                     currDelegate.bgrItemNumColor = itemNormalColor
