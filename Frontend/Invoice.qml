@@ -216,6 +216,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.right:  parent.right
                 height: 95
+                focusPolicy: Qt.NoFocus
 
                 Rectangle {
                     anchors.fill: parent
@@ -243,6 +244,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.right:  parent.right
                 height: 95
+                focusPolicy: Qt.NoFocus
 
                 Rectangle {
                     anchors.fill: parent
@@ -290,9 +292,6 @@ Rectangle {
                 onClicked: {
                     frameSearchProduct.visible = true
                     txtProductCodeInput.focus = true
-                    var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
-                    var item = {'_itemInfo': "test 3", '_itemNum': 5, '_itemPrice': 50000}
-                    tab.item.addItem( item )
                 }
             }
 
@@ -301,6 +300,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.right:  parent.right
                 height: 95
+                focusPolicy: Qt.NoFocus
 
                 Rectangle {
                     anchors.fill: parent
@@ -327,6 +327,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.right:  parent.right
                 height: 145
+                focusPolicy: Qt.NoFocus
 
                 Rectangle {
                     anchors.fill: parent
@@ -397,6 +398,15 @@ Rectangle {
                     anchors.fill: parent
                     radius: 5
                 }
+
+                onAccepted:
+                {
+                    var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
+                    var item = {'_itemInfo': text, '_itemNum': 5, '_itemPrice': 50000}
+                    tab.item.addItem( item )
+                    focus = false
+                    frameSearchProduct.visible = false
+                }
             }
         }
     }
@@ -421,6 +431,7 @@ Rectangle {
                     id: btnOne
                     width: keySize
                     height: keySize
+                    focusPolicy: Qt.NoFocus
                     Rectangle {
                         anchors.fill: parent
                         color: numKeyColor
@@ -435,7 +446,6 @@ Rectangle {
                     }
 
                     onClicked: {
-                        console.log( "press key 1" )
                         keyEmitter.emitKey( Qt.Key_1 )
                     }
                 }
@@ -444,6 +454,7 @@ Rectangle {
                     id: btnTwo
                     width: keySize
                     height: keySize
+                    focusPolicy: Qt.NoFocus
                     Rectangle {
                         anchors.fill: parent
                         color: numKeyColor
@@ -458,7 +469,6 @@ Rectangle {
                     }
 
                     onClicked: {
-                        console.log( "press key 2" )
                         keyEmitter.emitKey( Qt.Key_2 )
                     }
                 }
@@ -467,6 +477,7 @@ Rectangle {
                     id: btnThree
                     width: keySize
                     height: keySize
+                    focusPolicy: Qt.NoFocus
                     Rectangle {
                         anchors.fill: parent
                         color: numKeyColor
@@ -479,6 +490,9 @@ Rectangle {
                             font.pixelSize: 42
                         }
                     }
+                    onClicked: {
+                        keyEmitter.emitKey( Qt.Key_3 )
+                    }
                 }
             }
 
@@ -489,6 +503,7 @@ Rectangle {
                     id: btnFour
                     width: keySize
                     height: keySize
+                    focusPolicy: Qt.NoFocus
                     Rectangle {
                         anchors.fill: parent
                         color: numKeyColor
@@ -501,12 +516,16 @@ Rectangle {
                             font.pixelSize: 42
                         }
                     }
+                    onClicked: {
+                        keyEmitter.emitKey( Qt.Key_4 )
+                    }
                 }
 
                 Button {
                     id: btnFive
                     width: keySize
                     height: keySize
+                    focusPolicy: Qt.NoFocus
                     Rectangle {
                         anchors.fill: parent
                         color: numKeyColor
@@ -519,12 +538,16 @@ Rectangle {
                             font.pixelSize: 42
                         }
                     }
+                    onClicked: {
+                        keyEmitter.emitKey( Qt.Key_5 )
+                    }
                 }
 
                 Button {
                     id: btnSix
                     width: keySize
                     height: keySize
+                    focusPolicy: Qt.NoFocus
                     Rectangle {
                         anchors.fill: parent
                         color: numKeyColor
@@ -537,6 +560,9 @@ Rectangle {
                             font.pixelSize: 42
                         }
                     }
+                    onClicked: {
+                        keyEmitter.emitKey( Qt.Key_6 )
+                    }
                 }
             }
 
@@ -546,6 +572,7 @@ Rectangle {
                     id: btnSeven
                     width: keySize
                     height: keySize
+                    focusPolicy: Qt.NoFocus
                     Rectangle {
                         anchors.fill: parent
                         color: numKeyColor
@@ -558,12 +585,16 @@ Rectangle {
                             font.pixelSize: 42
                         }
                     }
+                    onClicked: {
+                        keyEmitter.emitKey( Qt.Key_7 )
+                    }
                 }
 
                 Button {
                     id: btnEight
                     width: keySize
                     height: keySize
+                    focusPolicy: Qt.NoFocus
                     Rectangle {
                         anchors.fill: parent
                         color: numKeyColor
@@ -576,12 +607,16 @@ Rectangle {
                             font.pixelSize: 42
                         }
                     }
+                    onClicked: {
+                        keyEmitter.emitKey( Qt.Key_8 )
+                    }
                 }
 
                 Button {
                     id: btnNine
                     width: keySize
                     height: keySize
+                    focusPolicy: Qt.NoFocus
                     Rectangle {
                         anchors.fill: parent
                         color: numKeyColor
@@ -594,6 +629,9 @@ Rectangle {
                             font.pixelSize: 42
                         }
                     }
+                    onClicked: {
+                        keyEmitter.emitKey( Qt.Key_9 )
+                    }
                 }
             }
 
@@ -603,6 +641,7 @@ Rectangle {
                     id: btnClear
                     width: keySize
                     height: keySize
+                    focusPolicy: Qt.NoFocus
                     Rectangle {
                         anchors.fill: parent
                         color: numKeyColor
@@ -615,12 +654,19 @@ Rectangle {
                             font.pixelSize: 42
                         }
                     }
+                    onClicked: {
+                        keyEmitter.emitKey( Qt.Key_Backspace )
+                    }
+                    onPressAndHold: {
+                        keyEmitter.emitKey( Qt.Key_Backspace )
+                    }
                 }
 
                 Button {
                     id: btnZero
                     width: keySize
                     height: keySize
+                    focusPolicy: Qt.NoFocus
                     Rectangle {
                         anchors.fill: parent
                         color: numKeyColor
@@ -633,12 +679,16 @@ Rectangle {
                             font.pixelSize: 42
                         }
                     }
+                    onClicked: {
+                        keyEmitter.emitKey( Qt.Key_0 )
+                    }
                 }
 
                 Button {
                     id: btnEnter
                     width: keySize
                     height: keySize
+                    focusPolicy: Qt.NoFocus
                     Rectangle {
                         anchors.fill: parent
                         color: numKeyColor
@@ -650,6 +700,9 @@ Rectangle {
                             horizontalAlignment: Text.AlignHCenter
                             font.pixelSize: 30
                         }
+                    }
+                    onClicked: {
+                        keyEmitter.emitKey( Qt.Key_Enter )
                     }
                 }
             }

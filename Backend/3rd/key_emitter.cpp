@@ -24,8 +24,6 @@ void KeyEmitter::emitKey(Qt::Key key)
         return;
     }
 
-    std::cout << "pressed key: " << QKeySequence(key).toString().toStdString() << std::endl;
-
 	QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, Qt::NoModifier, QKeySequence(key).toString());
 	QKeyEvent releaseEvent = QKeyEvent(QEvent::KeyRelease, key, Qt::NoModifier);
     QCoreApplication::sendEvent(receiver, &pressEvent);

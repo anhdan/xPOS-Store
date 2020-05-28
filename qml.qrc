@@ -6,5 +6,6 @@
         <file>Frontend/Signin.qml</file>
         <file>Frontend/Invoice.qml</file>
         <file>Frontend/ItemsListView.qml</file>
+        <file>Frontend/Payment.qml</file>
     </qresource>
 </RCC>
