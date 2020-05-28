@@ -6,4 +6,8 @@
 
 [Locale QML Type](https://www3.sra.co.jp/qt/relation/doc/qtqml/qml-qtqml-locale.html#nativeCountryName-prop)
 
+3. Simulate key press event when click a buttom
+
+[Qt Virtual Keyboard](https://www.wisol.ch/w/articles/2015-07-26-virtual-keyboard-qt/)
+
 
