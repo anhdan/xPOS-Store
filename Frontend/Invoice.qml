@@ -341,6 +341,11 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                     }
                 }
+
+                onClicked: {
+                    var tab = invoiceFrame.getTab( invoiceFrame.currentIndex )
+                    tab.item.showPayment()
+                }
             }
         }
     }           
@@ -406,6 +411,13 @@ Rectangle {
                     tab.item.addItem( item )
                     focus = false
                     frameSearchProduct.visible = false
+                }
+
+                onFocusChanged: {
+                    if( focus )
+                    {
+                        text = ""
+                    }
                 }
             }
         }
