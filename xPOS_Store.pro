@@ -12,20 +12,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-SOURCES += \
-        main.cpp \
-    Backend/Containers/Customer.cpp \
-    Backend/Containers/Product.cpp \
-    Backend/Containers/SellingRecord.cpp \
-    Backend/Containers/Invoice.cpp \
-    Backend/Containers/WorkShift.cpp \
-    Backend/Containers/Point.cpp \
-    Backend/Containers/Database.cpp \
-    Backend/3rd/tinyxml2.cpp \
-    Backend/Processes/InventoryProcess.cpp \
-    Backend/Containers/Staff.cpp \
-    Backend/Processes/WorkShiftProcess.cpp \
-    Backend/3rd/key_emitter.cpp
+SOURCES += main.cpp \
+    backend/containers/Product.cpp \
+    backend/containers/Customer.cpp \
+    backend/containers/Staff.cpp \
+    backend/containers/Person.cpp \
+    backend/database/Database.cpp \
+    backend/database/InventoryDatabase.cpp \
+    backend/XPBackend.cpp \
+    backend/3rd/key_emitter.cpp \
+    backend/database/UserDatabase.cpp
 
 RESOURCES += qml.qrc
 
@@ -40,28 +36,17 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-HEADERS += \
-    Backend/Containers/Product.h \
-    xPos.h \
-    Backend/Containers/Customer.h \
-    Backend/Containers/Point.h \
-    Backend/Containers/Person.h \
-    Backend/Containers/Staff.h \
-    Backend/Containers/SellingRecord.h \
-    Backend/Containers/Invoice.h \
-    Backend/Containers/WorkShift.h \
-    Backend/Containers/Database.h \
-    Backend/3rd/tinyxml2.h \
-    Backend/Configs/sqlitecmdFormat.h \
-    Backend/Processes/InventoryProcess.h \
-    Backend/Processes/WorkShiftProcess.h \
-    Backend/3rd/key_emitter.h
-
-
-#======== SQLite Database Lib
 LIBS += -lsqlite3
 
-DISTFILES += \
-    Backend/Configs/invoice_data.xml \
-    Backend/Configs/store_data.xml \
-    tips.md
+HEADERS += \
+    backend/containers/Product.h \
+    backend/xPos.h \
+    backend/containers/Item.h \
+    backend/containers/Customer.h \
+    backend/containers/Staff.h \
+    backend/containers/Person.h \
+    backend/database/Database.h \
+    backend/database/InventoryDatabase.h \
+    backend/XPBackend.h \
+    backend/3rd/key_emitter.h \
+    backend/database/UserDatabase.h

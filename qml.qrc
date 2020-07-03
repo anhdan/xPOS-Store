@@ -1,11 +1,19 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>Frontend/Inventory.qml</file>
-        <file>Frontend/ErrorDialog.qml</file>
-        <file>Frontend/Signin.qml</file>
-        <file>Frontend/Invoice.qml</file>
-        <file>Frontend/ItemsListView.qml</file>
-        <file>Frontend/Payment.qml</file>
+        <file>frontend/InventoryMgmt.qml</file>
+        <file>frontend/UIMaterials.qml</file>
+        <file>frontend/qmldir</file>
+        <file>resource/fonts/FontAwesomeRegular-400.otf</file>
+        <file>resource/fonts/FontAwesomeSolid-900.otf</file>
+        <file>frontend/NotificationPopup.qml</file>
+        <file>frontend/ProvidersListview.qml</file>
+        <file>frontend/HistoryListview.qml</file>
+        <file>frontend/Helper.qml</file>
+        <file>frontend/NumPad.qml</file>
+        <file>frontend/InvoiceComposition.qml</file>
+        <file>frontend/ItemsListView.qml</file>
+        <file>frontend/Payment.qml</file>
+        <file>frontend/Login.qml</file>
     </qresource>
 </RCC>
