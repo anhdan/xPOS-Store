@@ -265,7 +265,11 @@ Rectangle {
 
                 onReleased: {
                     rectBtnMskePayment.color = UIMaterials.goldDark
-                    payTransitionOnY.start()
+                    if( pnPayment.y >= root.height )
+                    {
+                        payTransitionOnY.start()
+                        tabviewInvoice.enabled = false
+                    }
                 }
             }
         }
@@ -584,6 +588,7 @@ Rectangle {
             //================== Signal handling
             onColapse: {
                 payTransitionOnYRev.start()
+                tabviewInvoice.enabled = true
             }
 
             //================== Animation

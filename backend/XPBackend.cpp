@@ -3,8 +3,9 @@
 /**
  * @brief XPBackend::XPBackend
  */
-XPBackend::XPBackend(QQmlApplicationEngine *engine, xpos_store::InventoryDatabase *_inventoryDB )
-    : m_engine(engine), m_inventoryDB( _inventoryDB )
+XPBackend::XPBackend(QQmlApplicationEngine *engine, xpos_store::InventoryDatabase *_inventoryDB,
+                     xpos_store::UserDatabase *_usersDB)
+    : m_engine(engine), m_inventoryDB( _inventoryDB ), m_usersDB(_usersDB)
 {
     LOG_MSG( "[DEB]: an xpos-store backend has been created\n" );
 }
@@ -127,4 +128,42 @@ int XPBackend::httpPostInvoice()
 
 
     return xpSuccess;
+}
+
+
+/**
+ * @brief XPBackend::login
+ */
+int XPBackend::login(QString _name, QString _pwd)
+{
+    bool authenticated = false;
+    m_currStaff.setLoginName( _name.toStdString() );
+    m_currStaff.setLoginPwd( _pwd.toStdString() );
+    xpError_t xpErr = m_usersDB->verifyStaff( m_currStaff, &authenticated );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to verify staff\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    if( authenticated )
+    {
+        emit sigStaffApproved();
+    }
+    else
+    {
+        emit sigStaffDisapproved();
+    }
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief XPBackend::getPrivilege
+ */
+int XPBackend::getPrivilege()
+{
+    return (int)m_currStaff.getPrivilege();
 }

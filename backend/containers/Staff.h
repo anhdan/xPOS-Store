@@ -9,7 +9,10 @@ namespace xpos_store {
 class Staff : public Person
 {
 public:
-    Staff() : Person() {}
+    Staff() : Person()
+    {
+        setDefault();
+    }
     ~Staff() {}
 
 public:

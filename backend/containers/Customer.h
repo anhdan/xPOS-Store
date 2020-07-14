@@ -9,7 +9,10 @@ namespace xpos_store {
     class Customer : public Person
     {
     public:
-        Customer() : Person() {}
+        Customer() : Person()
+        {
+            setDefault();
+        }
         ~Customer() { }
 
     public:

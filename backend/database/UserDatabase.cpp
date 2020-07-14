@@ -283,4 +283,62 @@ xpError_t UserDatabase::searchStaff(const std::string &_id, Staff &_staff)
     return xpSuccess;
 }
 
+/**
+ * @brief UserDatabase::verifyStaff
+ */
+xpError_t UserDatabase::verifyStaff( Staff &_staff, bool *_authenticated )
+{
+    if( _authenticated == nullptr )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Null pointer\n",
+                 xpErrorInvalidParameters, __FILE__, __LINE__ );
+        return xpErrorInvalidParameters;
+    }
+
+    if( !m_isOpen )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: The database has not been opened\n",
+                 xpErrorNotPermited, __FILE__, __LINE__ );
+        _staff.setDefault();
+        *_authenticated = false;
+        return xpErrorNotPermited;
+    }
+
+    std::string sqliteCmd = "SELECT * from STAFF where LOGIN_NAME='" + _staff.getLoginName() + "' AND LOGIN_PWD='" + _staff.getLoginPwd() + "';";
+    std::cout << ". verify staff cmd: " << sqliteCmd << std::endl;
+    char *sqliteMsg;
+    Staff staff;
+    xpError_t sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd.c_str(), Staff::searchCallBack, (void*)&staff, &sqliteMsg );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        _staff.setDefault();
+        *_authenticated = false;
+        return xpErrorProcessFailure;
+    }
+
+    if( staff.getId() == "" )
+    {
+        *_authenticated = false;
+    }
+    else {
+        *_authenticated = true;
+    }
+    staff.copyTo( (Item*)&_staff );
+    _staff.setLoginPwd( "" );
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief UserDatabase::registerStaff
+ */
+xpError_t UserDatabase::registerStaff(Staff &_staff)
+{
+
+}
+
 }

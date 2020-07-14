@@ -17,7 +17,7 @@ Window {
         id: formLogin
         anchors.fill: parent
 
-        onAuthenticated: {
+        onApproved: {
             stack.pop()
             stack.push( formInvoice )
         }

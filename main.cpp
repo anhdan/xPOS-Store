@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 
 #include "backend/database/InventoryDatabase.h"
+#include "backend/database/UserDatabase.h"
 #include "backend/XPBackend.h"
 #include "backend/3rd/key_emitter.h"
 
@@ -16,9 +17,9 @@ int main(int argc, char *argv[])
     //
     xpError_t xpErr;
     xpos_store::InventoryDatabase inventoryDB;
-    if( inventoryDB.connect( "inventory.db" ) != xpSuccess )
+    if( inventoryDB.connect( "../resource/dbs/inventory.db" ) != xpSuccess )
     {
-        xpErr = inventoryDB.create( "inventory.db" );
+        xpErr = inventoryDB.create( "../resource/dbs/inventory.db" );
         if( xpErr != xpSuccess )
         {
             LOG_MSG( "[ERR:%d] :%s:%d: Failed to either create or connect to database\n",
@@ -27,7 +28,19 @@ int main(int argc, char *argv[])
         }
     }
 
-    XPBackend xpBackend( &engine, &inventoryDB );
+    xpos_store::UserDatabase usersDB;
+    if( usersDB.connect( "../resource/dbs/users.db" ) != xpSuccess )
+    {
+        xpErr = usersDB.create( "../resource/dbs/users.db" );
+        if( xpErr != xpSuccess )
+        {
+            LOG_MSG( "[ERR:%d] :%s:%d: Failed to either create or connect to database\n",
+                     xpErr, __FILE__, __LINE__ );
+            exit( xpErr );
+        }
+    }
+
+    XPBackend xpBackend( &engine, &inventoryDB, &usersDB );
     KeyEmitter keyEmitter( &engine );
     QQmlContext *ctx = engine.rootContext();
     ctx->setContextProperty( "xpBackend", &xpBackend );

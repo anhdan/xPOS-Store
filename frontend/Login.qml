@@ -13,7 +13,14 @@ Rectangle {
     color: UIMaterials.appBgrColorPrimary
 
     //====================== Signal and slot definition
-    signal authenticated()
+    signal approved()
+    signal disapproved()
+
+    //====================== Signal & slot connections
+    Component.onCompleted: {
+        xpBackend.sigStaffApproved.connect( root.approved )
+        xpBackend.sigStaffDisapproved.connect( root.disapproved )
+    }
 
     //=================== Input panel
     InputPanel {
@@ -76,10 +83,10 @@ Rectangle {
             border.width: 1
         }
 
-        placeholderText: "ID Nhân viên"
+        placeholderText: "Tên đăng nhập"
         font.pixelSize: UIMaterials.fontSizeMedium
         color: "white"
-        inputMethodHints: Qt.ImhDialableCharactersOnly
+        inputMethodHints: Qt.ImhNoAutoUppercase
 
         onPressed: {
             inputPanel.active = true
@@ -107,6 +114,8 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.verticalCenter
         anchors.bottomMargin: UIMaterials.fontSizeMedium
+        echoMode: TextInput.Password
+        passwordMaskDelay: 200
 
         background: Rectangle {
             id: rectTxtPwd
@@ -120,7 +129,7 @@ Rectangle {
         placeholderText: "Mật khẩu"
         font.pixelSize: UIMaterials.fontSizeMedium
         color: "white"
-        inputMethodHints: Qt.ImhDialableCharactersOnly
+//        inputMethodHints: Qt.ImhDialableCharactersOnly
 
         onPressed: {
             inputPanel.active = true
@@ -136,6 +145,14 @@ Rectangle {
 
         onAccepted: {
             inputPanel.active = false
+        }
+
+        Keys.onReleased: {
+            if( event.key === Qt.Key_Return )
+            {
+                inputPanel.active = false
+                btnLogin.released()
+            }
         }
     }
 
@@ -169,7 +186,7 @@ Rectangle {
 
         onReleased: {
             rectBtnLogin.color = UIMaterials.appBgrColorLight
-            authenticated()
+            var ret = xpBackend.login( txtId.text, txtPwd.text )
         }
     }
 

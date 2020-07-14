@@ -2,6 +2,18 @@
 
 namespace xpos_store {
 
+/**
+ * @brief Staff::setDefault
+ */
+void Staff::setDefault()
+{
+    m_id = "";
+    m_name = "";
+    m_phone = "";
+    m_email = "";
+    m_privilege = Privilege::GUEST;
+    m_loginName = m_loginPwd = "";
+}
 
 /**
  * @brief Staff::copyTo
