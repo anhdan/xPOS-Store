@@ -32,8 +32,6 @@ int XPBackend::searchForProduct(QString _code)
         m_inventoryDB->open();
     }
 
-    std::cout << "--------> input code = " << _code.toStdString() << std::endl;
-
     m_currProduct.setDefault();
     xpErr = m_inventoryDB->searchProductByBarcode( _code.toStdString(), m_currProduct );
     if( xpErr != xpSuccess )
@@ -95,6 +93,17 @@ int XPBackend::updateProductFromInventory( const QVariant &_product)
         return xpErr;
     }
 
+    return xpSuccess;
+}
+
+
+/**
+ * @brief XPBackend::updateProductFromInvoice
+ */
+int XPBackend::updateProductFromInvoice(const QVariant &_product)
+{
+    //! TODO:
+    //! Implement this
     return xpSuccess;
 }
 
@@ -166,4 +175,51 @@ int XPBackend::login(QString _name, QString _pwd)
 int XPBackend::getPrivilege()
 {
     return (int)m_currStaff.getPrivilege();
+}
+
+
+/**
+ * @brief XPBackend::searchForCustomer
+ */
+int XPBackend::searchForCustomer(QString _id)
+{
+    xpError_t xpErr = xpSuccess;
+    if( !m_usersDB->isOpen() )
+    {
+        m_usersDB->open();
+    }
+
+    m_currCustomer.setDefault();
+    xpErr = m_usersDB->searchCustomer( _id.toStdString(), m_currCustomer );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to search for customer\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    if( m_currCustomer.getId() == "" )
+    {
+        LOG_MSG( "[WAR] %s:%d: Customer not found\n",
+                 __FILE__, __LINE__ );
+        emit sigCustomerNotFound();
+    }
+    else
+    {
+        m_currCustomer.printInfo();
+        emit sigCustomerFound( m_currCustomer.toQVariant() );
+    }
+
+    return xpErr;
+}
+
+
+/**
+ * @brief XPBackend::updateCustomerFromInvoice
+ */
+int XPBackend::updateCustomerFromInvoice(const QVariant &_customer)
+{
+    //! TODO:
+    //! Implement this
+    return xpSuccess;
 }

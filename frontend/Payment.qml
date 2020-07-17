@@ -9,17 +9,16 @@ Item {
     id: root
     property string titleColor: "#9e9e9e"
     property string buttonColor1: "#ffc107"
-    property int titleFontSize: 18
-    property int txtFontSize: 22
 
-    property var lastCustomer
+    property var currCustomer
+    property var updateCustomer
     property real totalCharge: 0
     property int finalPoint: 0
 
     //=============== Functions
     function updatePoint( newPoint )
     {
-        txtCustomerPoint.text = "Điểm: " + newPoint
+        lblCustomerPoint.text = "Điểm: " + newPoint
         finalPoint = newPoint
     }
 
@@ -27,6 +26,35 @@ Item {
     signal colapse()
     signal usePoint( var point, var convertRate )
     signal payCompleted()
+
+    signal customerFound( var customer )
+    signal customerNotFound()
+
+    //============== Signals & Slots connection
+    Component.onCompleted:
+    {
+        xpBackend.sigCustomerFound.connect( customerFound )
+        xpBackend.sigCustomerNotFound.connect( customerNotFound )
+    }
+
+
+    //============== Signals handling
+    onCustomerFound:
+    {
+        updateCustomer = Helper.deepCopy( customer )
+        currCustomer = Helper.deepCopy( customer )
+        lblCustomerName.text = customer["name"]
+        lblCustomerShoppingCnt.text = customer["shopping_count"]
+        lblCustomerPoint.text = customer["point"]
+        column.visible = true
+        btnUsePoint.visible = true
+    }
+
+    onCustomerNotFound:
+    {
+        //! TODO:
+        //! Display noti
+    }
 
     //=============== Colapse button
     Button {
@@ -76,9 +104,9 @@ Item {
                 anchors.leftMargin: 20
                 anchors.top: parent.top
                 anchors.topMargin: 10
-                text: "Mã Khách Hàng/SĐT"
-                font.pixelSize: titleFontSize
-                color: titleColor
+                text: "Mã khách hàng/SĐT"
+                font.pixelSize: UIMaterials.fontSizeSmall
+                color: UIMaterials.grayPrimary
             }
 
             TextField {
@@ -87,45 +115,104 @@ Item {
                 anchors.top: titCustomerCode.bottom
                 anchors.topMargin: 5
                 width: parent.width * 0.8
-                height: txtFontSize * 1.6
+                height: UIMaterials.fontSizeMedium * 1.6
                 text: ""
-                font.pixelSize: txtFontSize                
+                font.pixelSize: UIMaterials.fontSizeMedium
 
                 onPressed: {
                     text = ""
                 }
 
                 onAccepted: {
+                    var ret = xpBackend.searchForCustomer( text )
                     focus = false
                 }
-            }           
-
-            Label {
-                id: txtCustomerInfo
-                anchors.left: titCustomerCode.left
-                anchors.top: txtCustomerCode.bottom
-                anchors.topMargin: 15
-                width: txtCustomerCode.width
-                height: 2 * txtFontSize * 1.6
-                text: ""
-                font.pixelSize: txtFontSize
             }
 
             Label {
-                id: txtCustomerPoint
+                id: titCustomerInfo
                 anchors.left: titCustomerCode.left
-                anchors.top: txtCustomerInfo.bottom
-                anchors.topMargin: 9
-                width: parent.width / 2.5
-                height: txtFontSize * 1.6
-                text: ""
-                font.pixelSize: txtFontSize
-                font.bold: true
+                anchors.top: txtCustomerCode.bottom
+                anchors.topMargin: 15
+                text: "Thông tin khách hàng"
+                font.pixelSize: UIMaterials.fontSizeSmall
+                color: UIMaterials.grayPrimary
+            }
+
+            Column {
+                id: column
+                width: txtCustomerCode.width
+                anchors.left: txtCustomerCode.left
+                anchors.top: titCustomerInfo.bottom
+                anchors.topMargin: 5
+                spacing: 5
+                visible: false
+
+                Row {
+                    spacing: 0
+                    Label {
+                        id: titCustomerName
+                        width: column.width / 3
+                        text: qsTr( "Tên KH: " )
+                        font.pixelSize: UIMaterials.fontSizeMedium
+                        color: "black"
+                    }
+
+                    Label {
+                        id: lblCustomerName
+                        width: 2*column.width / 3
+                        text: ""
+                        font.pixelSize: UIMaterials.fontSizeMedium
+                        color: "black"
+                        horizontalAlignment: Text.AlignRight
+                    }
+                }
+
+                Row {
+                    spacing: 0
+                    Label {
+                        id: titCustomerShoppingCnt
+                        width: 2*column.width / 3
+                        text: qsTr( "Số lần mua sắm: " )
+                        font.pixelSize: UIMaterials.fontSizeMedium
+                        color: "black"
+                    }
+
+                    Label {
+                        id: lblCustomerShoppingCnt
+                        width: column.width / 3
+                        text: ""
+                        font.pixelSize: UIMaterials.fontSizeMedium
+                        color: "black"
+                        horizontalAlignment: Text.AlignRight
+                    }
+                }
+
+                Row {
+                    spacing: 0
+                    Label {
+                        id: titCustomerPoint
+                        width: 2*column.width / 3
+                        text: qsTr( "Điểm tích lũy: " )
+                        font.pixelSize: UIMaterials.fontSizeMedium
+                        color: "black"
+                    }
+
+                    Label {
+                        id: lblCustomerPoint
+                        width: column.width / 3
+                        text: ""
+                        font.pixelSize: UIMaterials.fontSizeMedium
+                        color: "black"
+                        horizontalAlignment: Text.AlignRight
+                    }
+                }
+
             }
 
             Button {
                 id: btnUsePoint
-                anchors.right: txtCustomerInfo.right
+                anchors.right: txtCustomerCode.right
                 anchors.rightMargin: 0
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 5
@@ -139,7 +226,7 @@ Item {
                     Text {
                         id: txtBtnUsePoint
                         color: "white"
-                        font.pixelSize: titleFontSize
+                        font.pixelSize: UIMaterials.fontSizeSmall
                         text: "Dùng điểm"
                         anchors.centerIn: parent
                     }
@@ -201,7 +288,7 @@ Item {
                     Text {
                         id: txtBtnCash
                         text: "Tiền mặt"
-                        font.pixelSize: titleFontSize
+                        font.pixelSize: UIMaterials.fontSizeSmall
                         color: "white"
                         anchors.centerIn: parent
                         anchors.topMargin: 5
@@ -257,7 +344,7 @@ Item {
                         id: txtBtnCard
                         text: "Thẻ"
                         color: "white"
-                        font.pixelSize: titleFontSize
+                        font.pixelSize: UIMaterials.fontSizeSmall
                         anchors.centerIn: parent
                         anchors.topMargin: 5
                     }
@@ -277,7 +364,7 @@ Item {
                 anchors.top: btnCard.bottom
                 anchors.topMargin: 15
                 text: "Nhập số tiền khách trả"
-                font.pixelSize: titleFontSize
+                font.pixelSize: UIMaterials.fontSizeSmall
                 color: titleColor
             }
 
@@ -288,9 +375,9 @@ Item {
                 anchors.top: titPayingAmount.bottom
                 anchors.topMargin: 5
                 width: txtCustomerCode.width
-                height: txtFontSize * 1.6
+                height: UIMaterials.fontSizeMedium * 1.6
                 text: ""
-                font.pixelSize: txtFontSize
+                font.pixelSize: UIMaterials.fontSizeMedium
 
                 onPressed:  {
                     text = ""
@@ -329,7 +416,7 @@ Item {
                 anchors.top: txtPayingAmount.bottom
                 anchors.topMargin: 15
                 text: "Tiền trả lại khách"
-                font.pixelSize: titleFontSize
+                font.pixelSize: UIMaterials.fontSizeSmall
                 color: titleColor
             }
 
@@ -339,9 +426,9 @@ Item {
                 anchors.top: titReturnAmount.bottom
                 anchors.topMargin: 5
                 width: parent.width / 3
-                height: txtFontSize * 1.6
+                height: UIMaterials.fontSizeMedium * 1.6
                 text: ",000 vnd"
-                font.pixelSize: txtFontSize
+                font.pixelSize: UIMaterials.fontSizeMedium
             }
 
             Button {
@@ -359,7 +446,7 @@ Item {
                     Text {
                         id: txtBtnComplete
                         color: "white"
-                        font.pixelSize: txtFontSize
+                        font.pixelSize: UIMaterials.fontSizeMedium
                         text: "Hoàn thành\nđơn hàng"
                         anchors.centerIn: parent
                         horizontalAlignment: Text.AlignHCenter
@@ -374,5 +461,4 @@ Item {
             }
         }
     }
-
 }

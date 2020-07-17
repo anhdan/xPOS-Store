@@ -36,13 +36,20 @@ signals:
     void sigStaffApproved();
     void sigStaffDisapproved();
 
+    void sigCustomerFound( QVariant _customer );
+    void sigCustomerNotFound();
+
 public slots:
     int searchForProduct( QString _code );
     int updateProductFromInventory( const QVariant &_product );
+    int updateProductFromInvoice( const QVariant &_product );
     int httpPostInvoice();
 
     int login( QString _name, QString _pwd );
     int getPrivilege();
+
+    int searchForCustomer( QString _id );
+    int updateCustomerFromInvoice( const QVariant &_customer );
 
 public:
 
@@ -52,6 +59,7 @@ private:
     xpos_store::UserDatabase *m_usersDB;
     xpos_store::Product m_currProduct;
     xpos_store::Staff m_currStaff;
+    xpos_store::Customer m_currCustomer;
 };
 
 #endif // XPBACKEND_H

@@ -58,7 +58,16 @@ void Customer::printInfo()
  */
 QVariant Customer::toQVariant()
 {
+    QVariantMap map;
+    map["id"] = QString::fromStdString( getId() );
+    map["name"] = QString::fromStdString( getName() );
+    map["phone"] = QString::fromStdString( getPhone() );
+    map["email"] = QString::fromStdString( getEmail() );
+    map["shopping_count"] = getShoppingCount();
+    map["total_payment"] = getTotalPayment();
+    map["point"] = getPoint();
 
+    return QVariant( map );
 }
 
 
@@ -67,6 +76,55 @@ QVariant Customer::toQVariant()
  */
 xpError_t Customer::fromQVariant( const QVariant &_item )
 {
+    setDefault();
+    bool finalRet = true;
+    if( _item.canConvert<QVariantMap>() )
+    {
+        bool ret = true;
+        QVariantMap map = _item.toMap();
+        if( map.contains( "id" ) )
+            m_id = map["id"].toString().toStdString();
+
+        if( map.contains( "name" ) )
+            m_name = map["name"].toString().toStdString();
+
+        if( map.contains( "phone" ) )
+            m_phone = map["phone"].toString().toStdString();
+
+        if( map.contains( "email" ) )
+            m_email = map["email"].toString().toStdString();
+
+        if( map.contains( "shopping_count" ) )
+        {
+            m_shoppingCnt = map["shopping_count"].toString().toInt( &ret );
+            finalRet &= ret;
+        }
+
+        if( map.contains( "total_payment" ) )
+        {
+            m_totalPayment = map["total_payment"].toString().toDouble( &ret );
+            finalRet &= ret;
+        }
+
+        if( map.contains( "point" ) )
+        {
+            m_point = map["point"].toString().toInt( &ret );
+            finalRet &= ret;
+        }
+    }
+    else
+    {
+        finalRet = false;
+    }
+
+    if( !finalRet )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to convert from QVariant\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__ );
+        setDefault();
+        return xpErrorProcessFailure;
+    }
+
     return xpSuccess;
 }
 
