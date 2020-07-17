@@ -265,8 +265,9 @@ Rectangle {
 
                 onReleased: {
                     rectBtnMskePayment.color = UIMaterials.goldDark
-                    if( pnPayment.y >= root.height )
+                    if( pnPayment.opacity === 0 )
                     {
+                        console.log( "============> show payment" )
                         payTransitionOnY.start()
                         tabviewInvoice.enabled = false
                     }
@@ -578,10 +579,11 @@ Rectangle {
         //================== Payment panel
         Payment {
             id: pnPayment
-            width: parent.width
-            height: parent.height / 2
+            width: 3*parent.width / 5
+            height: parent.height
+            opacity: 0
             x: 0
-            y: parent.height
+            y: 0
             z: 20
             clip: true
 
@@ -595,18 +597,18 @@ Rectangle {
             NumberAnimation {
                 id: payTransitionOnY
                 target: pnPayment
-                property: "y"
-                from: parent.height
-                to: parent.height/2
+                property: "opacity"
+                from: 0
+                to: 1
                 duration: 250
             }
 
             NumberAnimation {
                 id: payTransitionOnYRev
                 target: pnPayment
-                property: "y"
-                from: parent.height / 2
-                to: parent.height
+                property: "opacity"
+                from: 1
+                to: 0
                 duration: 250
             }
         }
