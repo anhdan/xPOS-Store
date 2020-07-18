@@ -12,19 +12,29 @@ Rectangle {
     property var currCustomer
     property var updateCustomer
     property real totalCharge: 0
-    property int finalPoint: 0
 
     //=============== Functions
-    function updatePoint( newPoint )
+    function setDefaultDisplay()
     {
-        lblCustomerPoint.text = "Điểm: " + newPoint
-        finalPoint = newPoint
+        totalCharge = 0
+        currCustomer = undefined
+        updateCustomer = undefined
+
+        txtCustomerCode.text = ""
+        column.visible = false
+        btnUsePoint.enabled = true
+        radioCash.checked = true
+        txtPayingAmount.text = ""
+        lblReturnAmount.text = ""
+        columnReturn.visible = false
+        btnComplete.visible = false
     }
 
     //=============== Signals
     signal colapse()
-    signal usePoint( var point, var convertRate )
+    signal pointUsed( var pointDiscount )
     signal payCompleted()
+    signal needMorePayingAmount()
 
     signal customerFound( var customer )
     signal customerNotFound()
@@ -166,28 +176,60 @@ Rectangle {
 
     Button {
         id: btnUsePoint
-        anchors.horizontalCenter: root.horizontalCenter
+        anchors.right: txtCustomerCode.right
         anchors.top: column.bottom
         anchors.topMargin: 10
         width: Math.max( parent.width / 4, txtBtnUsePoint.width + 4)
-        height: titCustomerCode.height * 2.5
+        height: 50
         visible: false
         background: Rectangle {
-            color: UIMaterials.goldDark
+            id: rectBtnUsePoint
+            color: "transparent" //UIMaterials.goldDark
+            border.color: UIMaterials.goldDark
             radius: 5
             anchors.fill: parent
             Text {
                 id: txtBtnUsePoint
-                color: UIMaterials.grayDark
-                font.pixelSize: UIMaterials.fontSizeMedium
+                color: UIMaterials.goldDark
+                font.pixelSize: UIMaterials.fontSizeSmall
                 text: "Dùng điểm"
+//                anchors.right: parent.right
+//                anchors.verticalCenter: parent.verticalCenter
                 anchors.centerIn: parent
             }
         }
 
-        onClicked: {
-            //! TODO:
-            //! Implement this
+        onPressed: {
+            rectBtnUsePoint.color = UIMaterials.grayPrimary
+        }
+
+        onReleased: {
+            rectBtnUsePoint.color = "transparent"
+            var convertRate = xpBackend.getPoint2MoneyRate()
+            var discount = 0
+            if( (currCustomer["point"] * convertRate) > totalCharge )
+            {
+                updateCustomer["point"] = currCustomer["point"] - ((totalCharge / convertRate) | 0)
+                discount = totalCharge
+                totalCharge = 0
+                txtPayingAmount.text = "0 vnd"
+                txtPayingAmount.accepted()
+            }
+            else
+            {
+                discount = currCustomer["point"] * convertRate
+                totalCharge = totalCharge - discount
+                updateCustomer["point"] = 0
+                updateCustomer["total_payment"] = currCustomer["total_payment"] + totalCharge
+                if( radioCash.checked === true )
+                {
+                    txtPayingAmount.focus = true
+                }
+            }
+
+            lblCustomerPoint.text = updateCustomer["point"]
+            enabled = false
+            pointUsed( discount )
         }
     }
 
@@ -220,6 +262,7 @@ Rectangle {
             {
                 titPayingAmount.visible = true
                 txtPayingAmount.visible = true
+                txtPayingAmount.focus = true
             }
         }
     }
@@ -268,6 +311,7 @@ Rectangle {
         onCheckedChanged: {
             if( checked === true )
             {
+                txtPayingAmount.focus = false
                 titPayingAmount.visible = false
                 txtPayingAmount.visible = false
             }
@@ -317,7 +361,6 @@ Rectangle {
     }
 
     TextField {
-
         id: txtPayingAmount
         anchors.left: txtCustomerCode.left
         anchors.top: titPayingAmount.bottom
@@ -359,9 +402,19 @@ Rectangle {
             var orgText = text.replace( /,/g, "" )
             orgText = orgText.replace( "vnd", "" )
             var payingAmount = parseFloat(orgText, 10)
-            var vietnam = Qt.locale( )
-            txtReturnAmount.text = Number(payingAmount-totalCharge).toLocaleString( vietnam, "f", 0 ) + " vnd"
-            focus = false
+            if( payingAmount >= totalCharge )
+            {
+                var vietnam = Qt.locale( )
+                lblReturnAmount.text = Number(payingAmount-totalCharge).toLocaleString( vietnam, "f", 0 ) + " vnd"
+                columnReturn.visible = true
+                focus = false
+                btnComplete.visible = true
+            }
+            else
+            {
+                needMorePayingAmount()
+            }
+
         }
     }
 
@@ -372,7 +425,7 @@ Rectangle {
         width: txtCustomerCode.width
         anchors.left: txtCustomerCode.left
         anchors.top: txtPayingAmount.bottom
-        anchors.topMargin: 20
+        anchors.topMargin: 30
         spacing: 5
         visible: false
 
@@ -427,8 +480,10 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 20
+        visible: false
 
         background: Rectangle {
+            id: rectBtnComplete
             color:  UIMaterials.goldDark
             radius: 5
             anchors.fill: parent
@@ -443,9 +498,27 @@ Rectangle {
             }
         }
 
-        onClicked:
+        onPressed: {
+            rectBtnComplete.color = UIMaterials.goldPrimary
+        }
+
+        onReleased:
         {
+            rectBtnComplete.color = UIMaterials.goldDark
+
+            // Update cusomter in database
+            if( updateCustomer !== undefined )
+            {
+                updateCustomer["shopping_count"] += 1
+                xpBackend.updateCustomerFromInvoice( updateCustomer )
+            }
+
             var ret = xpBackend.httpPostInvoice();
+            currCustomer = undefined
+            updateCustomer = undefined
+            totalCharge = 0
+            payCompleted()
+            colapse()
         }
     }
 

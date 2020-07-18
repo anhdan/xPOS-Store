@@ -92,7 +92,6 @@ ListView {
     {
         if( itemModel.count > 0 )
         {
-            console.log( "-----> here" )
             var cost = 0
             for( var idx = 0; idx < itemModel.count; idx++ )
             {
@@ -144,12 +143,15 @@ ListView {
         }
     }
 
+    function clearList()
+    {
+        itemModel.clear()
+        latestCost = latestDiscount = latestTax = 0
+    }
+
 
     //=================== Signal - slot connection
-    Component.onCompleted: {
-        xpBackend.sigProductFound.connect( root.productFound )
-        xpBackend.sigProductNotFound.connect( root.productNotFound )
-    }
+
 
     //================== Signal Handling
     onProductFound: {

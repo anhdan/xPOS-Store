@@ -221,5 +221,48 @@ int XPBackend::updateCustomerFromInvoice(const QVariant &_customer)
 {
     //! TODO:
     //! Implement this
-    return xpSuccess;
+    xpos_store::Customer beCustomer;
+    xpError_t xpErr = beCustomer.fromQVariant( _customer );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to convert Qvariant parameter to backend object\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    if( !m_usersDB->isOpen() )
+    {
+        m_usersDB->open();
+    }
+
+    if( beCustomer.getId() != "" )
+    {
+        if( m_currCustomer.getId() == beCustomer.getId() )
+        {
+            xpErr = m_usersDB->updateCustomer( beCustomer, true );
+        }
+        else
+        {
+            xpErr = m_usersDB->insertCustomer( beCustomer );
+        }
+    }
+
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to update customer info to database\n",
+                 xpErr, __FILE__, __LINE__ );
+    }
+
+    return xpErr;
+}
+
+
+/**
+ * @brief XPBackend::getPoint2MoneyRate
+ */
+double XPBackend::getPoint2MoneyRate()
+{
+    //! TODO:
+    //! Use a CURRENCY table to store conversion rate of many currency
+    return 1000.0;
 }

@@ -265,9 +265,11 @@ Rectangle {
 
                 onReleased: {
                     rectBtnMskePayment.color = UIMaterials.goldDark
+                    var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
+                    pnPayment.totalCharge = (tab.item.latestCost + tab.item.latestTax - tab.item.latestDiscount)
+
                     if( pnPayment.opacity === 0 )
                     {
-                        console.log( "============> show payment" )
                         payTransitionOnY.start()
                         tabviewInvoice.enabled = false
                     }
@@ -406,6 +408,8 @@ Rectangle {
                 source: "ItemsListView.qml"
                 onLoaded: {
                     item.costCalculated.connect( root.showCost )
+                    xpBackend.sigProductFound.connect( item.productFound )
+                    xpBackend.sigProductNotFound.connect( item.productNotFound )
                 }
             }
 
@@ -443,6 +447,19 @@ Rectangle {
                         font.pixelSize: UIMaterials.fontSizeMedium
                     }
                 }
+            }
+
+            onCurrentIndexChanged: {
+                var prevTab = tabviewInvoice.getTab( 1- tabviewInvoice.currentIndex )
+                xpBackend.sigProductFound.disconnect( prevTab.item.productFound )
+                xpBackend.sigProductNotFound.disconnect( prevTab.item.productNotFound )
+
+                var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
+                xpBackend.sigProductFound.connect( tab.item.productFound )
+                xpBackend.sigProductNotFound.connect( tab.item.productNotFound )
+                showCost( tab.item.latestCost, tab.item.latestTax, tab.item.latestDiscount )
+
+                pnPayment.setDefaultDisplay()
             }
         }
 
@@ -567,6 +584,7 @@ Rectangle {
                     txtBtnAddItem.color = UIMaterials.appBgrColorLight
                     // Search for product with given code
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
+                    console.log( "tabviewInvoice.currentIndex: " + tabviewInvoice.currentIndex )
                     tab.item.addItem( text )
                     txtBarcodeInput.focus = false
                     pnBarcodeInput.visible = false
@@ -591,6 +609,23 @@ Rectangle {
             onColapse: {
                 payTransitionOnYRev.start()
                 tabviewInvoice.enabled = true
+            }
+
+            onPayCompleted: {
+                showCost(0, 0, 0)
+                var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
+                tab.item.clearList()
+                pnPayment.setDefaultDisplay()
+            }
+
+            onPointUsed: {
+                var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
+                showCost( tab.item.latestCost, tab.item.latestTax, tab.item.latestDiscount + pointDiscount )
+            }
+
+            onNeedMorePayingAmount: {
+                //! TODO:
+                //!     Notify to add more paying amount
             }
 
             //================== Animation

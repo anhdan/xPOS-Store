@@ -51,6 +51,8 @@ public slots:
     int searchForCustomer( QString _id );
     int updateCustomerFromInvoice( const QVariant &_customer );
 
+    double getPoint2MoneyRate();
+
 public:
 
 private:
