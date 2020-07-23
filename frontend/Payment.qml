@@ -9,6 +9,7 @@ Rectangle {
     id: root
     color: "white"
 
+    property var currItemList
     property var currCustomer
     property var updateCustomer
     property real totalCharge: 0
@@ -28,6 +29,11 @@ Rectangle {
         lblReturnAmount.text = ""
         columnReturn.visible = false
         btnComplete.visible = false
+    }
+
+    function copyItemList( itemList )
+    {
+        currItemList = Helper.deepCopy( itemList )
     }
 
     //=============== Signals
@@ -511,6 +517,13 @@ Rectangle {
             {
                 updateCustomer["shopping_count"] += 1
                 xpBackend.updateCustomerFromInvoice( updateCustomer )
+            }
+
+            for( var id = 0; id < currItemList.count; id++ )
+            {
+                var cpItem = JSON.parse(JSON.stringify(currItemList.get(id)))
+//                var cpItem = Helper.deepCopy( currItemList.get( id ) )
+                xpBackend.updateProductFromInvoice( cpItem )
             }
 
             var ret = xpBackend.httpPostInvoice();

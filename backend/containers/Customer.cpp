@@ -56,7 +56,7 @@ void Customer::printInfo()
 /**
  * @brief Customer::toQVariant
  */
-QVariant Customer::toQVariant()
+QVariant Customer::toQVariant( )
 {
     QVariantMap map;
     map["id"] = QString::fromStdString( getId() );

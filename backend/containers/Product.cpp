@@ -67,7 +67,7 @@ void Product::printInfo()
 /**
  * @brief Product::toQVariant
  */
-QVariant Product::toQVariant()
+QVariant Product::toQVariant( )
 {
     QVariantMap map;
     map["barcode"] = QString::fromStdString( getBarcode() );
@@ -122,6 +122,7 @@ xpError_t Product::fromQVariant( const QVariant &_item )
     }
     else
     {
+        LOG_MSG( "=============> 1" );
         finalRet = false;
     }
 

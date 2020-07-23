@@ -102,9 +102,40 @@ int XPBackend::updateProductFromInventory( const QVariant &_product)
  */
 int XPBackend::updateProductFromInvoice(const QVariant &_product)
 {
-    //! TODO:
-    //! Implement this
-    return xpSuccess;
+    xpos_store::Product beProduct;
+    xpError_t xpErr = beProduct.fromQVariant( _product );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to convert Qvariant parameter to backend object\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    QVariantMap map = _product.toMap();
+    bool ret = true;
+    int itemNum = map["item_num"].toInt( &ret );
+    LOG_MSG( "item_num = %d\n", itemNum );
+    if( ret == false )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to get object property\n",
+                 xpErrorNotAllocated, __FILE__, __LINE__ );
+        return xpErrorNotAllocated;
+    }
+
+    if( !m_inventoryDB->isOpen() )
+    {
+        m_inventoryDB->open();
+    }
+
+    xpErr |= beProduct.sellFromStock( itemNum );
+    xpErr |= m_inventoryDB->updateProduct( beProduct, true );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to update product info to database\n",
+                 xpErr, __FILE__, __LINE__ );
+    }
+
+    return xpErr;
 }
 
 

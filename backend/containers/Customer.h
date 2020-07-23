@@ -19,7 +19,7 @@ namespace xpos_store {
         void setDefault();
         void copyTo( Item *_item );
         void printInfo();
-        QVariant toQVariant();
+        QVariant toQVariant( );
         xpError_t fromQVariant( const QVariant &_item );
 
 

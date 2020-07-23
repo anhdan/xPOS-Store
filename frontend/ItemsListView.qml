@@ -62,6 +62,15 @@ ListView {
         }
     }
 
+    function getCurrItemInstock()
+    {
+        if( root.currentIndex === - 1 )
+        {
+            return 0
+        }
+        var currItem = itemModel.get( root.currentIndex )
+        return currItem["num_instock"]
+    }
 
     function getCurrItemQuantity()
     {
@@ -71,8 +80,7 @@ ListView {
         }
         var currItem = itemModel.get( root.currentIndex )
         return currItem["item_num"]
-    }
-
+    }    
 
     function updateCurrItemQuantity( newQuant )
     {
@@ -205,7 +213,7 @@ ListView {
                 width: parent.width * 3/5
                 height: parent.height
 
-                text: barcode + " @ " + name + "\n" + "unit" + " @ " + Number(unit_price).toLocaleString(Qt.locale(), "f", 0) + "vnd"
+                text: barcode + " @ " + name + "\n" + unit + " @ " + Number(unit_price).toLocaleString(Qt.locale(), "f", 0) + "vnd"
                 font.pixelSize: UIMaterials.fontSizeMedium
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
@@ -221,6 +229,8 @@ ListView {
             }
 
             TextField {
+                property string prevText
+
                 id: txtItemNum
                 width: parent.width * 2 / 15
                 height: parent.height
@@ -240,6 +250,8 @@ ListView {
                 }
 
                 onPressed: {
+                    prevText = text
+                    text = ""
                     changeHighLight( index )
                     var currDelegate = root.currentItem
                     currDelegate.bgrItemNumColor = UIMaterials.goldDark
@@ -248,7 +260,17 @@ ListView {
                 onAccepted: {
                     var currDelegate = root.currentItem
                     var currItemQuant = parseInt( text, 10 )
-                    updateCurrItemQuantity( currItemQuant )
+                    var currItemInstock = getCurrItemInstock()
+                    console.log( "---> Curr Item Instock = " + currItemInstock )
+                    if( currItemInstock >= currItemQuant )
+                    {
+                        updateCurrItemQuantity( currItemQuant )
+                    }
+                    else
+                    {
+                        text = prevText
+                    }
+
                     currDelegate.bgrItemNumColor = "transparent"
                     focus = false
                 }

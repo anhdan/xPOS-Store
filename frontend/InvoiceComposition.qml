@@ -190,7 +190,11 @@ Rectangle {
                     rectBtnIncrease.color = UIMaterials.appBgrColorLight
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
                     var currItemQuant = tab.item.getCurrItemQuantity()
-                    currItemQuant++
+                    var currItemInstock = tab.item.getCurrItemInstock()
+                    if( currItemInstock > currItemQuant )
+                    {
+                        currItemQuant++
+                    }
                     tab.item.updateCurrItemQuantity( currItemQuant )
                 }
             }
@@ -267,6 +271,7 @@ Rectangle {
                     rectBtnMskePayment.color = UIMaterials.goldDark
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
                     pnPayment.totalCharge = (tab.item.latestCost + tab.item.latestTax - tab.item.latestDiscount)
+                    pnPayment.currItemList = tab.item.model
 
                     if( pnPayment.opacity === 0 )
                     {

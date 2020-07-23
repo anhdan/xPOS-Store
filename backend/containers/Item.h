@@ -18,7 +18,7 @@ public:
     virtual void setDefault() = 0;
     virtual void copyTo( Item *_item ) = 0;
     virtual void printInfo() = 0;
-    virtual QVariant toQVariant() = 0;
+    virtual QVariant toQVariant( ) = 0;
     virtual xpError_t fromQVariant( const QVariant &_item ) = 0;
 };
 
