@@ -122,7 +122,6 @@ xpError_t Product::fromQVariant( const QVariant &_item )
     }
     else
     {
-        LOG_MSG( "=============> 1" );
         finalRet = false;
     }
 

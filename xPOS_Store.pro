@@ -22,7 +22,9 @@ SOURCES += main.cpp \
     backend/XPBackend.cpp \
     backend/3rd/key_emitter.cpp \
     backend/database/UserDatabase.cpp \
-    backend/database/SellingDatabase.cpp
+    backend/database/SellingDatabase.cpp \
+    backend/containers/SellingRecord.cpp \
+    backend/containers/Bill.cpp
 
 RESOURCES += qml.qrc
 
@@ -51,4 +53,6 @@ HEADERS += \
     backend/XPBackend.h \
     backend/3rd/key_emitter.h \
     backend/database/UserDatabase.h \
-    backend/database/SellingDatabase.h
+    backend/database/SellingDatabase.h \
+    backend/containers/SellingRecord.h \
+    backend/containers/Bill.h
