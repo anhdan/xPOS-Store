@@ -7,7 +7,7 @@ namespace xpos_store {
  */
 void SellingRecord::setDefault()
 {
-    m_billId = -1;
+    m_billId = "";
     m_productBarcode = "";
     m_quantity = 0;
     m_totalPrice = 0;
@@ -34,7 +34,7 @@ void SellingRecord::copyTo( Item *_item )
 void SellingRecord::printInfo()
 {
     LOG_MSG( "\n---------Customer---------\n" );
-    LOG_MSG( ". BILL ID:                %ld\n", m_billId );
+    LOG_MSG( ". BILL ID:                %s\n", m_billId );
     LOG_MSG( ". PRODUCT BARCOE:         %s\n", m_productBarcode.c_str() );
     LOG_MSG( ". QUANTITY:               %d\n", m_quantity );
     LOG_MSG( ". TOTAL PRICE:            %f\n", m_totalPrice );
@@ -63,7 +63,7 @@ xpError_t SellingRecord::fromQVariant( const QVariant &_item )
 /**
  * @brief SellingRecord::setBillId
  */
-void SellingRecord::setBillId( const uint64_t _billId )
+void SellingRecord::setBillId( const std::string &_billId )
 {
     m_billId = _billId;
 }
@@ -72,7 +72,7 @@ void SellingRecord::setBillId( const uint64_t _billId )
 /**
  * @brief SellingRecord::getBillId
  */
-uint64_t SellingRecord::getBillId()
+std::string SellingRecord::getBillId()
 {
     return m_billId;
 }

@@ -180,7 +180,7 @@ xpError_t UserDatabase::insertCustomer(Customer &_customer)
     }
 
     std::string cmdFormat = "INSERT INTO CUSTOMER (ID, NAME, PHONE, EMAIL, TOTAL_PAYMENT, POINT, SHOPPING_COUNT) " \
-                            "VALUES('%s', '%s', '%s', '%s', %f, %d, %d";
+                            "VALUES('%s', '%s', '%s', '%s', %f, %d, %d);";
     char sqliteCmd[1000];
     sprintf( sqliteCmd, cmdFormat.c_str(), _customer.getId().c_str(),
              _customer.getName().c_str(), _customer.getPhone().c_str(), _customer.getEmail().c_str(),

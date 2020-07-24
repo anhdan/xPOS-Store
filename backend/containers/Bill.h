@@ -31,6 +31,9 @@ public:
 
     void setPayment( const double _totalCharging, const double _totalDiscount, const double _totalPayment );
     void getPayment( double *_totalCharging, double *_totalDiscount, double *_totalPayment );
+    double getTotalCharging();
+    double getTotalDiscount();
+    double getCustomerPayment();
 
     void setPoints( const double _usedPoint, const double _rewardedPoint );
     double getUsedPoint();

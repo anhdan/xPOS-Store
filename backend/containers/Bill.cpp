@@ -156,6 +156,33 @@ void Bill::getPayment( double *_totalCharging, double *_totalDiscount, double *_
 
 
 /**
+ * @brief Bill::getTotalCharging
+ */
+double Bill::getTotalCharging()
+{
+    return m_totalCharging;
+}
+
+
+/**
+ * @brief Bill::getTotalDiscount
+ */
+double Bill::getTotalDiscount()
+{
+    return m_totalDiscount;
+}
+
+
+/**
+ * @brief Bill::getCustomerPayment
+ */
+double Bill::getCustomerPayment()
+{
+    return m_customerPayment;
+}
+
+
+/**
  * @brief Bill::setPoints
  */
 void Bill::setPoints( const double _usedPoint, const double _rewardedPoint )

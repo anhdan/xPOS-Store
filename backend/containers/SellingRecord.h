@@ -21,8 +21,8 @@ public:
     QVariant toQVariant( );
     xpError_t fromQVariant( const QVariant &_item );
 
-    void setBillId( const uint64_t _billId );
-    uint64_t getBillId();
+    void setBillId( const std::string &_billId );
+    std::string getBillId();
 
     void setProductBarcode( const std::string &_barcode );
     std::string getProductBarcode();
@@ -34,7 +34,7 @@ public:
     double getTotalPrice();
 
 private:
-    unsigned long m_billId;
+    std::string m_billId;
     std::string m_productBarcode;
     int m_quantity;
     double m_totalPrice;
