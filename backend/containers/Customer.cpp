@@ -130,6 +130,14 @@ xpError_t Customer::fromQVariant( const QVariant &_item )
 
 
 /**
+ * @brief Customer::isValid
+ */
+bool Customer::isValid()
+{
+    return (m_id != "");
+}
+
+/**
  * @brief Customer::searchCallBack
  */
 xpError_t Customer::searchCallBack(void *data, int fieldsNum, char **fieldVal, char **fieldName)

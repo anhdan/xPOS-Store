@@ -138,6 +138,15 @@ xpError_t Product::fromQVariant( const QVariant &_item )
 
 
 /**
+ * @brief Product::isValid
+ */
+bool Product::isValid()
+{
+    return (m_barcode != "");
+}
+
+
+/**
  * @brief Product::isIdenticalTo
  */
 bool Product::isIdenticalTo(const Product &_product)

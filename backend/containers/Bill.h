@@ -3,7 +3,10 @@
 
 #include "backend/xPos.h"
 #include "backend/containers/Item.h"
+#include "backend/containers/Staff.h"
 #include "backend/containers/Customer.h"
+#include "backend/containers/Product.h"
+#include "backend/containers/Payment.h"
 
 namespace xpos_store {
 
@@ -19,6 +22,7 @@ public:
     void printInfo();
     QVariant toQVariant( );
     xpError_t fromQVariant( const QVariant &_item );
+    bool isValid();
 
     void setStaffId( const std::string &_staffId );
     std::string getStaffId();
@@ -29,25 +33,18 @@ public:
     void setCreationTime( const time_t _creationTime );
     time_t getCreationTime();
 
-    void setPayment( const double _totalCharging, const double _totalDiscount, const double _totalPayment );
-    void getPayment( double *_totalCharging, double *_totalDiscount, double *_totalPayment );
-    double getTotalCharging();
-    double getTotalDiscount();
-    double getCustomerPayment();
+    void setPayment( const Payment &_payment );
+    void getPayment( Payment &_payment );
 
-    void setPoints( const double _usedPoint, const double _rewardedPoint );
-    double getUsedPoint();
-    double getRewardedPoint();
+    xpError_t compose( const Staff &_staff, const Customer &_customer,
+                       const Payment &_payment, const std::vector<Product> &_products );
+    std::string getJSONString();
 
 private:
     std::string m_customerId;
     std::string m_staffId;
     time_t m_creationTime;
-    double m_totalCharging;
-    double m_totalDiscount;
-    double m_customerPayment;
-    int m_usedPoint;
-    int m_rewardedPoint;
+    Payment m_payment;
 };
 
 }

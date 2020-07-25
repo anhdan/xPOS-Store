@@ -19,6 +19,7 @@ public:
     void printInfo();
     QVariant toQVariant( );
     xpError_t fromQVariant( const QVariant &_item );
+    bool isValid();
     bool isIdenticalTo( const Product &_product );
 
 public:

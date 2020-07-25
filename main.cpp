@@ -3,6 +3,7 @@
 
 #include "backend/database/InventoryDatabase.h"
 #include "backend/database/UserDatabase.h"
+#include "backend/database/SellingDatabase.h"
 #include "backend/XPBackend.h"
 #include "backend/3rd/key_emitter.h"
 
@@ -40,7 +41,19 @@ int main(int argc, char *argv[])
         }
     }
 
-    XPBackend xpBackend( &engine, &inventoryDB, &usersDB );
+    xpos_store::SellingDatabase sellingDB;
+    if( sellingDB.connect( "../resource/dbs/selling.db" ) != xpSuccess )
+    {
+        xpErr = sellingDB.create( "../resource/dbs/selling.db" );
+        if( xpErr != xpSuccess )
+        {
+            LOG_MSG( "[ERR:%d] :%s:%d: Failed to either create or connect to database\n",
+                     xpErr, __FILE__, __LINE__ );
+            exit( xpErr );
+        }
+    }
+
+    XPBackend xpBackend( &engine, &inventoryDB, &usersDB, &sellingDB );
     KeyEmitter keyEmitter( &engine );
     QQmlContext *ctx = engine.rootContext();
     ctx->setContextProperty( "xpBackend", &xpBackend );

@@ -21,6 +21,7 @@ namespace xpos_store {
         void printInfo();
         QVariant toQVariant( );
         xpError_t fromQVariant( const QVariant &_item );
+        bool isValid();
 
 
         void setShoppingCount( const int _shoppingCnt );

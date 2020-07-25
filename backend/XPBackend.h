@@ -20,13 +20,14 @@
 
 #include "backend/database/InventoryDatabase.h"
 #include "backend/database/UserDatabase.h"
+#include "backend/database/SellingDatabase.h"
 
 class XPBackend : public QObject
 {
     Q_OBJECT
 public:
     XPBackend( QQmlApplicationEngine *engine, xpos_store::InventoryDatabase *_inventoryDB,
-               xpos_store::UserDatabase *_usersDB );
+               xpos_store::UserDatabase *_usersDB, xpos_store::SellingDatabase *_sellingDB );
     ~XPBackend();
 
 signals:
@@ -59,6 +60,7 @@ private:
     QQmlApplicationEngine *m_engine;
     xpos_store::InventoryDatabase *m_inventoryDB;  
     xpos_store::UserDatabase *m_usersDB;
+    xpos_store::SellingDatabase *m_sellingDB;
     xpos_store::Product m_currProduct;
     xpos_store::Staff m_currStaff;
     xpos_store::Customer m_currCustomer;

@@ -61,6 +61,15 @@ xpError_t SellingRecord::fromQVariant( const QVariant &_item )
 
 
 /**
+ * @brief SellingRecord::isValid
+ */
+bool SellingRecord::isValid()
+{
+    return ((m_billId != "") && (m_productBarcode != ""));
+}
+
+
+/**
  * @brief SellingRecord::setBillId
  */
 void SellingRecord::setBillId( const std::string &_billId )

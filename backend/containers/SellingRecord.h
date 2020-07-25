@@ -20,6 +20,7 @@ public:
     void printInfo();
     QVariant toQVariant( );
     xpError_t fromQVariant( const QVariant &_item );
+    bool isValid();
 
     void setBillId( const std::string &_billId );
     std::string getBillId();

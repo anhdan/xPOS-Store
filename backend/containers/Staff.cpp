@@ -115,6 +115,15 @@ xpError_t Staff::searchCallBack(void *data, int fieldsNum, char **fieldVal, char
     return xpSuccess;
 }
 
+
+/**
+ * @brief Staff::isValid
+ */
+bool Staff::isValid()
+{
+    return (m_id != "");
+}
+
 //==========================================================
 //
 //           get set functions

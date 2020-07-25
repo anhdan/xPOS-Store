@@ -191,10 +191,12 @@ xpError_t SellingDatabase::insertBill( Bill &_bill)
     std::string cmdFormat = "INSERT INTO BILL (CUSTOMER_ID, STAFF_ID, CREATION_TIME, TOTAL_CHARGING, TOTAL_DISCOUNT, CUSTOMER_PAYMENT, USED_POINT, REWARDED_POINT) " \
                             "VALUES('%s', '%s', %ld, %f, %f, %f, %d, %d);";
     char sqliteCmd[1000];
+    Payment payment;
+    _bill.getPayment( payment );
     sprintf( sqliteCmd, cmdFormat.c_str(),
              _bill.getCustomerId().c_str(), _bill.getStaffId().c_str(), _bill.getCreationTime(),
-             _bill.getTotalCharging(), _bill.getTotalDiscount(), _bill.getCustomerPayment(),
-             _bill.getUsedPoint(), _bill.getRewardedPoint() );
+             payment.getTotalCharging(), payment.getTotalDiscount(), payment.getCustomerPayment(),
+             payment.getUsedPoint(), payment.getRewardedPoint() );
     printf( "====> insert bill cmd: %s\n", sqliteCmd );
 
     char *sqliteMsg;

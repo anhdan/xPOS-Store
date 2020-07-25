@@ -9,8 +9,7 @@ void Bill::setDefault()
 {
     m_staffId = m_customerId = "";
     m_creationTime = 0;
-    m_totalCharging = m_totalDiscount = m_customerPayment = 0;
-    m_usedPoint = m_rewardedPoint = 0;
+
 }
 
 
@@ -25,10 +24,6 @@ void Bill::copyTo(Item *_item)
         bill->m_staffId = m_staffId;
         bill->m_customerId = m_customerId;
         bill->m_creationTime = m_creationTime;
-        bill->m_totalCharging = m_totalCharging;
-        bill->m_totalDiscount = m_totalDiscount;
-        bill->m_customerPayment = m_customerPayment;
-        bill->m_rewardedPoint = m_rewardedPoint;
     }
 }
 
@@ -37,16 +32,12 @@ void Bill::copyTo(Item *_item)
  * @brief Bill::printInfo
  */
 void Bill::printInfo()
-{
+{    
     LOG_MSG( "\n---------Bill---------\n" );
     LOG_MSG( ". STAFF ID:           %s\n", m_staffId.c_str() );
     LOG_MSG( ". CUSTOMER ID:        %s\n", m_customerId.c_str() );
     LOG_MSG( ". CREATION TIME:      %ld\n", (unsigned long)m_creationTime );
-    LOG_MSG( ". TOTAL CHARGING:     %f\n", m_totalCharging );
-    LOG_MSG( ". TOTAL DISCOUNT:     %f\n", m_totalDiscount );
-    LOG_MSG( ". CUSTOMER PAYMENT:   %f\n", m_customerPayment );
-    LOG_MSG( ". USED POINT:         %d\n", m_usedPoint );
-    LOG_MSG( ". REWARDED POINT:     %d\n", m_rewardedPoint );
+    m_payment.printInfo();
     LOG_MSG( "-------------------------\n" );
 }
 
@@ -66,6 +57,15 @@ QVariant Bill::toQVariant( )
 xpError_t Bill::fromQVariant( const QVariant &_item )
 {
     return xpSuccess;
+}
+
+
+/**
+ * @brief Bill::isValid
+ */
+bool Bill::isValid()
+{
+    return ((m_staffId != "") && (m_creationTime > 0));
 }
 
 
@@ -125,87 +125,39 @@ time_t Bill::getCreationTime()
 /**
  * @brief Bill::setPayment
  */
-void Bill::setPayment( const double _totalCharging, const double _totalDiscount, const double _customerPayment )
+void Bill::setPayment( const Payment &_payment )
 {
-    m_totalCharging = _totalCharging;
-    m_totalDiscount = _totalDiscount;
-    m_customerPayment = _customerPayment;
+    ((Payment)_payment).copyTo( &m_payment );
 }
 
 
 /**
  * @brief Bill::getPayment
  */
-void Bill::getPayment( double *_totalCharging, double *_totalDiscount, double *_customerPayment )
+void Bill::getPayment( Payment &_payment )
 {
-    if( _totalCharging )
-    {
-        *_totalCharging = m_totalCharging;
-    }
-
-    if( _totalDiscount )
-    {
-        *_totalDiscount = m_totalDiscount;
-    }
-
-    if( _customerPayment )
-    {
-        *_customerPayment = m_customerPayment;
-    }
+    m_payment.copyTo( &_payment );
 }
 
 
 /**
- * @brief Bill::getTotalCharging
+ * @brief Bill::compose
  */
-double Bill::getTotalCharging()
+xpError_t Bill::compose( const Staff &_staff, const Customer &_customer,
+                   const Payment &_payment, const std::vector<Product> &_products )
 {
-    return m_totalCharging;
+
+    return xpSuccess;
 }
 
 
 /**
- * @brief Bill::getTotalDiscount
+ * @brief Bill::getJSONString
  */
-double Bill::getTotalDiscount()
+std::string Bill::getJSONString()
 {
-    return m_totalDiscount;
-}
 
-
-/**
- * @brief Bill::getCustomerPayment
- */
-double Bill::getCustomerPayment()
-{
-    return m_customerPayment;
-}
-
-
-/**
- * @brief Bill::setPoints
- */
-void Bill::setPoints( const double _usedPoint, const double _rewardedPoint )
-{
-    m_usedPoint = _usedPoint;
-    m_rewardedPoint = _rewardedPoint;
-}
-
-
-/**
- * @brief Bill::getUsedPoint
- */
-double Bill::getUsedPoint()
-{
-    return m_usedPoint;
-}
-
-/**
- * @brief Bill::getRewardedPoint
- */
-double Bill::getRewardedPoint()
-{
-    return m_rewardedPoint;
+    return "Implement this";
 }
 
 }

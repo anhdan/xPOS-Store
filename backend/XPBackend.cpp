@@ -4,8 +4,8 @@
  * @brief XPBackend::XPBackend
  */
 XPBackend::XPBackend(QQmlApplicationEngine *engine, xpos_store::InventoryDatabase *_inventoryDB,
-                     xpos_store::UserDatabase *_usersDB)
-    : m_engine(engine), m_inventoryDB( _inventoryDB ), m_usersDB(_usersDB)
+                     xpos_store::UserDatabase *_usersDB, xpos_store::SellingDatabase *_sellingDB )
+    : m_engine(engine), m_inventoryDB( _inventoryDB ), m_usersDB(_usersDB), m_sellingDB(_sellingDB)
 {
     LOG_MSG( "[DEB]: an xpos-store backend has been created\n" );
 }
@@ -18,6 +18,8 @@ XPBackend::~XPBackend()
 {
     m_engine = nullptr;
     m_inventoryDB = nullptr;
+    m_usersDB = nullptr;
+    m_sellingDB = nullptr;
 }
 
 

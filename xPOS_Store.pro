@@ -25,7 +25,8 @@ SOURCES += main.cpp \
     backend/database/SellingDatabase.cpp \
     backend/containers/SellingRecord.cpp \
     backend/containers/Bill.cpp \
-    backend/containers/WorkShift.cpp
+    backend/containers/WorkShift.cpp \
+    backend/containers/Payment.cpp
 
 RESOURCES += qml.qrc
 
@@ -57,4 +58,5 @@ HEADERS += \
     backend/database/SellingDatabase.h \
     backend/containers/SellingRecord.h \
     backend/containers/Bill.h \
-    backend/containers/WorkShift.h
+    backend/containers/WorkShift.h \
+    backend/containers/Payment.h

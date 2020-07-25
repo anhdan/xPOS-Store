@@ -21,6 +21,7 @@ public:
     void printInfo();
     QVariant toQVariant();
     xpError_t fromQVariant( const QVariant &_item );
+    bool isValid();
 
     void setPrivilege( const Privilege _privilege );
     Privilege getPrivilege();

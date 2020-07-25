@@ -61,6 +61,15 @@ xpError_t WorkShift::fromQVariant( const QVariant &_item )
 
 
 /**
+ * @brief WorkShift::isValid
+ */
+bool WorkShift::isValid()
+{
+    return ((m_staffId != "") && (m_startTime >0) && (m_endTime > m_startTime));
+}
+
+
+/**
  * @brief WorkShift::setStaffId
  */
 void WorkShift::setStaffId( const std::string &_staffId )
