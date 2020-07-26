@@ -87,7 +87,7 @@ QVariant Product::toQVariant( )
     map["num_sold"]       = getNumSold();
     map["num_disqualified"] = getNumDisqualified();
 
-    return QVariant( map );
+    return QVariant::fromValue( map );
 }
 
 

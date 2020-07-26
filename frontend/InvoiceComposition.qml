@@ -270,8 +270,7 @@ Rectangle {
                 onReleased: {
                     rectBtnMskePayment.color = UIMaterials.goldDark
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
-                    pnPayment.totalCharge = (tab.item.latestCost + tab.item.latestTax - tab.item.latestDiscount)
-                    pnPayment.currItemList = tab.item.model
+                    pnPayment.initialize(tab.item.latestCost, tab.item.latestTax, tab.item.latestDiscount, tab.item.model)
 
                     if( pnPayment.opacity === 0 )
                     {

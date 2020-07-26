@@ -48,7 +48,14 @@ void Payment::printInfo()
  */
 QVariant Payment::toQVariant( )
 {
+    QVariantMap map;
+    map["total_charging"] = m_totalCharging;
+    map["total_discount"] = m_totalDiscount;
+    map["customer_payment"] = m_customerPayment;
+    map["used_point"] = m_usedPoint;
+    map["rewarded_point"] = m_rewardedPoint;
 
+    return QVariant::fromValue( map );
 }
 
 
@@ -57,6 +64,55 @@ QVariant Payment::toQVariant( )
  */
 xpError_t Payment::fromQVariant( const QVariant &_item )
 {
+    setDefault();
+    bool finalRet = true;
+    if( _item.canConvert<QVariantMap>() )
+    {
+        bool ret = true;
+        QVariantMap map = _item.toMap();
+        if( map.contains("total_charging") )
+        {
+            m_totalCharging = map["total_charging"].toDouble( &ret );
+            finalRet &= ret;
+        }
+
+        if( map.contains("total_discount") )
+        {
+            m_totalDiscount = map["total_discount"].toDouble( &ret );
+            finalRet &= ret;
+        }
+
+        if( map.contains("customer_payment") )
+        {
+            m_customerPayment = map["customer_payment"].toDouble( &ret );
+            finalRet &= ret;
+        }
+
+        if( map.contains("used_point") )
+        {
+            m_usedPoint = map["used_point"].toInt( &ret );
+            finalRet &= ret;
+        }
+
+        if( map.contains("rewarded_point") )
+        {
+            m_rewardedPoint = map["rewarded_point"].toInt( &ret );
+            finalRet &= ret;
+        }
+    }
+    else
+    {
+        finalRet = false;
+    }
+
+    if( !finalRet )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to convert from QVariant\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__ );
+        setDefault();
+        return xpErrorProcessFailure;
+    }
+
     return xpSuccess;
 }
 
@@ -66,7 +122,7 @@ xpError_t Payment::fromQVariant( const QVariant &_item )
  */
 bool Payment::isValid()
 {
-    return (m_totalCharging > 0 && m_customerPayment >=0);
+    return (m_totalCharging >= 0 && m_customerPayment >=0);
 }
 
 

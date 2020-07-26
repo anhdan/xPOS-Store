@@ -261,4 +261,24 @@ xpError_t Customer::makePayment(const double _payment, const int _usedPoint, con
     return xpSuccess;
 }
 
+
+/**
+ * @brief Customer::makePayment
+ */
+xpError_t Customer::makePayment( Payment &_payment)
+{
+    if( !_payment.isValid() )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Invalid payment info\n",
+                 xpErrorInvalidValues, __FILE__, __LINE__ );
+        return xpErrorInvalidValues;
+    }
+
+    m_totalPayment += _payment.getTotalCharging();
+    m_shoppingCnt++;
+    m_point = m_point - _payment.getUsedPoint() + _payment.getRewardedPoint();
+
+    return xpSuccess;
+}
+
 }

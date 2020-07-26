@@ -3,6 +3,7 @@
 
 #include "backend/xPos.h"
 #include "backend/containers/Person.h"
+#include "backend/containers/Payment.h"
 
 namespace xpos_store {
 
@@ -32,6 +33,7 @@ namespace xpos_store {
         int getPoint();
 
         xpError_t makePayment( const double _payment, const int _usedPoint, const int _rewardedPoint );
+        xpError_t makePayment( Payment &_payment );
 
         static xpError_t searchCallBack(void *data, int fieldsNum, char **fieldVal, char **fieldName);
 

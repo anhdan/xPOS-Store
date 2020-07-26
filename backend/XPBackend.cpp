@@ -174,6 +174,58 @@ int XPBackend::httpPostInvoice()
 
 
 /**
+ * @brief XPBackend::completePayment
+ */
+int XPBackend::completePayment( const QVariant &_qProductsList, const QVariant &_qCustomer, const QVariant &_qPayment )
+{
+    xpError_t xpErr = xpSuccess;
+
+    //! TODO:
+    //!     Convert Product List
+    xpos_store::Payment payment;
+    xpos_store::Customer customer;
+    xpErr |= customer.fromQVariant( _qCustomer );
+    xpErr |= payment.fromQVariant( _qPayment );
+
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to convert variable type\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    // Update  customer in database
+    xpErr |= customer.makePayment( payment );
+    if( customer.isValid() )
+    {
+        if( !m_usersDB->isOpen() )
+        {
+            m_usersDB->open();
+        }
+
+        if( m_currCustomer.getId() == customer.getId() )
+        {
+            xpErr = m_usersDB->updateCustomer( customer, true );
+        }
+        else
+        {
+            xpErr = m_usersDB->insertCustomer( customer );
+        }
+
+        if( xpErr != xpSuccess )
+        {
+            LOG_MSG( "[ERR:%d] %s:%d: Failed to update customer info to database\n",
+                     xpErr, __FILE__, __LINE__ );
+            return xpErr;
+        }
+    }
+
+
+    return xpErr;
+}
+
+
+/**
  * @brief XPBackend::login
  */
 int XPBackend::login(QString _name, QString _pwd)

@@ -11,15 +11,14 @@ Rectangle {
 
     property var currItemList
     property var currCustomer
-    property var updateCustomer
+    property var currPayment
     property real totalCharge: 0
 
     //=============== Functions
     function setDefaultDisplay()
     {
-        totalCharge = 0
-        currCustomer = undefined
-        updateCustomer = undefined
+        currPayment = Helper.setDefaultPayment( currPayment )
+        currCustomer = Helper.setDefaultCustomer( currCustomer )
 
         txtCustomerCode.text = ""
         column.visible = false
@@ -31,10 +30,14 @@ Rectangle {
         btnComplete.visible = false
     }
 
-    function copyItemList( itemList )
+    function initialize( latestCost, latesTax, latestDiscount, itemList )
     {
-        currItemList = Helper.deepCopy( itemList )
+        currPayment = Helper.setDefaultPayment( currPayment )
+        currPayment["total_discount"] = Number(latestDiscount)
+        currPayment["total_charging"] = Number(latestCost) + Number(latesTax) - Number(latestDiscount)
+        currItemList = itemList
     }
+
 
     //=============== Signals
     signal colapse()
@@ -56,7 +59,6 @@ Rectangle {
     //============== Signals handling
     onCustomerFound:
     {
-        updateCustomer = Helper.deepCopy( customer )
         currCustomer = Helper.deepCopy( customer )
         lblCustomerName.text = customer["name"]
         lblCustomerShoppingCnt.text = customer["shopping_count"]
@@ -213,27 +215,26 @@ Rectangle {
             rectBtnUsePoint.color = "transparent"
             var convertRate = xpBackend.getPoint2MoneyRate()
             var discount = 0
-            if( (currCustomer["point"] * convertRate) > totalCharge )
+            if( (currCustomer["point"] * convertRate) > currPayment["total_charging"] )
             {
-                updateCustomer["point"] = currCustomer["point"] - ((totalCharge / convertRate) | 0)
-                discount = totalCharge
-                totalCharge = 0
+                currPayment["used_point"] = ((currPayment["total_charging"] / convertRate) | 0)
+                currPayment["total_discount"] += currPayment["total_charging"]
+                currPayment["total_charging"] = 0
                 txtPayingAmount.text = "0 vnd"
                 txtPayingAmount.accepted()
             }
             else
             {
-                discount = currCustomer["point"] * convertRate
-                totalCharge = totalCharge - discount
-                updateCustomer["point"] = 0
-                updateCustomer["total_payment"] = currCustomer["total_payment"] + totalCharge
+                currPayment["used_point"] = currCustomer["point"]
+                currPayment["total_discount"] += currCustomer["point"] * convertRate
+                currPayment["total_charging"] = currPayment["total_charging"] - currCustomer["point"] * convertRate
                 if( radioCash.checked === true )
                 {
                     txtPayingAmount.focus = true
                 }
             }
 
-            lblCustomerPoint.text = updateCustomer["point"]
+            lblCustomerPoint.text = currCustomer["point"] - currPayment["used_point"]
             enabled = false
             pointUsed( discount )
         }
@@ -408,10 +409,11 @@ Rectangle {
             var orgText = text.replace( /,/g, "" )
             orgText = orgText.replace( "vnd", "" )
             var payingAmount = parseFloat(orgText, 10)
-            if( payingAmount >= totalCharge )
+            if( payingAmount >= currPayment["total_charging"] )
             {
                 var vietnam = Qt.locale( )
-                lblReturnAmount.text = Number(payingAmount-totalCharge).toLocaleString( vietnam, "f", 0 ) + " vnd"
+                currPayment["customer_payment"] = payingAmount
+                lblReturnAmount.text = Number(payingAmount-currPayment["total_charging"]).toLocaleString( vietnam, "f", 0 ) + " vnd"
                 columnReturn.visible = true
                 focus = false
                 btnComplete.visible = true
@@ -513,23 +515,18 @@ Rectangle {
             rectBtnComplete.color = UIMaterials.goldDark
 
             // Update cusomter in database
-            if( updateCustomer !== undefined )
-            {
-                updateCustomer["shopping_count"] += 1
-                xpBackend.updateCustomerFromInvoice( updateCustomer )
-            }
+            currCustomer["id"] = txtCustomerCode.text
+            var jsonItemList = JSON.parse(JSON.stringify(currItemList))
+            xpBackend.completePayment( jsonItemList, currCustomer, currPayment )
 
             for( var id = 0; id < currItemList.count; id++ )
             {
                 var cpItem = JSON.parse(JSON.stringify(currItemList.get(id)))
 //                var cpItem = Helper.deepCopy( currItemList.get( id ) )
                 xpBackend.updateProductFromInvoice( cpItem )
-            }
+            }            
 
             var ret = xpBackend.httpPostInvoice();
-            currCustomer = undefined
-            updateCustomer = undefined
-            totalCharge = 0
             payCompleted()
             colapse()
         }
