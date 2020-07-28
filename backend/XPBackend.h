@@ -45,7 +45,7 @@ public slots:
     int updateProductFromInventory( const QVariant &_product );
     int updateProductFromInvoice( const QVariant &_product );
     int httpPostInvoice();
-    int completePayment( const QVariant &_qProductsList, const QVariant &_qCustomer, const QVariant &_qPayment );
+    int completePayment( const QVariant &_qSellingRecords, const QVariant &_qCustomer, const QVariant &_qPayment );
 
     int login( QString _name, QString _pwd );
     int getPrivilege();

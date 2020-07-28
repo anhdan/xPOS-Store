@@ -116,7 +116,6 @@ int XPBackend::updateProductFromInvoice(const QVariant &_product)
     QVariantMap map = _product.toMap();
     bool ret = true;
     int itemNum = map["item_num"].toInt( &ret );
-    LOG_MSG( "item_num = %d\n", itemNum );
     if( ret == false )
     {
         LOG_MSG( "[ERR:%d] %s:%d: Failed to get object property\n",
@@ -176,16 +175,31 @@ int XPBackend::httpPostInvoice()
 /**
  * @brief XPBackend::completePayment
  */
-int XPBackend::completePayment( const QVariant &_qProductsList, const QVariant &_qCustomer, const QVariant &_qPayment )
+int XPBackend::completePayment( const QVariant &_qSellingRecords, const QVariant &_qCustomer, const QVariant &_qPayment )
 {
     xpError_t xpErr = xpSuccess;
 
-    //! TODO:
-    //!     Convert Product List
+    //===== Convert Qml type to C++ type
     xpos_store::Payment payment;
     xpos_store::Customer customer;
     xpErr |= customer.fromQVariant( _qCustomer );
     xpErr |= payment.fromQVariant( _qPayment );
+
+    std::list<xpos_store::SellingRecord> sellingRecords;
+    if( _qSellingRecords.canConvert<QVariantList>() )
+    {
+        QVariantList qtList = _qSellingRecords.toList();
+        xpos_store::SellingRecord record;
+        for( int id = 0; id < qtList.size(); id++ )
+        {
+            xpErr |= record.fromQVariant( qtList.at(id) );
+            sellingRecords.push_back( record );
+        }
+    }
+    else
+    {
+        xpErr |= xpErrorInvalidParameters;
+    }
 
     if( xpErr != xpSuccess )
     {
@@ -194,7 +208,7 @@ int XPBackend::completePayment( const QVariant &_qProductsList, const QVariant &
         return xpErr;
     }
 
-    // Update  customer in database
+    //===== Update customer in database
     xpErr |= customer.makePayment( payment );
     if( customer.isValid() )
     {
@@ -219,6 +233,9 @@ int XPBackend::completePayment( const QVariant &_qProductsList, const QVariant &
             return xpErr;
         }
     }
+
+
+    //===== Update selling record in database
 
 
     return xpErr;

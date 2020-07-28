@@ -33,7 +33,7 @@ void SellingRecord::copyTo( Item *_item )
  */
 void SellingRecord::printInfo()
 {
-    LOG_MSG( "\n---------Customer---------\n" );
+    LOG_MSG( "\n---------SellingRecord---------\n" );
     LOG_MSG( ". BILL ID:                %s\n", m_billId );
     LOG_MSG( ". PRODUCT BARCOE:         %s\n", m_productBarcode.c_str() );
     LOG_MSG( ". QUANTITY:               %d\n", m_quantity );
@@ -47,7 +47,13 @@ void SellingRecord::printInfo()
  */
 QVariant SellingRecord::toQVariant( )
 {
+    QVariantMap map;
+    map["bill_id"] = QString::fromStdString(m_billId);
+    map["product_barcode"] = QString::fromStdString(m_productBarcode);
+    map["quantity"] = m_quantity;
+    map["total_price"] = m_totalPrice;
 
+    return QVariant::fromValue( map );
 }
 
 
@@ -56,6 +62,31 @@ QVariant SellingRecord::toQVariant( )
  */
 xpError_t SellingRecord::fromQVariant( const QVariant &_item )
 {
+    bool finalRet = true;
+    if( _item.canConvert<QVariantMap>() )
+    {
+        bool ret = true;
+        QVariantMap map = _item.toMap();
+        m_billId = map["bill_id"].toString().toStdString();
+        m_productBarcode = map["product_barcode"].toString().toStdString();
+        m_quantity = map["quantity"].toInt( &ret );
+        finalRet &= ret;
+        m_totalPrice = map["total_price"].toDouble( &ret );
+        finalRet &= ret;
+    }
+    else
+    {
+        finalRet = false;
+    }
+
+    if( !finalRet )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to convert from QVariant\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__ );
+        setDefault();
+        return xpErrorProcessFailure;
+    }
+
     return xpSuccess;
 }
 

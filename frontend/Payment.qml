@@ -33,9 +33,21 @@ Rectangle {
     function initialize( latestCost, latesTax, latestDiscount, itemList )
     {
         currPayment = Helper.setDefaultPayment( currPayment )
+        currCustomer = Helper.setDefaultCustomer( currCustomer )
         currPayment["total_discount"] = Number(latestDiscount)
         currPayment["total_charging"] = Number(latestCost) + Number(latesTax) - Number(latestDiscount)
         currItemList = itemList
+    }
+
+    function item2SellingRecord( item )
+    {
+        var sellingRecord = {}
+        sellingRecord["bill_id"] = ""
+        sellingRecord["product_barcode"] = item["barcode"]
+        sellingRecord["quantity"] = item["item_num"]
+        sellingRecord["total_price"] = Number(item["item_num"]) * Number(item["unit_price"])
+
+        return sellingRecord
     }
 
 
@@ -59,7 +71,7 @@ Rectangle {
     //============== Signals handling
     onCustomerFound:
     {
-        currCustomer = Helper.deepCopy( customer )
+        currCustomer = customer//Helper.deepCopy( customer )
         lblCustomerName.text = customer["name"]
         lblCustomerShoppingCnt.text = customer["shopping_count"]
         lblCustomerPoint.text = customer["point"]
@@ -69,6 +81,8 @@ Rectangle {
 
     onCustomerNotFound:
     {
+        currCustomer = Helper.setDefaultCustomer( currCustomer )
+        currCustomer["id"] = txtCustomerCode.text
         //! TODO:
         //! Display noti
     }
@@ -514,17 +528,16 @@ Rectangle {
         {
             rectBtnComplete.color = UIMaterials.goldDark
 
-            // Update cusomter in database
-            currCustomer["id"] = txtCustomerCode.text
-            var jsonItemList = JSON.parse(JSON.stringify(currItemList))
-            xpBackend.completePayment( jsonItemList, currCustomer, currPayment )
-
+            //===== Payment post processing
+            var sellingRecords = []
             for( var id = 0; id < currItemList.count; id++ )
             {
-                var cpItem = JSON.parse(JSON.stringify(currItemList.get(id)))
-//                var cpItem = Helper.deepCopy( currItemList.get( id ) )
+//                var cpItem = JSON.parse(JSON.stringify(currItemList.get(id)))
+                sellingRecords.push( item2SellingRecord(currItemList.get(id)) )
+                var cpItem = Helper.deepCopy( currItemList.get( id ) )
                 xpBackend.updateProductFromInvoice( cpItem )
             }            
+            xpBackend.completePayment( sellingRecords, currCustomer, currPayment )
 
             var ret = xpBackend.httpPostInvoice();
             payCompleted()
