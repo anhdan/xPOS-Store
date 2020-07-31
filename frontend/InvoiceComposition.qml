@@ -27,6 +27,22 @@ Rectangle {
         lblSumFinal.text = Number(cost + tax - discount).toLocaleString( vietnam, "f", 0 ) + " vnd"
     }
 
+    function showNotFoundNoti()
+    {
+        // notification
+        if( noti.state == "visible" )
+        {
+            noti.state = "invisible"
+        }
+        noti.showNoti( "Không tìm thấy sản phẩm trong kho!", "error" )
+        noti.state = "visible"
+        noti.focus = true
+    }
+
+    Component.onCompleted: {
+        xpBackend.sigProductNotFound.connect( showNotFoundNoti )
+    }
+
     signal toInventoryBoard()
     signal toCustomerBoard()
     signal toAnalyticsBoard()
@@ -413,7 +429,7 @@ Rectangle {
                 onLoaded: {
                     item.costCalculated.connect( root.showCost )
                     xpBackend.sigProductFound.connect( item.productFound )
-                    xpBackend.sigProductNotFound.connect( item.productNotFound )
+                    xpBackend.sigProductNotFound.connect( item.productNotFound )                    
                 }
             }
 
@@ -462,8 +478,6 @@ Rectangle {
                 xpBackend.sigProductFound.connect( tab.item.productFound )
                 xpBackend.sigProductNotFound.connect( tab.item.productNotFound )
                 showCost( tab.item.latestCost, tab.item.latestTax, tab.item.latestDiscount )
-
-                pnPayment.setDefaultDisplay()
             }
         }
 
@@ -588,7 +602,6 @@ Rectangle {
                     txtBtnAddItem.color = UIMaterials.appBgrColorLight
                     // Search for product with given code
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
-                    console.log( "tabviewInvoice.currentIndex: " + tabviewInvoice.currentIndex )
                     tab.item.addItem( text )
                     txtBarcodeInput.focus = false
                     pnBarcodeInput.visible = false
@@ -620,6 +633,15 @@ Rectangle {
                 var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
                 tab.item.clearList()
                 pnPayment.setDefaultDisplay()
+
+                // notification
+                if( noti.state == "visible" )
+                {
+                    noti.state = "invisible"
+                }
+                noti.showNoti( "Hoàn tất 01 đơn hàng", "success" )
+                noti.state = "visible"
+                noti.focus = true
             }
 
             onPointUsed: {
@@ -628,8 +650,14 @@ Rectangle {
             }
 
             onNeedMorePayingAmount: {
-                //! TODO:
-                //!     Notify to add more paying amount
+                // notification
+                if( noti.state == "visible" )
+                {
+                    noti.state = "invisible"
+                }
+                noti.showNoti( "Tiền khách trả chưa đủ!", "error" )
+                noti.state = "visible"
+                noti.focus = true
             }
 
             //================== Animation
@@ -650,8 +678,76 @@ Rectangle {
                 to: 0
                 duration: 250
             }
-        }
+        }                        
     }
 
+    //=================== Notification Popup
+    NotificationPopup {
+        id: noti
+        width: 3*pnControl.width/4
+        height: 100
+        x: 5
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 5
+        state: "invisible"
 
+        states: [
+            State {
+                name: "visible"
+                PropertyChanges {
+                    target: noti
+                    x: 5
+                }
+            },
+
+            State {
+                name: "invisible"
+                PropertyChanges {
+                    target: noti
+                    x: -noti.width
+                }
+            }
+        ]
+
+        transitions: Transition {
+            from: "invisible"
+            to: "visible"
+            reversible: true
+            SequentialAnimation {
+                NumberAnimation {
+                    properties: "x"
+                    duration: 500
+                    easing.type: Easing.InOutQuad
+                }
+
+//                PropertyAnimation {
+//                    properties: "focus"
+//                    from: false
+//                    to: true
+//                }
+
+//                PauseAnimation {
+//                    duration: 500
+//                }
+            }
+        }
+
+        onColapse: {
+            state = "invisible"
+        }
+
+        onStateChanged: {
+            if( state === "visible" )
+            {
+                focus = true
+            }
+        }
+
+        onFocusChanged: {
+            if( focus === false )
+            {
+                state = "invisible"
+            }
+        }
+    }
 }
