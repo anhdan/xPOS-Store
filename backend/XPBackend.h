@@ -46,7 +46,6 @@ public slots:
 
     // Invoice methods
     int initializePayment();
-    int updateProductFromInvoice( const QVariant &_product );
     int httpPostInvoice();
     int sellProduct( const QVariant &_qProduct, const int _numSold );
     int completePayment( const QVariant &_qCustomer, const QVariant &_qPayment );

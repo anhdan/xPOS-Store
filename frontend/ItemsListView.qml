@@ -104,7 +104,7 @@ ListView {
             for( var idx = 0; idx < itemModel.count; idx++ )
             {
                 var item = itemModel.get( idx )
-                cost += Number( item["unit_price"] ) * Number(item["item_num"])
+                cost += Number( item["selling_price"] ) * Number(item["item_num"])
             }
             latestCost = cost
         }
@@ -205,7 +205,7 @@ ListView {
                 font.pixelSize: UIMaterials.fontSizeMedium
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                color: textColor
+                color: (discount_price > 0) ? UIMaterials.goldDark : textColor
             }
 
             Label {
@@ -213,11 +213,11 @@ ListView {
                 width: parent.width * 3/5
                 height: parent.height
 
-                text: barcode + " @ " + name + "\n" + unit + " @ " + Number(unit_price).toLocaleString(Qt.locale(), "f", 0) + "vnd"
+                text: barcode + " @ " + name + "\n" + unit + " @ " + Number(selling_price).toLocaleString(Qt.locale(), "f", 0) + "vnd"
                 font.pixelSize: UIMaterials.fontSizeMedium
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
-                color: textColor
+                color: (discount_price > 0) ? UIMaterials.goldDark : textColor
 
                 MouseArea {
                     id: itemMouse
@@ -240,7 +240,7 @@ ListView {
                 font.pixelSize: UIMaterials.fontSizeMedium
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                color: textColor
+                color: (discount_price > 0) ? UIMaterials.goldDark : textColor
 
                 background: Rectangle {
                     id: bgrItemNum
@@ -254,14 +254,13 @@ ListView {
                     text = ""
                     changeHighLight( index )
                     var currDelegate = root.currentItem
-                    currDelegate.bgrItemNumColor = UIMaterials.goldDark
+                    currDelegate.bgrItemNumColor = UIMaterials.appBgrColorLight
                 }
 
                 onAccepted: {
                     var currDelegate = root.currentItem
                     var currItemQuant = parseInt( text, 10 )
                     var currItemInstock = getCurrItemInstock()
-                    console.log( "---> Curr Item Instock = " + currItemInstock )
                     if( currItemInstock >= currItemQuant )
                     {
                         updateCurrItemQuantity( currItemQuant )
@@ -281,11 +280,11 @@ ListView {
                 width: parent.width * 11 / 50
                 height: parent.height
 
-                text: (item_num * unit_price).toLocaleString( Qt.locale(), 'f', 0 )
+                text: (item_num * selling_price).toLocaleString( Qt.locale(), 'f', 0 )
                 font.pixelSize: UIMaterials.fontSizeMedium
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                color: textColor
+                color: (discount_price > 0) ? UIMaterials.goldDark : textColor
             }
         }
     }

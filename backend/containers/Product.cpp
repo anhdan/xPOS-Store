@@ -75,13 +75,23 @@ QVariant Product::toQVariant( )
     map["desc"] = QString::fromStdString( getDescription() );
     map["unit"] = QString::fromStdString( getUnit() );
     map["unit_price"] = getUnitPrice();
-    map["discount_price"] = m_discountPrice;
 
-    QDateTime qTime;
-    qTime.setTime_t( (uint)m_discountStart );
-    map["discount_start"] = qTime.toString( "dd/MM/yyyy" );
-    qTime.setTime_t( (uint)m_discountEnd );
-    map["discount_end"] = qTime.toString( "dd/MM/yyyy" );
+    if( m_discountPrice > 0 && !isDiscountExpired() )
+    {
+        map["discount_price"] = m_discountPrice;
+        QDateTime qTime;
+        qTime.setTime_t( (uint)m_discountStart );
+        map["discount_start"] = qTime.toString( "dd/MM/yyyy" );
+        qTime.setTime_t( (uint)m_discountEnd );
+        map["discount_end"] = qTime.toString( "dd/MM/yyyy" );
+    }
+    else
+    {
+        map["discount_price"] = 0;
+        map["discount_start"] = "";
+        map["discount_end"] = "";
+    }
+    map["selling_price"] = getSellingPrice();
 
     map["num_instock"]    = getNumInstock();
     map["num_sold"]       = getNumSold();
@@ -375,6 +385,40 @@ void Product::cancelDiscount()
     m_discountPrice = 0.0;
     m_discountStart = 0;
     m_discountEnd = 0;
+}
+
+
+/**
+ * @brief Product::isDiscountExpired
+ */
+bool Product::isDiscountExpired()
+{
+    if( (m_discountPrice > 0) && (m_discountStart > 0) && (m_discountEnd > 0 ) )
+    {
+        time_t currTime = time( NULL );
+        if( (m_discountPrice > m_unitPrice) || (m_discountStart > m_discountEnd) || (currTime >= m_discountEnd) )
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+/**
+ * @brief Product::getSellingPrice
+ */
+double Product::getSellingPrice()
+{
+    if( m_discountPrice > 0 && !isDiscountExpired() )
+    {
+        return m_discountPrice;
+    }
+    else
+    {
+        return m_unitPrice;
+    }
 }
 
 

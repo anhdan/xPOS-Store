@@ -43,16 +43,21 @@ int XPBackend::searchForProduct(QString _code)
         return xpErr;
     }
 
-    if( m_currProduct.getBarcode() == "" )
+    if( m_currProduct.isValid())
     {
+        m_currProduct.printInfo();
+        if( m_currProduct.isDiscountExpired() )
+        {
+            m_currProduct.cancelDiscount();
+            xpErr |= m_inventoryDB->updateProduct( m_currProduct, false );
+        }
+        emit sigProductFound( m_currProduct.toQVariant() );
+    }
+    else
+    {        
         LOG_MSG( "[WAR] %s:%d: Product not found\n",
                  __FILE__, __LINE__ );
         emit sigProductNotFound();
-    }
-    else
-    {
-        m_currProduct.printInfo();
-        emit sigProductFound( m_currProduct.toQVariant() );
     }
 
     return xpErr;
@@ -109,47 +114,8 @@ int XPBackend::initializePayment()
     time_t now = time(NULL);
     m_bill.setCreationTime( now );
     m_bill.setStaffId( m_currStaff.getId() );
-}
 
-
-/**
- * @brief XPBackend::updateProductFromInvoice
- */
-int XPBackend::updateProductFromInvoice(const QVariant &_product)
-{
-    xpos_store::Product beProduct;
-    xpError_t xpErr = beProduct.fromQVariant( _product );
-    if( xpErr != xpSuccess )
-    {
-        LOG_MSG( "[ERR:%d] %s:%d: Failed to convert Qvariant parameter to backend object\n",
-                 xpErr, __FILE__, __LINE__ );
-        return xpErr;
-    }
-
-    QVariantMap map = _product.toMap();
-    bool ret = true;
-    int itemNum = map["item_num"].toInt( &ret );
-    if( ret == false )
-    {
-        LOG_MSG( "[ERR:%d] %s:%d: Failed to get object property\n",
-                 xpErrorNotAllocated, __FILE__, __LINE__ );
-        return xpErrorNotAllocated;
-    }
-
-    if( !m_inventoryDB->isOpen() )
-    {
-        m_inventoryDB->open();
-    }
-
-    xpErr |= beProduct.sellFromStock( itemNum );
-    xpErr |= m_inventoryDB->updateProduct( beProduct, true );
-    if( xpErr != xpSuccess )
-    {
-        LOG_MSG( "[ERR:%d] %s:%d: Failed to update product info to database\n",
-                 xpErr, __FILE__, __LINE__ );
-    }
-
-    return xpErr;
+    return xpSuccess;
 }
 
 
@@ -220,7 +186,7 @@ int XPBackend::sellProduct(const QVariant &_qProduct, const int _numSold)
     record.setBillId( m_bill.getId() );
     record.setProductBarcode( product.getBarcode() );
     record.setQuantity( _numSold );
-    record.setTotalPrice( (double)_numSold * product.getUnitPrice() );
+    record.setTotalPrice( (double)_numSold * product.getSellingPrice() );
     m_bill.addSellingRecord( (xpos_store::SellingRecord&)record );
 
     if( !m_sellingDB->isOpen() )

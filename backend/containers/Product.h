@@ -37,6 +37,8 @@ public:
     xpError_t runDiscount( const double _discountPrice, const time_t _start, const time_t _end );
     void getDiscountInfo(  double *_discountPrice, time_t *_start, time_t *_end );
     void cancelDiscount();
+    bool isDiscountExpired();
+    double getSellingPrice();
 
     void setNumInstock( const uint32_t _numInstock );
     uint32_t getNumInstock();

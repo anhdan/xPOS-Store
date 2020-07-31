@@ -39,18 +39,6 @@ Rectangle {
         xpBackend.initializePayment()
     }
 
-    function item2SellingRecord( item )
-    {
-        var sellingRecord = {}
-        sellingRecord["bill_id"] = ""
-        sellingRecord["product_barcode"] = item["barcode"]
-        sellingRecord["quantity"] = item["item_num"]
-        sellingRecord["total_price"] = Number(item["item_num"]) * Number(item["unit_price"])
-
-        return sellingRecord
-    }
-
-
     //=============== Signals
     signal colapse()
     signal pointUsed( var pointDiscount )
