@@ -17,12 +17,10 @@ Rectangle {
     //=============== Functions
     function setDefaultDisplay()
     {
-        currPayment = Helper.setDefaultPayment( currPayment )
-        currCustomer = Helper.setDefaultCustomer( currCustomer )
-
         txtCustomerCode.text = ""
         column.visible = false
         btnUsePoint.enabled = true
+        btnUsePoint.visible = false
         radioCash.checked = true
         txtPayingAmount.text = ""
         lblReturnAmount.text = ""
@@ -37,6 +35,7 @@ Rectangle {
         currPayment["total_discount"] = Number(latestDiscount)
         currPayment["total_charging"] = Number(latestCost) + Number(latesTax) - Number(latestDiscount)
         currItemList = itemList
+        setDefaultDisplay()
         xpBackend.initializePayment()
     }
 
