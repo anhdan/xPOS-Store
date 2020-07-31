@@ -100,6 +100,19 @@ int XPBackend::updateProductFromInventory( const QVariant &_product)
 
 
 /**
+ * @brief XPBackend::initializePayment
+ */
+int XPBackend::initializePayment()
+{
+    m_currCustomer.setDefault();
+    m_bill.setDefault();
+    time_t now = time(NULL);
+    m_bill.setCreationTime( now );
+    m_bill.setStaffId( m_currStaff.getId() );
+}
+
+
+/**
  * @brief XPBackend::updateProductFromInvoice
  */
 int XPBackend::updateProductFromInvoice(const QVariant &_product)
@@ -152,6 +165,8 @@ int XPBackend::httpPostInvoice()
     val = file.readAll();
     file.close();
     qWarning() << val;
+    QString test = QString("\n\n\n this is test string" ) + QString( ": test ok\n\n\n" );
+    qWarning() << test;
     QJsonDocument jsonDoc = QJsonDocument::fromJson(val.toUtf8());
 
 
@@ -173,33 +188,69 @@ int XPBackend::httpPostInvoice()
 
 
 /**
+ * @brief XPBackend::sellProduct
+ */
+int XPBackend::sellProduct(const QVariant &_qProduct, const int _numSold)
+{
+    xpos_store::Product product;
+    xpError_t xpErr = product.fromQVariant( _qProduct );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to convert Qvariant parameter to backend object\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    // Update product quantity instock
+    if( !m_inventoryDB->isOpen() )
+    {
+        m_inventoryDB->open();
+    }
+
+    xpErr |= product.sellFromStock( _numSold );
+    xpErr |= m_inventoryDB->updateProduct( product, true );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to update product info to database\n",
+                 xpErr, __FILE__, __LINE__ );
+    }
+
+    // Add selling record to current bill and save it to database
+    xpos_store::SellingRecord record;
+    record.setBillId( m_bill.getId() );
+    record.setProductBarcode( product.getBarcode() );
+    record.setQuantity( _numSold );
+    record.setTotalPrice( (double)_numSold * product.getUnitPrice() );
+    m_bill.addSellingRecord( (xpos_store::SellingRecord&)record );
+
+    if( !m_sellingDB->isOpen() )
+    {
+        m_sellingDB->open();
+    }
+
+    xpErr |= m_sellingDB->insertSellingRecord( record );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to update selling record info to database\n",
+                 xpErr, __FILE__, __LINE__ );
+    }
+
+    return xpErr;
+}
+
+
+/**
  * @brief XPBackend::completePayment
  */
-int XPBackend::completePayment( const QVariant &_qSellingRecords, const QVariant &_qCustomer, const QVariant &_qPayment )
+int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPayment )
 {
     xpError_t xpErr = xpSuccess;
 
-    //===== Convert Qml type to C++ type
+    //===== Update customer in database
     xpos_store::Payment payment;
     xpos_store::Customer customer;
     xpErr |= customer.fromQVariant( _qCustomer );
     xpErr |= payment.fromQVariant( _qPayment );
-
-    std::list<xpos_store::SellingRecord> sellingRecords;
-    if( _qSellingRecords.canConvert<QVariantList>() )
-    {
-        QVariantList qtList = _qSellingRecords.toList();
-        xpos_store::SellingRecord record;
-        for( int id = 0; id < qtList.size(); id++ )
-        {
-            xpErr |= record.fromQVariant( qtList.at(id) );
-            sellingRecords.push_back( record );
-        }
-    }
-    else
-    {
-        xpErr |= xpErrorInvalidParameters;
-    }
 
     if( xpErr != xpSuccess )
     {
@@ -208,7 +259,6 @@ int XPBackend::completePayment( const QVariant &_qSellingRecords, const QVariant
         return xpErr;
     }
 
-    //===== Update customer in database
     xpErr |= customer.makePayment( payment );
     if( customer.isValid() )
     {
@@ -235,8 +285,34 @@ int XPBackend::completePayment( const QVariant &_qSellingRecords, const QVariant
     }
 
 
-    //===== Update selling record in database
+    //===== Send bill to maintenance server
+    // create bill
+    m_bill.setCustomerId( customer.getId() );
+    m_bill.setPayment( payment );
+    QString json = m_bill.toJSONString();
 
+    // save bill to database
+    if( !m_sellingDB->isOpen() )
+    {
+        m_sellingDB->open();
+    }
+
+    xpErr |= m_sellingDB->insertBill( m_bill );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to save bill to database\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    // http post
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(json.toUtf8());
+    QNetworkAccessManager * manager = new QNetworkAccessManager(this);
+    QUrl url("https://asia-east2-xposproject.cloudfunctions.net/addNewBill");
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    QByteArray jsonData= jsonDoc.toJson();
+    manager->post(request, jsonData);
 
     return xpErr;
 }
@@ -321,8 +397,6 @@ int XPBackend::searchForCustomer(QString _id)
  */
 int XPBackend::updateCustomerFromInvoice(const QVariant &_customer)
 {
-    //! TODO:
-    //! Implement this
     xpos_store::Customer beCustomer;
     xpError_t xpErr = beCustomer.fromQVariant( _customer );
     if( xpErr != xpSuccess )

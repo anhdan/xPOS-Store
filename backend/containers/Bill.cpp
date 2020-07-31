@@ -9,7 +9,8 @@ void Bill::setDefault()
 {
     m_staffId = m_customerId = "";
     m_creationTime = 0;
-
+    m_sellingRecords.clear();
+    m_payment.setDefault();
 }
 
 
@@ -65,7 +66,25 @@ xpError_t Bill::fromQVariant( const QVariant &_item )
  */
 bool Bill::isValid()
 {
-    return ((m_staffId != "") && (m_creationTime > 0));
+    return (m_id != "");
+}
+
+
+/**
+ * @brief Bill::setId
+ */
+void Bill::setId(const std::string &_id)
+{
+    m_id = _id;
+}
+
+
+/**
+ * @brief Bill::getId
+ */
+std::string Bill::getId()
+{
+    return m_id;
 }
 
 
@@ -75,6 +94,10 @@ bool Bill::isValid()
 void Bill::setStaffId( const std::string &_staffId )
 {
     m_staffId = _staffId;
+    if( m_creationTime > 0 )
+    {
+        m_id = m_staffId + std::to_string( m_creationTime );
+    }
 }
 
 
@@ -110,6 +133,10 @@ std::string Bill::getCustomerId()
 void Bill::setCreationTime( const time_t _creationTime )
 {
     m_creationTime = _creationTime;
+    if( m_staffId != "" )
+    {
+        m_id = m_staffId + std::to_string( m_creationTime );
+    }
 }
 
 
@@ -141,10 +168,21 @@ void Bill::getPayment( Payment &_payment )
 
 
 /**
+ * @brief Bill::addSellingRecord
+ */
+xpError_t Bill::addSellingRecord( SellingRecord &_record)
+{
+    _record.setBillId( m_id );
+    m_sellingRecords.push_back( _record );
+    return xpSuccess;
+}
+
+
+/**
  * @brief Bill::compose
  */
 xpError_t Bill::compose( const Staff &_staff, const Customer &_customer,
-                   const Payment &_payment, const std::vector<Product> &_products )
+                   const Payment &_payment, const std::vector<SellingRecord> &_records )
 {
 
     return xpSuccess;
@@ -154,10 +192,40 @@ xpError_t Bill::compose( const Staff &_staff, const Customer &_customer,
 /**
  * @brief Bill::getJSONString
  */
-std::string Bill::getJSONString()
+QString Bill::toJSONString()
 {
+    std::cout << "print from inside\n";
+    m_payment.printInfo();
+    char cJSONStr[1000];
+    sprintf( cJSONStr,  "{\n" \
+                        "\"store_id\": %s,\n" \
+                        "\"bill_id\": %s,\n" \
+                        "\"staff_id\": %s,\n" \
+                        "\"time\": %ld,\n" \
+                        "\"post\": %d,\n" \
+                        "\"customer_id\": %s,\n" \
+                        "\"total_charging\": %f,\n" \
+                        "\"discount\": %f,\n" \
+                        "\"used_point\": %d,\n" \
+                        "\"rewarded_point\": %d,\n" \
+                        "\"products\":\n" \
+                        "[\n", "1111", m_id.c_str(), m_staffId.c_str(), (uint64_t)m_creationTime,
+                        1, m_customerId.c_str(), m_payment.getTotalCharging(), m_payment.getTotalDiscount(),
+                        m_payment.getUsedPoint(), m_payment.getRewardedPoint() );
+    QString qBillJSON = QString::fromStdString( std::string(cJSONStr) );
 
-    return "Implement this";
+    std::list<xpos_store::SellingRecord>::iterator it = m_sellingRecords.begin();
+    for( int id = 0; id < m_sellingRecords.size()-1; id++ )
+    {
+        qBillJSON = qBillJSON + QString(",\n") + it->toJSONString();
+        std::advance( it, 1 );
+    }
+    qBillJSON = qBillJSON + it->toJSONString() + QString("\n]\n}");
+
+    std::cout << qBillJSON.toStdString() << std::endl << std::endl;
+
+    return qBillJSON;
 }
+
 
 }

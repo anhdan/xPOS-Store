@@ -25,6 +25,7 @@ xpError_t SellingDatabase::createBillTable()
     }
 
     std::string sqliteCmd = "CREATE TABLE IF NOT EXISTS BILL (\n" \
+                            "   ID                  TEXT        PRIMARY KEY,\n" \
                             "   CUSTOMER_ID         TEXT        ,\n" \
                             "   STAFF_ID            TEXT        NOT NULL,\n" \
                             "   CREATION_TIME       INTEGER     NOT NULL,\n" \
@@ -32,8 +33,7 @@ xpError_t SellingDatabase::createBillTable()
                             "   TOTAL_DISCOUNT      REAL        NOT NULL,\n" \
                             "   CUSTOMER_PAYMENT    REAL        NOT NULL,\n" \
                             "   USED_POINT          INTEGER     NOT NULL,\n" \
-                            "   REWARDED_POINT      INTEGER     NOT NULL,\n" \
-                            "   PRIMARY KEY(STAFF_ID, CREATION_TIME)\n" \
+                            "   REWARDED_POINT      INTEGER     NOT NULL\n" \
                             ") WITHOUT ROWID;";
     char* sqliteMsg = nullptr;
     int sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd.c_str(), nullptr, nullptr, &sqliteMsg );
@@ -174,7 +174,7 @@ xpError_t SellingDatabase::create(const std::string &_dbPath)
  */
 xpError_t SellingDatabase::insertBill( Bill &_bill)
 {
-    if( _bill.getStaffId() == "" || _bill.getCreationTime() <= 0 )
+    if( !_bill.isValid() )
     {
         LOG_MSG( "[ERR:%d] %s:%d: Invalid bill info\n",
                  xpErrorInvalidParameters, __FILE__, __LINE__ );
@@ -188,12 +188,12 @@ xpError_t SellingDatabase::insertBill( Bill &_bill)
         return xpErrorNotPermited;
     }
 
-    std::string cmdFormat = "INSERT INTO BILL (CUSTOMER_ID, STAFF_ID, CREATION_TIME, TOTAL_CHARGING, TOTAL_DISCOUNT, CUSTOMER_PAYMENT, USED_POINT, REWARDED_POINT) " \
-                            "VALUES('%s', '%s', %ld, %f, %f, %f, %d, %d);";
+    std::string cmdFormat = "INSERT INTO BILL (ID, CUSTOMER_ID, STAFF_ID, CREATION_TIME, TOTAL_CHARGING, TOTAL_DISCOUNT, CUSTOMER_PAYMENT, USED_POINT, REWARDED_POINT) " \
+                            "VALUES('%s', '%s', '%s', %ld, %f, %f, %f, %d, %d);";
     char sqliteCmd[1000];
     Payment payment;
     _bill.getPayment( payment );
-    sprintf( sqliteCmd, cmdFormat.c_str(),
+    sprintf( sqliteCmd, cmdFormat.c_str(), _bill.getId().c_str(),
              _bill.getCustomerId().c_str(), _bill.getStaffId().c_str(), _bill.getCreationTime(),
              payment.getTotalCharging(), payment.getTotalDiscount(), payment.getCustomerPayment(),
              payment.getUsedPoint(), payment.getRewardedPoint() );

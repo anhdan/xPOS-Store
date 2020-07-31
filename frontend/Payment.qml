@@ -37,6 +37,7 @@ Rectangle {
         currPayment["total_discount"] = Number(latestDiscount)
         currPayment["total_charging"] = Number(latestCost) + Number(latesTax) - Number(latestDiscount)
         currItemList = itemList
+        xpBackend.initializePayment()
     }
 
     function item2SellingRecord( item )
@@ -532,14 +533,11 @@ Rectangle {
             var sellingRecords = []
             for( var id = 0; id < currItemList.count; id++ )
             {
-//                var cpItem = JSON.parse(JSON.stringify(currItemList.get(id)))
-                sellingRecords.push( item2SellingRecord(currItemList.get(id)) )
                 var cpItem = Helper.deepCopy( currItemList.get( id ) )
-                xpBackend.updateProductFromInvoice( cpItem )
+                xpBackend.sellProduct( cpItem, cpItem["item_num"] )
             }            
-            xpBackend.completePayment( sellingRecords, currCustomer, currPayment )
+            xpBackend.completePayment( currCustomer, currPayment )
 
-            var ret = xpBackend.httpPostInvoice();
             payCompleted()
             colapse()
         }

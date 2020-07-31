@@ -28,10 +28,10 @@ public:
     double getCustomerPayment();
     double getReturnToCustomer();
 
-    void setUsedPoints( const double _usedPoint );
-    double getUsedPoint();
-    void setRewardedPoints( const double _rewardedPoint );
-    double getRewardedPoint();
+    void setUsedPoints( const int _usedPoint );
+    int getUsedPoint();
+    void setRewardedPoints( const int _rewardedPoint );
+    int getRewardedPoint();
 
 private:
     double m_totalCharging;

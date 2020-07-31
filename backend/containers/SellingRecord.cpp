@@ -171,4 +171,19 @@ double SellingRecord::getTotalPrice()
 }
 
 
+/**
+ * @brief SellingRecord::toJSONString
+ */
+QString SellingRecord::toJSONString()
+{
+    char cJSONStr[1000];
+    sprintf( cJSONStr,  "{\n"\
+                        "\"code\": %s,\n" \
+                        "\"quantity\": %d,\n" \
+                        "\"total_price\": %f\n"\
+                        "}", m_productBarcode.c_str(), m_quantity, m_totalPrice );
+    return QString::fromStdString( std::string(cJSONStr) );
+}
+
+
 }

@@ -34,6 +34,8 @@ public:
     void setTotalPrice( const double _totalPrice );
     double getTotalPrice();
 
+    QString toJSONString();
+
 private:
     std::string m_billId;
     std::string m_productBarcode;

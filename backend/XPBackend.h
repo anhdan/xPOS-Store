@@ -43,9 +43,13 @@ signals:
 public slots:
     int searchForProduct( QString _code );
     int updateProductFromInventory( const QVariant &_product );
+
+    // Invoice methods
+    int initializePayment();
     int updateProductFromInvoice( const QVariant &_product );
     int httpPostInvoice();
-    int completePayment( const QVariant &_qSellingRecords, const QVariant &_qCustomer, const QVariant &_qPayment );
+    int sellProduct( const QVariant &_qProduct, const int _numSold );
+    int completePayment( const QVariant &_qCustomer, const QVariant &_qPayment );
 
     int login( QString _name, QString _pwd );
     int getPrivilege();
@@ -65,6 +69,7 @@ private:
     xpos_store::Product m_currProduct;
     xpos_store::Staff m_currStaff;
     xpos_store::Customer m_currCustomer;
+    xpos_store::Bill m_bill;
 };
 
 #endif // XPBACKEND_H

@@ -23,6 +23,7 @@ void Payment::copyTo( Item *_item )
         payment->m_totalCharging = m_totalCharging;
         payment->m_totalDiscount = m_totalDiscount;
         payment->m_customerPayment = m_customerPayment;
+        payment->m_usedPoint = m_usedPoint;
         payment->m_rewardedPoint = m_rewardedPoint;
     }
 }
@@ -192,7 +193,7 @@ double Payment::getReturnToCustomer()
 /**
  * @brief Payment::setUsedPoints
  */
-void Payment::setUsedPoints( const double _usedPoint )
+void Payment::setUsedPoints( const int _usedPoint )
 {
     m_usedPoint = _usedPoint;
 }
@@ -201,7 +202,7 @@ void Payment::setUsedPoints( const double _usedPoint )
 /**
  * @brief Payment::getUsedPoint
  */
-double Payment::getUsedPoint()
+int Payment::getUsedPoint()
 {
     return m_usedPoint;
 }
@@ -210,7 +211,7 @@ double Payment::getUsedPoint()
 /**
  * @brief Payment::setRewardedPoints
  */
-void Payment::setRewardedPoints( const double _rewardedPoint )
+void Payment::setRewardedPoints( const int _rewardedPoint )
 {
     m_rewardedPoint = _rewardedPoint;
 }
@@ -219,7 +220,7 @@ void Payment::setRewardedPoints( const double _rewardedPoint )
 /**
  * @brief Payment::getRewardedPoint
  */
-double Payment::getRewardedPoint()
+int Payment::getRewardedPoint()
 {
     return m_rewardedPoint;
 }
