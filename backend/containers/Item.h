@@ -11,7 +11,7 @@ namespace xpos_store {
 class Item
 {
 public:
-    Item(){}
+    Item(){ }
     ~Item(){}
 
 public:
@@ -21,6 +21,7 @@ public:
     virtual QVariant toQVariant( ) = 0;
     virtual xpError_t fromQVariant( const QVariant &_item ) = 0;
     virtual bool isValid() = 0;
+    virtual QString toJSONString() = 0;
 };
 
 

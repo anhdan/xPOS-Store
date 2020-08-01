@@ -14,7 +14,10 @@ namespace xpos_store {
 class Bill : public Item
 {
 public:
-    Bill() : Item() {}
+    Bill() : Item()
+    {
+        setDefault();
+    }
     ~Bill() {}
 
 public:
@@ -24,6 +27,7 @@ public:
     QVariant toQVariant( );
     xpError_t fromQVariant( const QVariant &_item );
     bool isValid();
+    QString toJSONString();
 
     void setId( const std::string &_id );
     std::string getId();
@@ -43,7 +47,6 @@ public:
     xpError_t addSellingRecord( SellingRecord &_record );
     xpError_t compose( const Staff &_staff, const Customer &_customer,
                        const Payment &_payment, const std::vector<SellingRecord> &_records );
-    QString toJSONString();
 
 private:
     std::string m_id;

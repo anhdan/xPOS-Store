@@ -11,7 +11,10 @@ namespace xpos_store {
 class SellingRecord : public Item
 {
 public:
-    SellingRecord() : Item() {}
+    SellingRecord() : Item()
+    {
+        setDefault();
+    }
     ~SellingRecord() {}
 
 public:
@@ -21,6 +24,7 @@ public:
     QVariant toQVariant( );
     xpError_t fromQVariant( const QVariant &_item );
     bool isValid();
+    QString toJSONString();
 
     void setBillId( const std::string &_billId );
     std::string getBillId();
@@ -34,7 +38,6 @@ public:
     void setTotalPrice( const double _totalPrice );
     double getTotalPrice();
 
-    QString toJSONString();
 
 private:
     std::string m_billId;

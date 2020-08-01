@@ -23,6 +23,7 @@ namespace xpos_store {
         QVariant toQVariant( );
         xpError_t fromQVariant( const QVariant &_item );
         bool isValid();
+        QString toJSONString();
 
 
         void setShoppingCount( const int _shoppingCnt );

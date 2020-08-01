@@ -7,6 +7,23 @@ XPBackend::XPBackend(QQmlApplicationEngine *engine, xpos_store::InventoryDatabas
                      xpos_store::UserDatabase *_usersDB, xpos_store::SellingDatabase *_sellingDB )
     : m_engine(engine), m_inventoryDB( _inventoryDB ), m_usersDB(_usersDB), m_sellingDB(_sellingDB)
 {
+    // Initialize network manager
+    m_httpManager = new QNetworkAccessManager(this);
+//    QObject::connect(m_httpManager, &QNetworkAccessManager::finished,
+//                     this, [=](QNetworkReply *reply) {
+//        if (reply->error()) {
+//            qDebug() << reply->errorString();
+//            return;
+//        }
+
+//        QString answer = reply->readAll();
+
+//        qDebug() << answer;
+//    }
+//    );
+    QObject::connect(m_httpManager, &QNetworkAccessManager::finished,
+                     this, &XPBackend::httpReplyFinished );
+
     LOG_MSG( "[DEB]: an xpos-store backend has been created\n" );
 }
 
@@ -20,6 +37,7 @@ XPBackend::~XPBackend()
     m_inventoryDB = nullptr;
     m_usersDB = nullptr;
     m_sellingDB = nullptr;
+    delete m_httpManager;
 }
 
 
@@ -135,9 +153,6 @@ int XPBackend::httpPostInvoice()
     qWarning() << test;
     QJsonDocument jsonDoc = QJsonDocument::fromJson(val.toUtf8());
 
-
-    QNetworkAccessManager * manager = new QNetworkAccessManager(this);
-
     QUrl url("https://asia-east2-xposproject.cloudfunctions.net/addNewBill");
     QNetworkRequest request(url);
 
@@ -145,9 +160,35 @@ int XPBackend::httpPostInvoice()
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 //    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/plain");
     QByteArray jsonData= jsonDoc.toJson();
-//    manager->post(request, "{\"item\":\"dando\"}");
-    manager->post(request, jsonData);
+    m_httpManager->post(request, jsonData);
 
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief XPBackend::httpRequestCustomer
+ */
+int XPBackend::httpRequestCustomer(xpos_store::Customer &_customer)
+{
+    // Get request data including customer id and phone
+    QString jsonStr = QString("{\n\"id\": ") + QString::fromStdString( _customer.getId() )
+            + QString(",\n\"phone\": ") + QString::fromStdString( _customer.getPhone() ) + QString("\n}");
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonStr.toUtf8());
+
+    // Send request
+    QUrl url("https://asia-east2-xposproject.cloudfunctions.net/addNewBill");
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    // by posting
+//    m_httpManager->post(request, jsonDoc.toJson());
+
+    // by getting
+    request.setRawHeader( QByteArray("id"), QByteArray(_customer.getId().c_str()) );
+    request.setRawHeader( QByteArray("phone"), QByteArray(_customer.getPhone().c_str()) );
+    m_httpManager->get( request );
 
     return xpSuccess;
 }
@@ -225,7 +266,7 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
         return xpErr;
     }
 
-    xpErr |= customer.makePayment( payment );
+    xpErr |= customer.makePayment( payment );   
     if( customer.isValid() )
     {
         if( !m_usersDB->isOpen() )
@@ -250,12 +291,19 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
         }
     }
 
+    //===== Add payment income to total earning of the current workshift
+    xpErr |= m_currWorkshift.increaseEarning( payment.getTotalCharging() );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to add payment to current workshift income\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
 
     //===== Send bill to maintenance server
     // create bill
     m_bill.setCustomerId( customer.getId() );
     m_bill.setPayment( payment );
-    QString json = m_bill.toJSONString();
 
     // save bill to database
     if( !m_sellingDB->isOpen() )
@@ -271,14 +319,14 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
         return xpErr;
     }
 
-    // http post
+    // http post bill
+    QString json = m_bill.toJSONString();
     QJsonDocument jsonDoc = QJsonDocument::fromJson(json.toUtf8());
-    QNetworkAccessManager * manager = new QNetworkAccessManager(this);
     QUrl url("https://asia-east2-xposproject.cloudfunctions.net/addNewBill");
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     QByteArray jsonData= jsonDoc.toJson();
-    manager->post(request, jsonData);
+    m_httpManager->post(request, jsonData);
 
     return xpErr;
 }
@@ -303,13 +351,15 @@ int XPBackend::login(QString _name, QString _pwd)
     if( authenticated )
     {
         emit sigStaffApproved();
+        m_currWorkshift.printInfo();
+        xpErr |= m_currWorkshift.start( m_currStaff.getId() );
     }
     else
     {
         emit sigStaffDisapproved();
     }
 
-    return xpSuccess;
+    return xpErr;
 }
 
 
@@ -319,6 +369,36 @@ int XPBackend::login(QString _name, QString _pwd)
 int XPBackend::getPrivilege()
 {
     return (int)m_currStaff.getPrivilege();
+}
+
+
+/**
+ * @brief XPBackend::logout
+ */
+int XPBackend::logout()
+{
+    // End workshift and store to database
+    xpError_t xpErr = xpSuccess;
+    xpErr |= m_currWorkshift.end();
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to end workshift\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    if( !m_sellingDB->isOpen() )
+    {
+        xpErr |= m_sellingDB->open();
+    }
+    xpErr |= m_sellingDB->insertWorkShift( m_currWorkshift );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to store workshift to database\n",
+                 xpErr, __FILE__, __LINE__ );
+    }
+
+    return xpErr;
 }
 
 
@@ -357,48 +437,6 @@ int XPBackend::searchForCustomer(QString _id)
     return xpErr;
 }
 
-
-/**
- * @brief XPBackend::updateCustomerFromInvoice
- */
-int XPBackend::updateCustomerFromInvoice(const QVariant &_customer)
-{
-    xpos_store::Customer beCustomer;
-    xpError_t xpErr = beCustomer.fromQVariant( _customer );
-    if( xpErr != xpSuccess )
-    {
-        LOG_MSG( "[ERR:%d] %s:%d: Failed to convert Qvariant parameter to backend object\n",
-                 xpErr, __FILE__, __LINE__ );
-        return xpErr;
-    }
-
-    if( !m_usersDB->isOpen() )
-    {
-        m_usersDB->open();
-    }
-
-    if( beCustomer.getId() != "" )
-    {
-        if( m_currCustomer.getId() == beCustomer.getId() )
-        {
-            xpErr = m_usersDB->updateCustomer( beCustomer, true );
-        }
-        else
-        {
-            xpErr = m_usersDB->insertCustomer( beCustomer );
-        }
-    }
-
-    if( xpErr != xpSuccess )
-    {
-        LOG_MSG( "[ERR:%d] %s:%d: Failed to update customer info to database\n",
-                 xpErr, __FILE__, __LINE__ );
-    }
-
-    return xpErr;
-}
-
-
 /**
  * @brief XPBackend::getPoint2MoneyRate
  */
@@ -407,4 +445,22 @@ double XPBackend::getPoint2MoneyRate()
     //! TODO:
     //! Use a CURRENCY table to store conversion rate of many currency
     return 1000.0;
+}
+
+
+/**
+ * @brief XPBackend::httpReplyFinished
+ */
+void XPBackend::httpReplyFinished(QNetworkReply *_reply)
+{
+    if (_reply->error()) {
+        qDebug() << _reply->errorString();
+        return;
+    }
+
+    QString answer = _reply->readAll();
+    qDebug() << answer;
+
+    //! TODO:
+    //!     Implement code to read customer info here
 }

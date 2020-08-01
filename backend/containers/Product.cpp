@@ -157,6 +157,17 @@ bool Product::isValid()
 
 
 /**
+ * @brief Product::toJSONString
+ */
+QString Product::toJSONString()
+{
+    //! TODO:
+    //!     Implement this
+    return QString("");
+}
+
+
+/**
  * @brief Product::isIdenticalTo
  */
 bool Product::isIdenticalTo(const Product &_product)

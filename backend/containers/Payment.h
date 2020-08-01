@@ -9,7 +9,10 @@ namespace xpos_store {
 class Payment : public Item
 {
 public:
-    Payment() : Item(){}
+    Payment() : Item()
+    {
+        setDefault();
+    }
     ~Payment(){}
 
 public:
@@ -19,6 +22,7 @@ public:
     QVariant toQVariant( );
     xpError_t fromQVariant( const QVariant &_item );
     bool isValid();
+    QString toJSONString();
 
     void setTotalCharging( const double _totalCharing );
     double getTotalCharging();

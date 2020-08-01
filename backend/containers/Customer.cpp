@@ -137,6 +137,17 @@ bool Customer::isValid()
     return (m_id != "");
 }
 
+
+/**
+ * @brief Customer::toJSONString
+ */
+QString Customer::toJSONString()
+{
+    //! TODO:
+    //!     Implement this
+    return QString("");
+}
+
 /**
  * @brief Customer::searchCallBack
  */

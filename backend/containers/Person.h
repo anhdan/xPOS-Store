@@ -27,6 +27,7 @@ public:
     virtual void printInfo() = 0;
     virtual QVariant toQVariant( ) = 0;
     virtual xpError_t fromQVariant( const QVariant &_item ) = 0;
+    virtual QString toJSONString() = 0;
 
 protected:
     std::string m_id;

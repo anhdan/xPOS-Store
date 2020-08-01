@@ -128,6 +128,17 @@ bool Payment::isValid()
 
 
 /**
+ * @brief Payment::toJSONString
+ */
+QString Payment::toJSONString()
+{
+    //! TODO:
+    //!     Implement this
+    return QString("");
+}
+
+
+/**
  * @brief Payment::setTotalCharging
  */
 void Payment::setTotalCharging( const double _totalCharing )

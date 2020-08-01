@@ -373,6 +373,7 @@ Rectangle {
                 text: "Đăng xuất"
                 onTriggered: {
                     toLoginBoard()
+                    xpBackend.logout()
                 }
             }
 

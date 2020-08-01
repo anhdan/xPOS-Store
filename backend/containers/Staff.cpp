@@ -124,6 +124,17 @@ bool Staff::isValid()
     return (m_id != "");
 }
 
+
+/**
+ * @brief Staff::toJSONString
+ */
+QString Staff::toJSONString()
+{
+    //! TODO:
+    //!     Implement this
+    return QString("");
+}
+
 //==========================================================
 //
 //           get set functions

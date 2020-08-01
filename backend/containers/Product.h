@@ -10,7 +10,10 @@ class Product : public Item
 {
 
 public:
-    Product() : Item() {}
+    Product() : Item()
+    {
+        setDefault();
+    }
     ~Product(){}
 
 public:
@@ -20,6 +23,7 @@ public:
     QVariant toQVariant( );
     xpError_t fromQVariant( const QVariant &_item );
     bool isValid();
+    QString toJSONString();
     bool isIdenticalTo( const Product &_product );
 
 public:

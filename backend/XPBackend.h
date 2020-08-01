@@ -1,4 +1,4 @@
-#ifndef XPBACKEND_H
+﻿#ifndef XPBACKEND_H
 #define XPBACKEND_H
 
 #include <QGuiApplication>
@@ -41,25 +41,30 @@ signals:
     void sigCustomerNotFound();
 
 public slots:
+    // Inventory methods
     int searchForProduct( QString _code );
     int updateProductFromInventory( const QVariant &_product );
 
     // Invoice methods
     int initializePayment();
-    int httpPostInvoice();
+    double getPoint2MoneyRate();
     int sellProduct( const QVariant &_qProduct, const int _numSold );
-    int completePayment( const QVariant &_qCustomer, const QVariant &_qPayment );
+    int completePayment( const QVariant &_qCustomer, const QVariant &_qPayment );    
 
+    // Users methods
+    int searchForCustomer( QString _id );
+
+    // Authentication methods
     int login( QString _name, QString _pwd );
     int getPrivilege();
+    int logout();
 
-    int searchForCustomer( QString _id );
-    int updateCustomerFromInvoice( const QVariant &_customer );
-
-    double getPoint2MoneyRate();
+    // Http methods
+    int httpPostInvoice();
+    int httpRequestCustomer( xpos_store::Customer &_customer );
 
 public:
-
+    static void httpReplyFinished( QNetworkReply *_reply );
 private:
     QQmlApplicationEngine *m_engine;
     xpos_store::InventoryDatabase *m_inventoryDB;  
@@ -67,8 +72,12 @@ private:
     xpos_store::SellingDatabase *m_sellingDB;
     xpos_store::Product m_currProduct;
     xpos_store::Staff m_currStaff;
+    xpos_store::WorkShift m_currWorkshift;
     xpos_store::Customer m_currCustomer;
     xpos_store::Bill m_bill;
+
+    // HTTP objects
+    QNetworkAccessManager *m_httpManager;
 };
 
 #endif // XPBACKEND_H

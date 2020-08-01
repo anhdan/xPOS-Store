@@ -22,6 +22,7 @@ public:
     QVariant toQVariant();
     xpError_t fromQVariant( const QVariant &_item );
     bool isValid();
+    QString toJSONString();
 
     void setPrivilege( const Privilege _privilege );
     Privilege getPrivilege();

@@ -11,7 +11,10 @@ namespace  xpos_store {
 class WorkShift : public Item
 {
 public:
-    WorkShift() : Item() {}
+    WorkShift() : Item()
+    {
+        setDefault();
+    }
     ~WorkShift() {}
 
 public:
@@ -21,6 +24,7 @@ public:
     QVariant toQVariant( );
     xpError_t fromQVariant( const QVariant &_item );
     bool isValid();
+    QString toJSONString();
 
     void setStaffId( const std::string &_staffId );
     std::string getStaffId();
@@ -34,10 +38,17 @@ public:
     xpError_t increaseEarning( const double _newEarning );
     double getTotalEarning();
 
+    xpError_t start();
+    xpError_t start( const std::string &_staffId );
+    xpError_t end();
+    bool isStarted();
+    bool isEnded();
+
 private:
     std::string m_staffId;
     time_t m_startTime;
     time_t m_endTime;
+    bool m_isStarted;
     double m_totalEarning;
 };
 

@@ -9,6 +9,7 @@ void WorkShift::setDefault()
 {
     m_staffId = "";
     m_startTime = m_endTime = 0;
+    m_isStarted = false;
     m_totalEarning = 0;
 }
 
@@ -38,6 +39,7 @@ void WorkShift::printInfo()
     LOG_MSG( ". START TIME:     %ld\n", (uint64_t)m_startTime );
     LOG_MSG( ". END TIME:       %ld\n", (uint64_t)m_endTime );
     LOG_MSG( ". TOTAL EARNING:  %f\n", m_totalEarning);
+    LOG_MSG( ". IS RUNNING:     %s\n", m_isStarted ? "true" : "false" );
     LOG_MSG( "-------------------------\n" );
 }
 
@@ -66,6 +68,17 @@ xpError_t WorkShift::fromQVariant( const QVariant &_item )
 bool WorkShift::isValid()
 {
     return ((m_staffId != "") && (m_startTime >0) && (m_endTime > m_startTime));
+}
+
+
+/**
+ * @brief WorkShift::toJSONString
+ */
+QString WorkShift::toJSONString()
+{
+    //! TODO:
+    //!     Implement this
+    return QString("");
 }
 
 
@@ -157,6 +170,89 @@ xpError_t WorkShift::increaseEarning( const double _newEarning )
 double WorkShift::getTotalEarning()
 {
     return  m_totalEarning;
+}
+
+
+/**
+ * @brief WorkShift::start
+ */
+xpError_t WorkShift::start()
+{
+    if( m_isStarted )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: A workshift is running\n",
+                 xpErrorNotPermited, __FILE__, __LINE__ );
+        return xpErrorNotPermited;
+    }
+
+    m_startTime = time( NULL );
+    m_endTime = 0;
+    m_totalEarning = 0;
+    m_isStarted = true;
+    return xpSuccess;
+}
+
+
+/**
+ * @brief WorkShift::start
+ */
+xpError_t WorkShift::start( const std::string &_staffId )
+{
+    if( m_isStarted )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: A workshift is running\n",
+                 xpErrorNotPermited, __FILE__, __LINE__ );
+        return xpErrorNotPermited;
+    }
+
+    m_staffId = _staffId;
+    m_startTime = time( NULL );
+    m_endTime = 0;
+    m_totalEarning = 0;
+    m_isStarted = true;
+    return xpSuccess;
+}
+
+/**
+ * @brief WorkShift::end
+ */
+xpError_t WorkShift::end()
+{
+    if( !m_isStarted )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: None workshift is running\n",
+                 xpErrorNotPermited, __FILE__, __LINE__ );
+        return xpErrorNotPermited;
+    }
+
+    m_endTime = time( NULL );
+    if( m_endTime < m_startTime )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Invalid workshift timing\n",
+                 xpErrorInvalidValues, __FILE__, __LINE__ );
+        return xpErrorInvalidValues;
+    }
+
+    m_isStarted = false;
+    return xpSuccess;
+}
+
+
+/**
+ * @brief WorkShift::isStarted
+ */
+bool WorkShift::isStarted()
+{
+    return m_isStarted;
+}
+
+
+/**
+ * @brief WorkShift::isEnded
+ */
+bool WorkShift::isEnded()
+{
+    return (!m_isStarted);
 }
 
 
