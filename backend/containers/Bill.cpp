@@ -215,12 +215,15 @@ QString Bill::toJSONString()
     QString qBillJSON = QString::fromStdString( std::string(cJSONStr) );
 
     std::list<xpos_store::SellingRecord>::iterator it = m_sellingRecords.begin();
-    for( int id = 0; id < m_sellingRecords.size()-1; id++ )
+    for( int id = 0; id < (int)m_sellingRecords.size()-1; id++ )
     {
         qBillJSON = qBillJSON + it->toJSONString() + QString(",\n");
         std::advance( it, 1 );
     }
-    qBillJSON = qBillJSON + it->toJSONString() + QString("\n]\n}");
+    if( m_sellingRecords.size() > 0 )
+    {
+        qBillJSON = qBillJSON + it->toJSONString() + QString("\n]\n}");
+    }
 
     std::cout << qBillJSON.toStdString() << std::endl << std::endl;
 

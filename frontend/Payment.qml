@@ -269,6 +269,7 @@ Rectangle {
         onCheckedChanged: {
             if( checked === true )
             {
+                rowMultiZeros.visible = true
                 titPayingAmount.visible = true
                 txtPayingAmount.visible = true
                 txtPayingAmount.focus = true
@@ -320,6 +321,7 @@ Rectangle {
         onCheckedChanged: {
             if( checked === true )
             {
+                rowMultiZeros.visible = false
                 txtPayingAmount.focus = false
                 titPayingAmount.visible = false
                 txtPayingAmount.visible = false
@@ -428,14 +430,88 @@ Rectangle {
         }
     }
 
+    //=========== [00] and [000] buttons for quick input
+    Row {
+        id: rowMultiZeros
+        spacing: 10
+        anchors.top: txtPayingAmount.bottom
+        anchors.topMargin: 10
+        anchors.left: txtPayingAmount.left
+
+        Button {
+            id: btnTwoZeros
+            width: 70
+            height: 50
+            focusPolicy: Qt.NoFocus
+
+            background: Rectangle {
+                id: rectBtnTwoZeros
+                anchors.fill: parent
+                radius: 10
+                color: UIMaterials.grayPrimary
+
+                Text {
+                    id: txtBtnTwoZeros
+                    text: "00"
+                    color: "white"
+                    font.pixelSize: UIMaterials.fontSizeMedium
+                    anchors.centerIn: parent
+                }
+            }
+
+            onPressed: {
+                rectBtnTwoZeros.color = UIMaterials.grayLight
+            }
+
+            onReleased: {
+                rectBtnTwoZeros.color = UIMaterials.grayPrimary
+                keyEmitter.emitKey( Qt.Key_0 )
+                keyEmitter.emitKey( Qt.Key_0 )
+            }
+        }
+
+        Button {
+            id: btnThreeZeros
+            width: 70
+            height: 50
+            focusPolicy: Qt.NoFocus
+
+            background: Rectangle {
+                id: rectBtnThreeZeros
+                anchors.fill: parent
+                radius: 10
+                color: UIMaterials.grayPrimary
+
+                Text {
+                    id: txtBtnThreeZeros
+                    text: "000"
+                    color: "white"
+                    font.pixelSize: UIMaterials.fontSizeMedium
+                    anchors.centerIn: parent
+                }
+            }
+
+            onPressed: {
+                rectBtnThreeZeros.color = UIMaterials.grayLight
+            }
+
+            onReleased: {
+                rectBtnThreeZeros.color = UIMaterials.grayPrimary
+                keyEmitter.emitKey( Qt.Key_0 )
+                keyEmitter.emitKey( Qt.Key_0 )
+                keyEmitter.emitKey( Qt.Key_0 )
+            }
+        }
+    }
+
 
     //=========== Payment return and reward points area
     Column {
         id: columnReturn
         width: txtCustomerCode.width
         anchors.left: txtCustomerCode.left
-        anchors.top: txtPayingAmount.bottom
-        anchors.topMargin: 30
+        anchors.top: rowMultiZeros.bottom
+        anchors.topMargin: 20
         spacing: 5
         visible: false
 

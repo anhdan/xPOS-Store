@@ -15,6 +15,7 @@ ListView {
     property real latestCost: 0
     property real latestTax: 0
     property real latestDiscount: 0
+    property alias count: itemModel.count
 
 
     //====================== Signals ============================

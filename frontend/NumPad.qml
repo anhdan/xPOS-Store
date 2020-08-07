@@ -400,6 +400,6 @@ Rectangle {
                     rectBtnEnter.color = keyBgrColor
                 }
             }
-        }
+        }       
     }
 }

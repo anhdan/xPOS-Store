@@ -286,12 +286,15 @@ Rectangle {
                 onReleased: {
                     rectBtnMskePayment.color = UIMaterials.goldDark
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
-                    pnPayment.initialize(tab.item.latestCost, tab.item.latestTax, tab.item.latestDiscount, tab.item.model)
-
-                    if( pnPayment.opacity === 0 )
+                    if( tab.item.count > 0 )
                     {
-                        payTransitionOnY.start()
-                        tabviewInvoice.enabled = false
+                        pnPayment.initialize(tab.item.latestCost, tab.item.latestTax, tab.item.latestDiscount, tab.item.model)
+
+                        if( pnPayment.opacity === 0 )
+                        {
+                            payTransitionOnY.start()
+                            tabviewInvoice.enabled = false
+                        }
                     }
                 }
             }
