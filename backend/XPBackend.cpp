@@ -407,13 +407,15 @@ int XPBackend::searchForCustomer(QString _id)
     }
 
     xpos_store::Customer customer;
-    xpErr = m_usersDB->searchCustomer( m_currCustomer.getId(), customer );
+    xpErr = m_usersDB->searchCustomer( _id.toStdString(), customer );
     if( xpErr != xpSuccess )
     {
         LOG_MSG( "[ERR:%d] %s:%d: Failed to search for customer\n",
                  xpErr, __FILE__, __LINE__ );
         return xpErr;
     }
+    std::cout << "llllllllll\n";
+    customer.printInfo();
 
     if( customer.isValid() )
     {

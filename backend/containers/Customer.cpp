@@ -33,6 +33,7 @@ void Customer::copyTo(Item *_item)
         _cust->m_shoppingCnt = m_shoppingCnt;
         _cust->m_totalPayment = m_totalPayment;
         _cust->m_rewardPoint = m_rewardPoint;
+        _cust->m_usedPoint = m_usedPoint;
     }
 }
 
@@ -50,6 +51,7 @@ void Customer::printInfo()
     LOG_MSG( ". SHOPPING_COUNT: %d\n", m_shoppingCnt );
     LOG_MSG( ". TOTAL_PAYMENT:  %f\n", m_totalPayment );
     LOG_MSG( ". POINT:          %d\n", m_rewardPoint );
+    LOG_MSG( ". USED POINT:     %d\n", m_usedPoint );
     LOG_MSG( "-------------------------\n" );
 }
 
@@ -297,7 +299,7 @@ xpError_t Customer::makePayment(const double _payment, const int _usedPoint, con
 
     m_totalPayment += _payment;
     m_shoppingCnt++;
-    m_rewardPoint = m_rewardPoint + _rewardedPoint - _usedPoint;
+    m_rewardPoint += _rewardedPoint;
     m_usedPoint += _usedPoint;
 
     return xpSuccess;
@@ -315,10 +317,11 @@ xpError_t Customer::makePayment( Payment &_payment)
                  xpErrorInvalidValues, __FILE__, __LINE__ );
         return xpErrorInvalidValues;
     }
+    _payment.printInfo();
 
     m_totalPayment += _payment.getTotalCharging();
     m_shoppingCnt++;
-    m_rewardPoint = m_rewardPoint + _payment.getRewardedPoint() - m_usedPoint;
+    m_rewardPoint += _payment.getRewardedPoint();
     m_usedPoint += _payment.getUsedPoint();
 
     return xpSuccess;
