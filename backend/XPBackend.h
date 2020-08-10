@@ -65,7 +65,7 @@ public slots:
     int httpRequestCustomer( xpos_store::Customer &_customer );
 
 public:
-    static void httpReplyFinished( QNetworkReply *_reply );
+    void httpReplyFinished( QNetworkReply *_reply );
 private:
     QQmlApplicationEngine *m_engine;
     xpos_store::InventoryDatabase *m_inventoryDB;  

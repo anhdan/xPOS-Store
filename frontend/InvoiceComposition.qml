@@ -34,7 +34,7 @@ Rectangle {
         {
             noti.state = "invisible"
         }
-        noti.showNoti( "Không tìm thấy sản phẩm trong kho!", "error" )
+        noti.showNoti( "Không tìm thấy trong cơ sở dữ liệu!", "error" )
         noti.state = "visible"
         noti.focus = true
     }
@@ -650,7 +650,7 @@ Rectangle {
 
             onPointUsed: {
                 var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
-                showCost( tab.item.latestCost, tab.item.latestTax, tab.item.latestDiscount + pointDiscount )
+                showCost( tab.item.latestCost, tab.item.latestTax, newDiscount )
             }
 
             onNeedMorePayingAmount: {
@@ -662,6 +662,10 @@ Rectangle {
                 noti.showNoti( "Tiền khách trả chưa đủ!", "error" )
                 noti.state = "visible"
                 noti.focus = true
+            }
+
+            onCustomerNotFound: {
+                showNotFoundNoti()
             }
 
             //================== Animation

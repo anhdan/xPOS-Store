@@ -30,7 +30,8 @@ xpError_t UserDatabase::createCustomerTable()
                             "   PHONE               TEXT        NOT NULL,\n" \
                             "   EMAIL               TEXT        NOT NULL,\n" \
                             "   TOTAL_PAYMENT       REAL        NOT NULL,\n" \
-                            "   POINT               INTEGER     NOT NULL,\n" \
+                            "   REWARDED_POINT      INTEGER     NOT NULL,\n" \
+                            "   USED_POINT          INTEGER     NOT NULL,\n" \
                             "   SHOPPING_COUNT      INTEGER     NOT NULL) WITHOUT ROWID;";
     char* sqliteMsg = nullptr;
     int sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd.c_str(), nullptr, nullptr, &sqliteMsg );
@@ -179,12 +180,12 @@ xpError_t UserDatabase::insertCustomer(Customer &_customer)
         return xpErrorNotPermited;
     }
 
-    std::string cmdFormat = "INSERT INTO CUSTOMER (ID, NAME, PHONE, EMAIL, TOTAL_PAYMENT, POINT, SHOPPING_COUNT) " \
-                            "VALUES('%s', '%s', '%s', '%s', %f, %d, %d);";
+    std::string cmdFormat = "INSERT INTO CUSTOMER (ID, NAME, PHONE, EMAIL, TOTAL_PAYMENT, REWARDED_POINT, USED_POINT, SHOPPING_COUNT) " \
+                            "VALUES('%s', '%s', '%s', '%s', %f, %d, %d, %d);";
     char sqliteCmd[1000];
     sprintf( sqliteCmd, cmdFormat.c_str(), _customer.getId().c_str(),
              _customer.getName().c_str(), _customer.getPhone().c_str(), _customer.getEmail().c_str(),
-             _customer.getTotalPayment(), _customer.getPoint(), _customer.getShoppingCount() );
+             _customer.getTotalPayment(), _customer.getRewardedPoint(), _customer.getUsedPoint(), _customer.getShoppingCount() );
     printf( "====> insert customer cmd: %s\n", sqliteCmd );
 
     char *sqliteMsg;
@@ -218,12 +219,13 @@ xpError_t UserDatabase::updateCustomer(Customer &_customer, const bool _isShoppi
     {
         sqliteCmdFormat =   "UPDATE CUSTOMER\n" \
                             "SET    TOTAL_PAYMENT   = %f,\n" \
-                            "       POINT           = %d,\n" \
+                            "       REWARDED_POINT  = %d,\n" \
+                            "       USED_POINT      = %d,\n" \
                             "       SHOPPING_COUNT  = %d\n" \
                             "WHERE\n" \
                             "       ID = '%s';";
-        sprintf( sqliteCmd, sqliteCmdFormat.c_str(), _customer.getTotalPayment(),
-                 _customer.getPoint(), _customer.getShoppingCount(), _customer.getId().c_str() );
+        sprintf( sqliteCmd, sqliteCmdFormat.c_str(), _customer.getTotalPayment(), _customer.getRewardedPoint(),
+                 _customer.getUsedPoint(), _customer.getShoppingCount(), _customer.getId().c_str() );
     }
     else
     {
@@ -232,13 +234,14 @@ xpError_t UserDatabase::updateCustomer(Customer &_customer, const bool _isShoppi
                             "       PHONE           = '%s',\n" \
                             "       EMAIL           = '%s',\n" \
                             "       TOTAL_PAYMENT   = %f,\n" \
-                            "       POINT           = %d,\n" \
+                            "       REWARDED_POINT  = %d,\n" \
+                            "       USED_POINT      = %d,\n" \
                             "       SHOPPING_COUNT  = %d\n" \
                             "WHERE\n" \
                             "       ID = '%s';";
         sprintf( sqliteCmd, sqliteCmdFormat.c_str(),
                  _customer.getName().c_str(), _customer.getEmail().c_str(), _customer.getTotalPayment(),
-                 _customer.getPoint(), _customer.getShoppingCount(), _customer.getId().c_str() );
+                 _customer.getRewardedPoint(), _customer.getUsedPoint(), _customer.getShoppingCount(), _customer.getId().c_str() );
     }
     printf( "====> update customer cmd: \n\t%s\n\n", sqliteCmd );
 

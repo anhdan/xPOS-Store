@@ -13,7 +13,8 @@ void Customer::setDefault()
     m_email = "";
     m_shoppingCnt = 0;
     m_totalPayment = 0.0;
-    m_point = 0;
+    m_rewardPoint = 0;
+    m_usedPoint = 0;
 }
 
 
@@ -31,7 +32,7 @@ void Customer::copyTo(Item *_item)
         _cust->m_email = m_email;
         _cust->m_shoppingCnt = m_shoppingCnt;
         _cust->m_totalPayment = m_totalPayment;
-        _cust->m_point = m_point;
+        _cust->m_rewardPoint = m_rewardPoint;
     }
 }
 
@@ -48,7 +49,7 @@ void Customer::printInfo()
     LOG_MSG( ". EMAIL:          %s\n", m_email.c_str() );
     LOG_MSG( ". SHOPPING_COUNT: %d\n", m_shoppingCnt );
     LOG_MSG( ". TOTAL_PAYMENT:  %f\n", m_totalPayment );
-    LOG_MSG( ". POINT:          %d\n", m_point );
+    LOG_MSG( ". POINT:          %d\n", m_rewardPoint );
     LOG_MSG( "-------------------------\n" );
 }
 
@@ -65,7 +66,8 @@ QVariant Customer::toQVariant( )
     map["email"] = QString::fromStdString( getEmail() );
     map["shopping_count"] = getShoppingCount();
     map["total_payment"] = getTotalPayment();
-    map["point"] = getPoint();
+    map["point"] = getRewardedPoint();
+    map["used_point"] = getUsedPoint();
 
     return QVariant( map );
 }
@@ -108,7 +110,13 @@ xpError_t Customer::fromQVariant( const QVariant &_item )
 
         if( map.contains( "point" ) )
         {
-            m_point = map["point"].toString().toInt( &ret );
+            m_rewardPoint = map["point"].toString().toInt( &ret );
+            finalRet &= ret;
+        }
+
+        if( map.contains( "used_point" ) )
+        {
+            m_rewardPoint = map["used_point"].toString().toInt( &ret );
             finalRet &= ret;
         }
     }
@@ -176,9 +184,13 @@ xpError_t Customer::searchCallBack(void *data, int fieldsNum, char **fieldVal, c
         {
             customer->m_totalPayment = fieldVal[fieldId] ? atof( fieldVal[fieldId] ) : 0.0;
         }
-        else if( !strcmp(fieldName[fieldId], "POINT") )
+        else if( !strcmp(fieldName[fieldId], "REWARDED_POINT") )
         {
-            customer->m_point = fieldVal[fieldId] ? atoi( fieldVal[fieldId] ) : 0;
+            customer->m_rewardPoint = fieldVal[fieldId] ? atoi( fieldVal[fieldId] ) : 0;
+        }
+        else if( !strcmp(fieldName[fieldId], "USED_POINT") )
+        {
+            customer->m_usedPoint = fieldVal[fieldId] ? atoi( fieldVal[fieldId] ) : 0;
         }
         else if( !strcmp(fieldName[fieldId], "SHOPPING_COUNT") )
         {
@@ -236,20 +248,38 @@ double Customer::getTotalPayment()
 
 
 /**
- * @brief Customer::setPoint
+ * @brief Customer::setRewardedPoint
  */
-void Customer::setPoint( const int _point )
+void Customer::setRewardedPoint( const int _point )
 {
-    m_point = _point;
+    m_rewardPoint = _point;
 }
 
 
 /**
- * @brief Customer::getPoint
+ * @brief Customer::getRewardedPoint
  */
-int Customer::getPoint()
+int Customer::getRewardedPoint()
 {
-    return m_point;
+    return m_rewardPoint;
+}
+
+
+/**
+ * @brief Customer::setUsedPoint
+ */
+void Customer::setUsedPoint(const int _point)
+{
+    m_usedPoint = _point;
+}
+
+
+/**
+ * @brief Customer::getUsedPoint
+ */
+int Customer::getUsedPoint()
+{
+    return m_usedPoint;
 }
 
 
@@ -258,7 +288,7 @@ int Customer::getPoint()
  */
 xpError_t Customer::makePayment(const double _payment, const int _usedPoint, const int _rewardedPoint)
 {
-    if( _payment < 0 || _usedPoint > m_point || _rewardedPoint < 0 )
+    if( _payment < 0 || _usedPoint > m_rewardPoint || _rewardedPoint < 0 )
     {
         LOG_MSG( "[ERR:%d] %s:%d: Invalid payment info\n",
                  xpErrorInvalidValues, __FILE__, __LINE__ );
@@ -267,7 +297,8 @@ xpError_t Customer::makePayment(const double _payment, const int _usedPoint, con
 
     m_totalPayment += _payment;
     m_shoppingCnt++;
-    m_point = m_point - _usedPoint + _rewardedPoint;
+    m_rewardPoint = m_rewardPoint + _rewardedPoint - _usedPoint;
+    m_usedPoint += _usedPoint;
 
     return xpSuccess;
 }
@@ -287,7 +318,8 @@ xpError_t Customer::makePayment( Payment &_payment)
 
     m_totalPayment += _payment.getTotalCharging();
     m_shoppingCnt++;
-    m_point = m_point - _payment.getUsedPoint() + _payment.getRewardedPoint();
+    m_rewardPoint = m_rewardPoint + _payment.getRewardedPoint() - m_usedPoint;
+    m_usedPoint += _payment.getUsedPoint();
 
     return xpSuccess;
 }

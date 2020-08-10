@@ -249,10 +249,7 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
 
     //===== Update customer in database
     xpos_store::Payment payment;
-    xpos_store::Customer customer;
-    xpErr |= customer.fromQVariant( _qCustomer );
     xpErr |= payment.fromQVariant( _qPayment );
-
     if( xpErr != xpSuccess )
     {
         LOG_MSG( "[ERR:%d] %s:%d: Failed to convert variable type\n",
@@ -260,21 +257,22 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
         return xpErr;
     }
 
-    xpErr |= customer.makePayment( payment );   
-    if( customer.isValid() )
+    if( m_currCustomer.isValid() )
     {
+        xpErr |= m_currCustomer.makePayment( payment );
+
         if( !m_usersDB->isOpen() )
         {
             m_usersDB->open();
         }
 
-        if( m_currCustomer.getId() == customer.getId() )
+        if( m_currCustomer.getShoppingCount() > 1 )
         {
-            xpErr = m_usersDB->updateCustomer( customer, true );
+            xpErr = m_usersDB->updateCustomer( m_currCustomer, true );
         }
         else
         {
-            xpErr = m_usersDB->insertCustomer( customer );
+            xpErr = m_usersDB->insertCustomer( m_currCustomer );
         }
 
         if( xpErr != xpSuccess )
@@ -296,7 +294,7 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
 
     //===== Send bill to maintenance server
     // create bill
-    m_bill.setCustomerId( customer.getId() );
+    m_bill.setCustomerId( m_currCustomer.getId() );
     m_bill.setPayment( payment );
 
     // save bill to database
@@ -400,15 +398,16 @@ int XPBackend::logout()
  * @brief XPBackend::searchForCustomer
  */
 int XPBackend::searchForCustomer(QString _id)
-{
+{    
+    //===== Check the existence of this customer in local database
     xpError_t xpErr = xpSuccess;
     if( !m_usersDB->isOpen() )
     {
         m_usersDB->open();
     }
 
-    m_currCustomer.setDefault();
-    xpErr = m_usersDB->searchCustomer( _id.toStdString(), m_currCustomer );
+    xpos_store::Customer customer;
+    xpErr = m_usersDB->searchCustomer( m_currCustomer.getId(), customer );
     if( xpErr != xpSuccess )
     {
         LOG_MSG( "[ERR:%d] %s:%d: Failed to search for customer\n",
@@ -416,27 +415,17 @@ int XPBackend::searchForCustomer(QString _id)
         return xpErr;
     }
 
-
-    /** For Test
-     *      Request customer info grom firebase
-     */
-    xpos_store::Customer customer;
-    customer.setPhone( "+84382700019" );
-    httpRequestCustomer( customer );
-
-    if( m_currCustomer.getId() == "" )
+    if( customer.isValid() )
     {
-        LOG_MSG( "[WAR] %s:%d: Customer not found\n",
-                 __FILE__, __LINE__ );
-        emit sigCustomerNotFound();
-    }
-    else
-    {
-        m_currCustomer.printInfo();
-        emit sigCustomerFound( m_currCustomer.toQVariant() );
+        customer.copyTo( (xpos_store::Item*)&m_currCustomer );
     }
 
-    return xpErr;
+    //===== Request customer info from xPOS Bank
+    m_currCustomer.setPhone( "+84382700019" );
+    m_currCustomer.setId( _id.toStdString() );
+    httpRequestCustomer( m_currCustomer );
+
+    return xpSuccess;
 }
 
 /**
@@ -453,10 +442,11 @@ double XPBackend::getPoint2MoneyRate()
 /**
  * @brief XPBackend::httpReplyFinished
  */
-void XPBackend::httpReplyFinished(QNetworkReply *_reply)
+void XPBackend::httpReplyFinished(QNetworkReply *_reply )
 {
     if (_reply->error()) {
         qDebug() << _reply->errorString();
+        _reply->deleteLater();
         return;
     }
 
@@ -468,6 +458,7 @@ void XPBackend::httpReplyFinished(QNetworkReply *_reply)
     {
         LOG_MSG( "[ERR:%d] %s:%d: %s\n",
                  xpErrorProcessFailure, __FILE__, __LINE__, jsonErr.errorString().toStdString().c_str() );
+        _reply->deleteLater();
         return;
     }
 
@@ -475,15 +466,41 @@ void XPBackend::httpReplyFinished(QNetworkReply *_reply)
     if( jsonVar.canConvert<QVariantMap>() )
     {
         QVariantMap map = jsonVar.toMap();
-        qDebug() << ". name = " << map["name"];
-        qDebug() << ". phone = " << map["phone_number"];
-        qDebug() << ". birth year = " << map["year_of_birth"];
-        qDebug() << ". point = " << map["point"];
+        if( !map.empty() )
+        {
+            m_currCustomer.setName( map["name"].toString().toStdString() );
+            m_currCustomer.setPhone( map["phone_number"].toString().toStdString() );
+            int ix =0;
+            bool ret = true;
+            ix = map["point"].toString().toInt( &ret );
+            m_currCustomer.setRewardedPoint( ix );
+            if( !ret )
+            {
+                m_currCustomer.setDefault();
+                LOG_MSG( "[WAR] %s:%d: Customer not found\n",
+                         __FILE__, __LINE__ );
+                emit sigCustomerNotFound();
+                _reply->deleteLater();
+                return;
+            }
+            m_currCustomer.printInfo();
+
+            emit sigCustomerFound( m_currCustomer.toQVariant() );
+        }
+        else
+        {
+            m_currCustomer.setDefault();
+            LOG_MSG( "[WAR] %s:%d: Customer not found\n",
+                     __FILE__, __LINE__ );
+            emit sigCustomerNotFound();
+        }
     }
     else
     {
         LOG_MSG( "[ERR:%d] %s:%d: Failed to convert QVariant to QVariantMap\n",
                  xpErrorInvalidParameters, __FILE__, __LINE__ );
-        return;
     }
+
+    _reply->deleteLater();
+    return;
 }

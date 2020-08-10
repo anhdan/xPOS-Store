@@ -41,7 +41,7 @@ Rectangle {
 
     //=============== Signals
     signal colapse()
-    signal pointUsed( var pointDiscount )
+    signal pointUsed( var newDiscount )
     signal payCompleted()
     signal needMorePayingAmount()
 
@@ -70,9 +70,6 @@ Rectangle {
     onCustomerNotFound:
     {
         currCustomer = Helper.setDefaultCustomer( currCustomer )
-        currCustomer["id"] = txtCustomerCode.text
-        //! TODO:
-        //! Display noti
     }
 
     //=============== Customer info area
@@ -216,7 +213,6 @@ Rectangle {
         onReleased: {
             rectBtnUsePoint.color = "transparent"
             var convertRate = xpBackend.getPoint2MoneyRate()
-            var discount = 0
             if( (currCustomer["point"] * convertRate) > currPayment["total_charging"] )
             {
                 currPayment["used_point"] = ((currPayment["total_charging"] / convertRate) | 0)
@@ -238,7 +234,7 @@ Rectangle {
 
             lblCustomerPoint.text = currCustomer["point"] - currPayment["used_point"]
             enabled = false
-            pointUsed( discount )
+            pointUsed( currPayment["total_discount"] )
         }
     }
 

@@ -30,8 +30,10 @@ namespace xpos_store {
         int getShoppingCount();
         void setTotalPayment(const double _total );
         double getTotalPayment();
-        void setPoint( const int _point );
-        int getPoint();
+        void setRewardedPoint( const int _point );
+        int getRewardedPoint();
+        void setUsedPoint( const int _point );
+        int getUsedPoint();
 
         xpError_t makePayment( const double _payment, const int _usedPoint, const int _rewardedPoint );
         xpError_t makePayment( Payment &_payment );
@@ -41,7 +43,8 @@ namespace xpos_store {
     private:
         int m_shoppingCnt;
         double m_totalPayment;
-        int m_point;
+        int m_rewardPoint;
+        int m_usedPoint;
     };
 
 }
