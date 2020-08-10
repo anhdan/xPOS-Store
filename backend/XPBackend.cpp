@@ -172,22 +172,16 @@ int XPBackend::httpPostInvoice()
  */
 int XPBackend::httpRequestCustomer(xpos_store::Customer &_customer)
 {
-    // Get request data including customer id and phone
-    QString jsonStr = QString("{\n\"id\": ") + QString::fromStdString( _customer.getId() )
-            + QString(",\n\"phone\": ") + QString::fromStdString( _customer.getPhone() ) + QString("\n}");
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonStr.toUtf8());
+    // Set query params
+    QUrlQuery query;
+    query.addQueryItem( "phone", QString::fromStdString(_customer.getPhone()) );
 
     // Send request
-    QUrl url("https://asia-east2-xposproject.cloudfunctions.net/addNewBill");
+    QUrl url("https://asia-east2-xposproject.cloudfunctions.net/getUserInfo");
+    url.setQuery( query );
     QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+//    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    // by posting
-//    m_httpManager->post(request, jsonDoc.toJson());
-
-    // by getting
-    request.setRawHeader( QByteArray("id"), QByteArray(_customer.getId().c_str()) );
-    request.setRawHeader( QByteArray("phone"), QByteArray(_customer.getPhone().c_str()) );
     m_httpManager->get( request );
 
     return xpSuccess;
@@ -422,6 +416,14 @@ int XPBackend::searchForCustomer(QString _id)
         return xpErr;
     }
 
+
+    /** For Test
+     *      Request customer info grom firebase
+     */
+    xpos_store::Customer customer;
+    customer.setPhone( "+84382700019" );
+    httpRequestCustomer( customer );
+
     if( m_currCustomer.getId() == "" )
     {
         LOG_MSG( "[WAR] %s:%d: Customer not found\n",
@@ -458,9 +460,30 @@ void XPBackend::httpReplyFinished(QNetworkReply *_reply)
         return;
     }
 
+    // Json parsing
     QString answer = _reply->readAll();
-    qDebug() << answer;
+    QJsonParseError jsonErr;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson( answer.toUtf8(), &jsonErr );
+    if( jsonErr.error != QJsonParseError::NoError )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, jsonErr.errorString().toStdString().c_str() );
+        return;
+    }
 
-    //! TODO:
-    //!     Implement code to read customer info here
+    QVariant jsonVar = jsonDoc.toVariant();
+    if( jsonVar.canConvert<QVariantMap>() )
+    {
+        QVariantMap map = jsonVar.toMap();
+        qDebug() << ". name = " << map["name"];
+        qDebug() << ". phone = " << map["phone_number"];
+        qDebug() << ". birth year = " << map["year_of_birth"];
+        qDebug() << ". point = " << map["point"];
+    }
+    else
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to convert QVariant to QVariantMap\n",
+                 xpErrorInvalidParameters, __FILE__, __LINE__ );
+        return;
+    }
 }
