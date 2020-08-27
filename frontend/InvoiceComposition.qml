@@ -43,6 +43,20 @@ Rectangle {
         xpBackend.sigProductNotFound.connect( showNotFoundNoti )
     }
 
+    onOpacityChanged: {
+        var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
+        if( opacity === 1 )
+        {
+            enabled = true
+            xpBackend.sigProductNotFound.connect( showNotFoundNoti )
+        }
+        else
+        {
+            enabled = false
+            xpBackend.sigProductNotFound.disconnect( showNotFoundNoti )
+        }
+    }
+
     signal toInventoryBoard()
     signal toCustomerBoard()
     signal toAnalyticsBoard()

@@ -99,20 +99,21 @@ ListView {
 
     function calculateCost()
     {
+        latestCost = latestDiscount = latestTax = 0
         if( itemModel.count > 0 )
         {
-            var cost = 0
             for( var idx = 0; idx < itemModel.count; idx++ )
             {
                 var item = itemModel.get( idx )
-                cost += Number( item["selling_price"] ) * Number(item["item_num"])
+                latestCost += Number( item["unit_price"] ) * Number(item["item_num"])
+                latestDiscount += Number( item["unit_price"] - item["selling_price"] ) * Number(item["item_num"])
             }
-            latestCost = cost
+//            latestCost = cost
         }
-        else
-        {
-            latestCost = latestDiscount = latestTax = 0
-        }
+//        else
+//        {
+//            latestCost = latestDiscount = latestTax = 0
+//        }
 
         costCalculated( latestCost, latestTax, latestDiscount )
     }
@@ -164,14 +165,17 @@ ListView {
 
     //================== Signal Handling
     onProductFound: {
-        var item = Helper.deepCopy( product )
-        item["item_order"] = itemModel.count + 1
-        item["item_num"] = 1
-        itemModel.append( item )
-        var newIndex = itemModel.count - 1
-        changeHighLight( newIndex )
-        itemAdded()
-        calculateCost()
+        if( enabled === true )
+        {
+            var item = Helper.deepCopy( product )
+            item["item_order"] = itemModel.count + 1
+            item["item_num"] = 1
+            itemModel.append( item )
+            var newIndex = itemModel.count - 1
+            changeHighLight( newIndex )
+            itemAdded()
+            calculateCost()
+        }
     }
 
 
@@ -206,7 +210,7 @@ ListView {
                 font.pixelSize: UIMaterials.fontSizeMedium
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                color: (discount_price > 0) ? UIMaterials.goldDark : textColor
+                color: (selling_price < unit_price) ? UIMaterials.goldDark : textColor
             }
 
             Label {
@@ -218,7 +222,7 @@ ListView {
                 font.pixelSize: UIMaterials.fontSizeMedium
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
-                color: (discount_price > 0) ? UIMaterials.goldDark : textColor
+                color: (selling_price < unit_price) ? UIMaterials.goldDark : textColor
 
                 MouseArea {
                     id: itemMouse
@@ -241,7 +245,7 @@ ListView {
                 font.pixelSize: UIMaterials.fontSizeMedium
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                color: (discount_price > 0) ? UIMaterials.goldDark : textColor
+                color: (selling_price < unit_price) ? UIMaterials.goldDark : textColor
 
                 background: Rectangle {
                     id: bgrItemNum
@@ -285,7 +289,7 @@ ListView {
                 font.pixelSize: UIMaterials.fontSizeMedium
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                color: (discount_price > 0) ? UIMaterials.goldDark : textColor
+                color: (selling_price < unit_price) ? UIMaterials.goldDark : textColor
             }
         }
     }

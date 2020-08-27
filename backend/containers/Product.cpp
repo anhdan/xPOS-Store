@@ -420,17 +420,34 @@ void Product::cancelDiscount()
  */
 bool Product::isDiscountExpired()
 {
-    bool ret = true;
-    if( (m_discountPrice > 0) && (m_discountPrice < m_unitPrice) )
+    if( m_discountPrice > 0 )
     {
         time_t currTime = time( NULL );
-        if( (m_discountStart > 0) && (currTime > m_discountStart) && (m_discountEnd > currTime) )
+        if( (m_discountPrice > m_unitPrice) || (m_discountEnd < currTime) )
         {
-            ret = false;
+            return true;
         }
     }
 
-    return ret;
+    return false;
+}
+
+
+/**
+ * @brief Product::isDiscountActive
+ */
+bool Product::isDiscountActive()
+{
+    if( (m_discountPrice > 0) && (m_discountPrice < m_unitPrice) )
+    {
+        time_t currTime = time( NULL );
+        if( (m_discountStart < currTime) && (currTime < m_discountEnd) )
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 
@@ -439,7 +456,7 @@ bool Product::isDiscountExpired()
  */
 double Product::getSellingPrice()
 {
-    if( !isDiscountExpired() )
+    if( isDiscountActive() )
     {
         return m_discountPrice;
     }

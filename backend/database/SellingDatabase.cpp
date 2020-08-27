@@ -67,7 +67,8 @@ xpError_t SellingDatabase::createSellingRecordTable()
                             "   BILL_ID             TEXT        NOT NULL,\n" \
                             "   PRODUCT_BARCODE     TEXT        NOT NULL,\n" \
                             "   QUANTITY            INTEGER     NOT NULL,\n" \
-                            "   TOTAL_PRICE         REAL        NOT NULL,\n" \
+                            "   SELLING_PRICE       REAL        NOT NULL,\n" \
+                            "   DISCOUNT_PERCENT    REAL,\n" \
                             "   PRIMARY KEY(BILL_ID, PRODUCT_BARCODE)\n" \
                             ") WITHOUT ROWID;";
     char* sqliteMsg = nullptr;
@@ -232,12 +233,12 @@ xpError_t SellingDatabase::insertSellingRecord( SellingRecord &_record)
         return xpErrorNotPermited;
     }
 
-    std::string cmdFormat = "INSERT INTO SELLING_RECORD (BILL_ID, PRODUCT_BARCODE, QUANTITY, TOTAL_PRICE) " \
-                            "VALUES('%s', '%s', %d, %f);";
+    std::string cmdFormat = "INSERT INTO SELLING_RECORD (BILL_ID, PRODUCT_BARCODE, QUANTITY, SELLING_PRICE, DISCOUNT_PERCENT) " \
+                            "VALUES('%s', '%s', %d, %f, %f);";
     char sqliteCmd[1000];
     sprintf( sqliteCmd, cmdFormat.c_str(),
              _record.getBillId().c_str(), _record.getProductBarcode().c_str(),
-             _record.getQuantity(), _record.getSellingPrice() );
+             _record.getQuantity(), _record.getSellingPrice(), _record.getDiscountPercent() );
     printf( "====> insert selling record cmd: %s\n", sqliteCmd );
 
     char *sqliteMsg;
@@ -273,12 +274,14 @@ xpError_t SellingDatabase::insertSellingRecord(Product &_product, const std::str
         return xpErrorNotPermited;
     }
 
-    std::string cmdFormat = "INSERT INTO SELLING_RECORD (BILL_ID, PRODUCT_BARCODE, QUANTITY, TOTAL_PRICE) " \
-                            "VALUES('%s', '%s', %d, %f);";
+
+    double discountPercent = (_product.getUnitPrice() - _product.getSellingPrice()) / _product.getUnitPrice() * 100;
+    std::string cmdFormat = "INSERT INTO SELLING_RECORD (BILL_ID, PRODUCT_BARCODE, QUANTITY, SELLING_PRICE, DISCOUNT_PERCENT) " \
+                            "VALUES('%s', '%s', %d, %f, %f);";
     char sqliteCmd[1000];
     sprintf( sqliteCmd, cmdFormat.c_str(),
              _billId.c_str(), _product.getBarcode().c_str(),
-             _product.getItemNum(), _product.getSellingPrice() );
+             _product.getItemNum(), _product.getSellingPrice(), discountPercent );
     printf( "====> insert selling record cmd: %s\n", sqliteCmd );
 
     char *sqliteMsg;

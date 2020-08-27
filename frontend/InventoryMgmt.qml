@@ -68,29 +68,43 @@ Rectangle {
         xpBackend.sigProductNotFound.connect( root.productNotFound )
     }
 
+    onOpacityChanged: {
+        if( opacity === 1 )
+        {
+            enabled = true
+        }
+        else
+        {
+            enabled = false
+        }
+    }
+
 
     //================== Signal Handling
     onProductFound: {
-        updateProduct = Helper.deepCopy( product )
-        currProduct = Helper.deepCopy( product )
-        showProduct( product )
+        if( enabled === true )
+        {
+            updateProduct = Helper.deepCopy( product )
+            currProduct = Helper.deepCopy( product )
+            showProduct( product )
+        }
     }
 
     onProductNotFound: {
-        updateProduct = Helper.createDefaultProduct()
-        updateProduct["barcode"] = txtBarcode.text
-        currProduct = Helper.createDefaultProduct()
-        currProduct["barcode"] = txtBarcode.text
-        showProduct( currProduct )
-        console.log( "============> 1" )
-        if( noti.state === "visible" )
+        if( enabled === true )
         {
-            noti.state = "invisible"
+            updateProduct = Helper.createDefaultProduct()
+            updateProduct["barcode"] = txtBarcode.text
+            currProduct = Helper.createDefaultProduct()
+            currProduct["barcode"] = txtBarcode.text
+            showProduct( currProduct )
+            if( noti.state === "visible" )
+            {
+                noti.state = "invisible"
+            }
+            noti.showNoti( "Sản phẩm chưa tồn tại. Mời bạn điền thông tin!", "error" )
+            noti.state = "visible"
         }
-        noti.showNoti( "Sản phẩm chưa tồn tại. Mời bạn điền thông tin!", "error" )
-        noti.state = "visible"
-        noti.focus = true
-        console.log( "============> 2" )
     }
 
     onProductInfoChanged: {
@@ -1322,7 +1336,7 @@ Rectangle {
                         console.log( "price = ", price, ", currDate = ", currDate.getTime(),
                                     ", start = ", startDate.getTime(), ", end = ", endDate.getTime() )
                         if( (discountPrice < price) && (discountPrice > 0)
-                                && (startDate.getTime() >= currDate.getTime())
+                                && (startDate.getTime() >= (currDate.getTime()-86400000))
                                 && (endDate.getTime() > startDate.getTime()) )
                         {
                             state = "active"

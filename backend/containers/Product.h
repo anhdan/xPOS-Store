@@ -42,6 +42,7 @@ public:
     void getDiscountInfo(  double *_discountPrice, time_t *_start, time_t *_end );
     void cancelDiscount();
     bool isDiscountExpired();
+    bool isDiscountActive();
     double getSellingPrice();
 
     void setItemNum( const uint32_t _itemNum );
