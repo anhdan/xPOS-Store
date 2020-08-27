@@ -3,3 +3,4 @@ build/*
 *.o
 *.user
 *.user.*
+*.db
