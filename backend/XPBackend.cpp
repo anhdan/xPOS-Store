@@ -174,6 +174,7 @@ int XPBackend::httpRequestCustomer(xpos_store::Customer &_customer)
 {
     // Set query params
     QUrlQuery query;
+    query.addQueryItem( "id", QString::fromStdString(_customer.getId()) );
     query.addQueryItem( "phone", QString::fromStdString(_customer.getPhone()) );
 
     // Send request
@@ -313,6 +314,7 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
 
     // http post bill
     QString json = m_bill.toJSONString();
+    qDebug() << json;
     QJsonDocument jsonDoc = QJsonDocument::fromJson(json.toUtf8());
     QUrl url("https://asia-east2-xposproject.cloudfunctions.net/addNewBill");
     QNetworkRequest request(url);
@@ -414,7 +416,6 @@ int XPBackend::searchForCustomer(QString _id)
                  xpErr, __FILE__, __LINE__ );
         return xpErr;
     }
-    std::cout << "llllllllll\n";
     customer.printInfo();
 
     if( customer.isValid() )
@@ -423,7 +424,6 @@ int XPBackend::searchForCustomer(QString _id)
     }
 
     //===== Request customer info from xPOS Bank
-    m_currCustomer.setPhone( "+84382700019" );
     m_currCustomer.setId( _id.toStdString() );
     httpRequestCustomer( m_currCustomer );
 

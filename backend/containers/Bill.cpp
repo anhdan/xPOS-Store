@@ -198,18 +198,18 @@ QString Bill::toJSONString()
     m_payment.printInfo();
     char cJSONStr[1000];
     sprintf( cJSONStr,  "{\n" \
-                        "\"store_id\": %s,\n" \
+                        "\"store_id\": \"%s\",\n" \
                         "\"bill_id\": %s,\n" \
-                        "\"staff_id\": %s,\n" \
+                        "\"staff_id\": \"%s\",\n" \
                         "\"time\": %ld,\n" \
                         "\"post\": %d,\n" \
-                        "\"customer_id\": %s,\n" \
+                        "\"customer_id\": \"%s\",\n" \
                         "\"total_charging\": %f,\n" \
                         "\"discount\": %f,\n" \
                         "\"used_point\": %d,\n" \
                         "\"rewarded_point\": %d,\n" \
                         "\"products\":\n" \
-                        "[\n", "1111", m_id.c_str(), m_staffId.c_str(), (uint64_t)m_creationTime,
+                        "[\n", "65KWa1nJ5D6WhSMmQFqY", m_id.c_str(), m_staffId.c_str(), (uint64_t)m_creationTime,
                         1, m_customerId.c_str(), m_payment.getTotalCharging(), m_payment.getTotalDiscount(),
                         m_payment.getUsedPoint(), m_payment.getRewardedPoint() );
     QString qBillJSON = QString::fromStdString( std::string(cJSONStr) );
