@@ -32,18 +32,27 @@ public:
     void setProductBarcode( const std::string &_barcode );
     std::string getProductBarcode();
 
+    void setDescription( const std::string &_desc );
+    std::string getDescription();
+
     void setQuantity( const int _quantity );
     int getQuantity();
 
-    void setTotalPrice( const double _totalPrice );
-    double getTotalPrice();
+    void setSellingPrice( const double _sellingPrice );
+    double getSellingPrice();
+
+    void setDiscountPercent( const double _discountPercent );
+    void setDiscountPercent( const double _unitPrice, const double _sellingPrice );
+    double getDiscountPercent();
 
 
 private:
     std::string m_billId;
     std::string m_productBarcode;
+    std::string m_desc;
     int m_quantity;
-    double m_totalPrice;
+    double m_sellingPrice;
+    double m_discountPercent;
 };
 
 }

@@ -16,7 +16,7 @@ void Product::setDefault()
     m_unitPrice = m_discountPrice = 0.0;
     m_discountStart = m_discountEnd = 0;
 
-    m_numInstock = m_numSold = m_numDisqualified = 0;
+    m_itemNum = m_numInstock = m_numSold = m_numDisqualified = 0;
 }
 
 
@@ -36,6 +36,7 @@ void Product::copyTo(Item *_item)
         _prod->m_discountPrice = m_discountPrice;
         _prod->m_discountStart = m_discountStart;
         _prod->m_discountEnd = m_discountEnd;
+        _prod->m_itemNum = m_itemNum;
         _prod->m_numInstock = m_numInstock;
         _prod->m_numSold = m_numSold;
         _prod->m_numDisqualified = m_numDisqualified;
@@ -55,8 +56,9 @@ void Product::printInfo()
     LOG_MSG( ". UNIT:           %s\n", m_unit.c_str() );
     LOG_MSG( ". UNIT PRICE:     %f\n", m_unitPrice );
     LOG_MSG( ". DISCOUNT PRICE: %f\n", m_discountPrice );
-    LOG_MSG( ". DISCOUNT START: %d\n", m_discountStart );
-    LOG_MSG( ". DISCOUNT END:   %d\n", m_discountEnd );
+    LOG_MSG( ". DISCOUNT START: %ld\n", m_discountStart );
+    LOG_MSG( ". DISCOUNT END:   %ld\n", m_discountEnd );
+    LOG_MSG( ". # ITEM NUM:     %d\n", m_itemNum );
     LOG_MSG( ". # INSTOCK:      %d\n", m_numInstock );
     LOG_MSG( ". # SOLD:         %d\n", m_numSold );
     LOG_MSG( ". # DISQUALIFIED: %d\n", m_numDisqualified );
@@ -75,8 +77,9 @@ QVariant Product::toQVariant( )
     map["desc"] = QString::fromStdString( getDescription() );
     map["unit"] = QString::fromStdString( getUnit() );
     map["unit_price"] = getUnitPrice();
+    map["item_num"] = getItemNum();
 
-    if( m_discountPrice > 0 && !isDiscountExpired() )
+    if( !isDiscountExpired() )
     {
         map["discount_price"] = m_discountPrice;
         QDateTime qTime;
@@ -123,6 +126,8 @@ xpError_t Product::fromQVariant( const QVariant &_item )
         m_discountStart = (time_t)QDateTime::fromString( map["discount_start"].toString(), "dd/MM/yyyy" ).toTime_t();
         m_discountEnd = (time_t)QDateTime::fromString( map["discount_end"].toString(), "dd/MM/yyyy" ).toTime_t();
 
+        m_itemNum = map["item_num"].toInt( &ret );
+        finalRet &= ret;
         m_numInstock = map["num_instock"].toInt( &ret );
         finalRet &= ret;
         m_numSold = map["num_sold"].toInt( &ret );
@@ -161,9 +166,18 @@ bool Product::isValid()
  */
 QString Product::toJSONString()
 {
-    //! TODO:
-    //!     Implement this
-    return QString("");
+    double sellingPrice = getSellingPrice();
+    double discountPercent = (m_unitPrice - sellingPrice) / m_unitPrice * 100;
+    char cJSONStr[1000];
+    sprintf( cJSONStr,  "{\n"\
+                        "\"code\": \"%s\",\n" \
+                        "\"name\": \"%s\",\n" \
+                        "\"selling_price\": %f,\n"\
+                        "\"discount_percent\": %f,\n"\
+                        "\"quantity\": %d\n" \
+                        "}", m_barcode.c_str(), m_name.c_str(),
+                        getSellingPrice(), discountPercent, m_itemNum );
+    return QString::fromStdString( std::string(cJSONStr) );
 }
 
 
@@ -184,6 +198,8 @@ bool Product::isIdenticalTo(const Product &_product)
     ret &= (m_numInstock == _product.m_numInstock);
     ret &= (m_numSold = _product.m_numSold);
     ret &= (m_numDisqualified == _product.m_numDisqualified);
+
+    return  ret;
 }
 
 
@@ -404,16 +420,17 @@ void Product::cancelDiscount()
  */
 bool Product::isDiscountExpired()
 {
-    if( (m_discountPrice > 0) && (m_discountStart > 0) && (m_discountEnd > 0 ) )
+    bool ret = true;
+    if( (m_discountPrice > 0) && (m_discountPrice < m_unitPrice) )
     {
         time_t currTime = time( NULL );
-        if( (m_discountPrice > m_unitPrice) || (m_discountStart > m_discountEnd) || (currTime >= m_discountEnd) )
+        if( (m_discountStart > 0) && (currTime > m_discountStart) && (m_discountEnd > currTime) )
         {
-            return true;
+            ret = false;
         }
     }
 
-    return false;
+    return ret;
 }
 
 
@@ -422,7 +439,7 @@ bool Product::isDiscountExpired()
  */
 double Product::getSellingPrice()
 {
-    if( m_discountPrice > 0 && !isDiscountExpired() )
+    if( !isDiscountExpired() )
     {
         return m_discountPrice;
     }
@@ -430,6 +447,24 @@ double Product::getSellingPrice()
     {
         return m_unitPrice;
     }
+}
+
+
+/**
+ * @brief Product::setItemNum
+ */
+void Product::setItemNum(const uint32_t _itemNum)
+{
+    m_itemNum = _itemNum;
+}
+
+
+/**
+ * @brief Product::getItemNum
+ */
+uint32_t Product::getItemNum()
+{
+    return m_itemNum;
 }
 
 
@@ -506,6 +541,7 @@ xpError_t Product::sellFromStock(const uint32_t _sub)
         return xpErrorInvalidValues;
     }
 
+    m_itemNum = _sub;
     m_numInstock -= _sub;
     m_numSold += _sub;
     return xpSuccess;

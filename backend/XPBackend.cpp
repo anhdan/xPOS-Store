@@ -209,7 +209,7 @@ int XPBackend::sellProduct(const QVariant &_qProduct, const int _numSold)
         m_inventoryDB->open();
     }
 
-    xpErr |= product.sellFromStock( _numSold );
+    xpErr |= product.sellFromStock( product.getItemNum() );
     xpErr |= m_inventoryDB->updateProduct( product, true );
     if( xpErr != xpSuccess )
     {
@@ -218,19 +218,14 @@ int XPBackend::sellProduct(const QVariant &_qProduct, const int _numSold)
     }
 
     // Add selling record to current bill and save it to database
-    xpos_store::SellingRecord record;
-    record.setBillId( m_bill.getId() );
-    record.setProductBarcode( product.getBarcode() );
-    record.setQuantity( _numSold );
-    record.setTotalPrice( (double)_numSold * product.getSellingPrice() );
-    m_bill.addSellingRecord( (xpos_store::SellingRecord&)record );
+    m_bill.addProduct( (xpos_store::Product&)product );
 
     if( !m_sellingDB->isOpen() )
     {
         m_sellingDB->open();
     }
 
-    xpErr |= m_sellingDB->insertSellingRecord( record );
+    xpErr |= m_sellingDB->insertSellingRecord( product, m_bill.getId() );
     if( xpErr != xpSuccess )
     {
         LOG_MSG( "[ERR:%d] %s:%d: Failed to update selling record info to database\n",

@@ -9,6 +9,7 @@ void Payment::setDefault()
 {
     m_totalCharging = m_totalDiscount = m_customerPayment = 0;
     m_usedPoint = m_rewardedPoint = 0;
+    m_payingMethod = PayingMethod::CASH;
 }
 
 
@@ -22,6 +23,7 @@ void Payment::copyTo( Item *_item )
         Payment* payment = (Payment*)_item;
         payment->m_totalCharging = m_totalCharging;
         payment->m_totalDiscount = m_totalDiscount;
+        payment->m_payingMethod = m_payingMethod;
         payment->m_customerPayment = m_customerPayment;
         payment->m_usedPoint = m_usedPoint;
         payment->m_rewardedPoint = m_rewardedPoint;
@@ -37,6 +39,7 @@ void Payment::printInfo()
     LOG_MSG( "\n---------PAYMENT---------\n" );
     LOG_MSG( ". TOTAL CHARGING:     %f\n", m_totalCharging );
     LOG_MSG( ". TOTAL DISCOUNT:     %f\n", m_totalDiscount );
+    LOG_MSG( ". PAYING METHOD:      %s\n", (m_payingMethod == PayingMethod::CASH) ? "CASH" : "CARD" );
     LOG_MSG( ". CUSTOMER PAYMENT:   %f\n", m_customerPayment );
     LOG_MSG( ". USED POINT:         %d\n", m_usedPoint );
     LOG_MSG( ". REWARDED POINT:     %d\n", m_rewardedPoint );
@@ -55,6 +58,7 @@ QVariant Payment::toQVariant( )
     map["customer_payment"] = m_customerPayment;
     map["used_point"] = m_usedPoint;
     map["rewarded_point"] = m_rewardedPoint;
+    map["paying_method"] = (int)m_payingMethod;
 
     return QVariant::fromValue( map );
 }
@@ -80,6 +84,12 @@ xpError_t Payment::fromQVariant( const QVariant &_item )
         if( map.contains("total_discount") )
         {
             m_totalDiscount = map["total_discount"].toDouble( &ret );
+            finalRet &= ret;
+        }
+
+        if( map.contains("paying_method") )
+        {
+            m_payingMethod = (PayingMethod)(map["paying_method"].toInt( &ret ));
             finalRet &= ret;
         }
 
@@ -171,6 +181,24 @@ void Payment::setTotalDiscount( const double _totalDiscount )
 double Payment::getTotalDiscount()
 {
     return m_totalDiscount;
+}
+
+
+/**
+ * @brief Payment::setPayingMethod
+ */
+void Payment::setPayingMethod(const PayingMethod _payingMethod)
+{
+    m_payingMethod = _payingMethod;
+}
+
+
+/**
+ * @brief Payment::getPayingMethod
+ */
+PayingMethod Payment::getPayingMethod()
+{
+    return m_payingMethod;
 }
 
 

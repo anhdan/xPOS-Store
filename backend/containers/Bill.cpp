@@ -9,7 +9,7 @@ void Bill::setDefault()
 {
     m_staffId = m_customerId = "";
     m_creationTime = 0;
-    m_sellingRecords.clear();
+    m_products.clear();
     m_payment.setDefault();
 }
 
@@ -22,9 +22,12 @@ void Bill::copyTo(Item *_item)
     if( _item )
     {
         Bill* bill = (Bill*)_item;
+        bill->m_id = m_id;
         bill->m_staffId = m_staffId;
         bill->m_customerId = m_customerId;
         bill->m_creationTime = m_creationTime;
+        m_payment.copyTo( &(bill->m_payment) );
+        bill->m_products = m_products;
     }
 }
 
@@ -35,10 +38,16 @@ void Bill::copyTo(Item *_item)
 void Bill::printInfo()
 {    
     LOG_MSG( "\n---------Bill---------\n" );
+    LOG_MSG( ". ID:                 %s\n", m_id.c_str() );
     LOG_MSG( ". STAFF ID:           %s\n", m_staffId.c_str() );
     LOG_MSG( ". CUSTOMER ID:        %s\n", m_customerId.c_str() );
     LOG_MSG( ". CREATION TIME:      %ld\n", (unsigned long)m_creationTime );
     m_payment.printInfo();
+    std::list<Product>::iterator it = m_products.begin();
+    for( int id = 0; id < (int)m_products.size(); id++ )
+    {
+        it->printInfo();
+    }
     LOG_MSG( "-------------------------\n" );
 }
 
@@ -48,7 +57,7 @@ void Bill::printInfo()
  */
 QVariant Bill::toQVariant( )
 {
-
+//    return QVariant::fromValue("");
 }
 
 
@@ -168,26 +177,13 @@ void Bill::getPayment( Payment &_payment )
 
 
 /**
- * @brief Bill::addSellingRecord
+ * @brief Bill::addProduct
  */
-xpError_t Bill::addSellingRecord( SellingRecord &_record)
+xpError_t Bill::addProduct( Product &_product)
 {
-    _record.setBillId( m_id );
-    m_sellingRecords.push_back( _record );
+    m_products.push_back( _product );
     return xpSuccess;
 }
-
-
-/**
- * @brief Bill::compose
- */
-xpError_t Bill::compose( const Staff &_staff, const Customer &_customer,
-                   const Payment &_payment, const std::vector<SellingRecord> &_records )
-{
-
-    return xpSuccess;
-}
-
 
 /**
  * @brief Bill::getJSONString
@@ -198,29 +194,30 @@ QString Bill::toJSONString()
     m_payment.printInfo();
     char cJSONStr[1000];
     sprintf( cJSONStr,  "{\n" \
-                        "\"store_id\": \"%s\",\n" \
-                        "\"bill_id\": %s,\n" \
-                        "\"staff_id\": \"%s\",\n" \
                         "\"time\": %ld,\n" \
-                        "\"post\": %d,\n" \
+                        "\"store_id\": \"%s\",\n" \
+                        "\"bill_id\": \"%s\",\n" \
                         "\"customer_id\": \"%s\",\n" \
                         "\"total_charging\": %f,\n" \
                         "\"discount\": %f,\n" \
                         "\"used_point\": %d,\n" \
                         "\"rewarded_point\": %d,\n" \
+                        "\"paying_method\": %d,\n" \
+                        "\"paying_amount\": %f,\n" \
                         "\"products\":\n" \
-                        "[\n", "65KWa1nJ5D6WhSMmQFqY", m_id.c_str(), m_staffId.c_str(), (uint64_t)m_creationTime,
-                        1, m_customerId.c_str(), m_payment.getTotalCharging(), m_payment.getTotalDiscount(),
-                        m_payment.getUsedPoint(), m_payment.getRewardedPoint() );
+                        "[\n", (uint64_t)m_creationTime, "65KWa1nJ5D6WhSMmQFqY", m_id.c_str(),
+                        m_customerId.c_str(), m_payment.getTotalCharging(), m_payment.getTotalDiscount(),
+                        m_payment.getUsedPoint(), m_payment.getRewardedPoint(),
+                        (int)m_payment.getPayingMethod(), m_payment.getCustomerPayment() );
     QString qBillJSON = QString::fromStdString( std::string(cJSONStr) );
 
-    std::list<xpos_store::SellingRecord>::iterator it = m_sellingRecords.begin();
-    for( int id = 0; id < (int)m_sellingRecords.size()-1; id++ )
+    std::list<xpos_store::Product>::iterator it = m_products.begin();
+    for( int id = 0; id < (int)m_products.size()-1; id++ )
     {
         qBillJSON = qBillJSON + it->toJSONString() + QString(",\n");
         std::advance( it, 1 );
     }
-    if( m_sellingRecords.size() > 0 )
+    if( m_products.size() > 0 )
     {
         qBillJSON = qBillJSON + it->toJSONString() + QString("\n]\n}");
     }

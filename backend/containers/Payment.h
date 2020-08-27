@@ -28,6 +28,8 @@ public:
     double getTotalCharging();
     void setTotalDiscount( const double _totalDiscount );
     double getTotalDiscount();
+    void setPayingMethod( const PayingMethod _payingMethod );
+    PayingMethod getPayingMethod();
     void setCustmomerPayment( const double _customerPayment );
     double getCustomerPayment();
     double getReturnToCustomer();
@@ -40,6 +42,7 @@ public:
 private:
     double m_totalCharging;
     double m_totalDiscount;
+    PayingMethod m_payingMethod;
     double m_customerPayment;
     int m_usedPoint;
     int m_rewardedPoint;

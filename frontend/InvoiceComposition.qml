@@ -30,7 +30,7 @@ Rectangle {
     function showNotFoundNoti()
     {
         // notification
-        if( noti.state == "visible" )
+        if( noti.state === "visible" )
         {
             noti.state = "invisible"
         }

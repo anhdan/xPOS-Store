@@ -19,8 +19,11 @@ Rectangle {
     {
         var vietnam = Qt.locale( )
         txtName.text = product["name"]
+        txtName.enabled = true
         txtDesc.text = product["desc"]
+        txtDesc.enabled = true
         txtUnit.text = product["unit"]
+        txtUnit.enabled = true
         txtUnitPrice.text = Number(product["unit_price"]).toLocaleString( vietnam, "f", 0 )
         if( (product["discount_price"] > 0) && (product["discount_price"] < product["unit_price"]) )
         {
@@ -79,12 +82,15 @@ Rectangle {
         currProduct = Helper.createDefaultProduct()
         currProduct["barcode"] = txtBarcode.text
         showProduct( currProduct )
-        if( noti.state == "visible" )
+        console.log( "============> 1" )
+        if( noti.state === "visible" )
         {
             noti.state = "invisible"
         }
         noti.showNoti( "Sản phẩm chưa tồn tại. Mời bạn điền thông tin!", "error" )
         noti.state = "visible"
+        noti.focus = true
+        console.log( "============> 2" )
     }
 
     onProductInfoChanged: {
@@ -268,6 +274,7 @@ Rectangle {
             font.pixelSize: UIMaterials.fontSizeMedium
             color: "white"
             text: ""
+            enabled: false
 
             background: Rectangle {
                 id: rectTxtUnit
@@ -315,8 +322,9 @@ Rectangle {
             font.pixelSize: UIMaterials.fontSizeMedium
             color: "white"
             text: ""
+            enabled: false
             wrapMode: Text.Wrap
-            readOnly: true
+//            readOnly: true
 
             background: Rectangle {
                 id: rectTxtDesc

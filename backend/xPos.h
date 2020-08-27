@@ -78,4 +78,14 @@ enum class Privilege : int
     GUEST
 };
 
+
+/**
+ * @brief The PayingMethod enum
+ */
+enum class PayingMethod : int
+{
+    CASH = 0,
+    CARD
+};
+
 #endif // XPOS_H

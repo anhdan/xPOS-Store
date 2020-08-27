@@ -9,8 +9,10 @@ void SellingRecord::setDefault()
 {
     m_billId = "";
     m_productBarcode = "";
+    m_desc = "";
     m_quantity = 0;
-    m_totalPrice = 0;
+    m_sellingPrice = 0;
+    m_discountPercent = 0;
 }
 
 /**
@@ -23,8 +25,10 @@ void SellingRecord::copyTo( Item *_item )
         SellingRecord* record = (SellingRecord*)_item;
         record->m_billId = m_billId;
         record->m_productBarcode = m_productBarcode;
+        record->m_desc = m_desc;
         record->m_quantity = m_quantity;
-        record->m_totalPrice = m_totalPrice;
+        record->m_sellingPrice = m_sellingPrice;
+        record->m_discountPercent = m_discountPercent;
     }
 }
 
@@ -34,10 +38,12 @@ void SellingRecord::copyTo( Item *_item )
 void SellingRecord::printInfo()
 {
     LOG_MSG( "\n---------SellingRecord---------\n" );
-    LOG_MSG( ". BILL ID:                %s\n", m_billId );
+    LOG_MSG( ". BILL ID:                %s\n", m_billId.c_str() );
     LOG_MSG( ". PRODUCT BARCOE:         %s\n", m_productBarcode.c_str() );
+    LOG_MSG( ". DESCRIPTION:            %s\n", m_desc.c_str() );
     LOG_MSG( ". QUANTITY:               %d\n", m_quantity );
-    LOG_MSG( ". TOTAL PRICE:            %f\n", m_totalPrice );
+    LOG_MSG( ". TOTAL PRICE:            %f\n", m_sellingPrice );
+    LOG_MSG( ". DISCOUNT PERCENT:       %f\n", m_discountPercent );
     LOG_MSG( "-------------------------\n" );
 }
 
@@ -51,7 +57,7 @@ QVariant SellingRecord::toQVariant( )
     map["bill_id"] = QString::fromStdString(m_billId);
     map["product_barcode"] = QString::fromStdString(m_productBarcode);
     map["quantity"] = m_quantity;
-    map["total_price"] = m_totalPrice;
+    map["selling_price"] = m_sellingPrice;
 
     return QVariant::fromValue( map );
 }
@@ -71,7 +77,7 @@ xpError_t SellingRecord::fromQVariant( const QVariant &_item )
         m_productBarcode = map["product_barcode"].toString().toStdString();
         m_quantity = map["quantity"].toInt( &ret );
         finalRet &= ret;
-        m_totalPrice = map["total_price"].toDouble( &ret );
+        m_sellingPrice = map["selling_price"].toDouble( &ret );
         finalRet &= ret;
     }
     else
@@ -136,6 +142,24 @@ std::string SellingRecord::getProductBarcode()
 
 
 /**
+ * @brief SellingRecord::setDescription
+ */
+void SellingRecord::setDescription(const std::string &_desc)
+{
+    m_desc = _desc;
+}
+
+
+/**
+ * @brief SellingRecord::getDescription
+ */
+std::string SellingRecord::getDescription()
+{
+    return m_desc;
+}
+
+
+/**
  * @brief SellingRecord::setQuantity
  */
 void SellingRecord::setQuantity( const int _quantity )
@@ -154,20 +178,54 @@ int SellingRecord::getQuantity()
 
 
 /**
- * @brief SellingRecord::setTotalPrice
+ * @brief SellingRecord::setSellingPrice
  */
-void SellingRecord::setTotalPrice( const double _totalPrice )
+void SellingRecord::setSellingPrice( const double _sellingPrice )
 {
-    m_totalPrice = _totalPrice;
+    m_sellingPrice = _sellingPrice;
 }
 
 
 /**
- * @brief SellingRecord::getTotalPrice
+ * @brief SellingRecord::getSellingPrice
  */
-double SellingRecord::getTotalPrice()
+double SellingRecord::getSellingPrice()
 {
-    return m_totalPrice;
+    return m_sellingPrice;
+}
+
+
+/**
+ * @brief SellingRecord::setDiscountPercentage
+ */
+void SellingRecord::setDiscountPercent(const double _discountPercent)
+{
+    m_discountPercent = _discountPercent;
+}
+
+
+/**
+ * @brief SellingRecord::setDiscountPercent
+ */
+void SellingRecord::setDiscountPercent(const double _unitPrice, const double _sellingPrice)
+{
+    if( _unitPrice > _sellingPrice )
+    {
+        m_discountPercent = (_unitPrice - _sellingPrice) / _unitPrice * 100;
+    }
+    else
+    {
+        m_discountPercent = 0;
+    }
+}
+
+
+/**
+ * @brief SellingRecord::getDiscountPercent
+ */
+double SellingRecord::getDiscountPercent()
+{
+    return  m_discountPercent;
 }
 
 
@@ -178,10 +236,13 @@ QString SellingRecord::toJSONString()
 {
     char cJSONStr[1000];
     sprintf( cJSONStr,  "{\n"\
-                        "\"code\": %s,\n" \
-                        "\"quantity\": %d,\n" \
-                        "\"total_price\": %f\n"\
-                        "}", m_productBarcode.c_str(), m_quantity, m_totalPrice );
+                        "\"code\": \"%s\",\n" \
+                        "\"desc\": \"%s\",\n" \
+                        "\"selling_price\": %f,\n"\
+                        "\"discount_percent\": %f,\n"\
+                        "\"quantity\": %d\n" \
+                        "}", m_productBarcode.c_str(), m_desc.c_str(),
+                        m_sellingPrice, m_discountPercent, m_quantity );
     return QString::fromStdString( std::string(cJSONStr) );
 }
 

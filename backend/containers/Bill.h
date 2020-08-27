@@ -44,9 +44,7 @@ public:
     void setPayment( const Payment &_payment );
     void getPayment( Payment &_payment );
 
-    xpError_t addSellingRecord( SellingRecord &_record );
-    xpError_t compose( const Staff &_staff, const Customer &_customer,
-                       const Payment &_payment, const std::vector<SellingRecord> &_records );
+    xpError_t addProduct( Product &_product );
 
 private:
     std::string m_id;
@@ -54,7 +52,7 @@ private:
     std::string m_staffId;
     time_t m_creationTime;
     Payment m_payment;
-    std::list<SellingRecord> m_sellingRecords;
+    std::list<Product> m_products;
 };
 
 }

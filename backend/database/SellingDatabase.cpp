@@ -237,7 +237,48 @@ xpError_t SellingDatabase::insertSellingRecord( SellingRecord &_record)
     char sqliteCmd[1000];
     sprintf( sqliteCmd, cmdFormat.c_str(),
              _record.getBillId().c_str(), _record.getProductBarcode().c_str(),
-             _record.getQuantity(), _record.getTotalPrice() );
+             _record.getQuantity(), _record.getSellingPrice() );
+    printf( "====> insert selling record cmd: %s\n", sqliteCmd );
+
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd, nullptr, nullptr, &sqliteMsg );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        return xpErrorProcessFailure;
+    }
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief SellingDatabase::insertSellingRecord
+ */
+xpError_t SellingDatabase::insertSellingRecord(Product &_product, const std::string &_billId)
+{
+    if( !_product.isValid() || _product.getItemNum() <= 0 )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Invalid selling record info\n",
+                 xpErrorInvalidParameters, __FILE__, __LINE__ );
+        return xpErrorInvalidParameters;
+    }
+
+    if( !m_isOpen )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: The database has not been opened\n",
+                 xpErrorNotPermited, __FILE__, __LINE__ );
+        return xpErrorNotPermited;
+    }
+
+    std::string cmdFormat = "INSERT INTO SELLING_RECORD (BILL_ID, PRODUCT_BARCODE, QUANTITY, TOTAL_PRICE) " \
+                            "VALUES('%s', '%s', %d, %f);";
+    char sqliteCmd[1000];
+    sprintf( sqliteCmd, cmdFormat.c_str(),
+             _billId.c_str(), _product.getBarcode().c_str(),
+             _product.getItemNum(), _product.getSellingPrice() );
     printf( "====> insert selling record cmd: %s\n", sqliteCmd );
 
     char *sqliteMsg;

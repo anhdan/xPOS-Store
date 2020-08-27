@@ -44,6 +44,8 @@ public:
     bool isDiscountExpired();
     double getSellingPrice();
 
+    void setItemNum( const uint32_t _itemNum );
+    uint32_t getItemNum();
     void setNumInstock( const uint32_t _numInstock );
     uint32_t getNumInstock();
     xpError_t addToStock( const uint32_t _add );
@@ -66,6 +68,7 @@ private:
     time_t m_discountStart;
     time_t m_discountEnd;
 
+    uint32_t m_itemNum;
     uint32_t m_numInstock;
     uint32_t m_numSold;
     uint32_t m_numDisqualified;

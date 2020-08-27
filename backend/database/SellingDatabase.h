@@ -26,6 +26,7 @@ public:
 
     xpError_t insertBill( Bill &_bill );
     xpError_t insertSellingRecord( SellingRecord &_record );
+    xpError_t insertSellingRecord( Product &_product, const std::string &_billId );
     xpError_t insertWorkShift( WorkShift &_workshift );
 };
 
