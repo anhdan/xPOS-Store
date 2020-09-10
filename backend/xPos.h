@@ -22,6 +22,14 @@
 
 #include <sqlite3.h>
 
+#include <firebase/app.h>
+#include <firebase/auth.h>
+#include <firebase/functions.h>
+#include <firebase/future.h>
+#include <firebase/variant.h>
+#include <firebase/log.h>
+#include <firebase/util.h>
+
 
 /***************************************************
  *              Macros
@@ -50,7 +58,9 @@ enum xpError_enum
     xpErrorNotCompatible = -4,
     xpErrorProcessFailure = -5,
     xpErrorNotPermited = -6,
-    xpErrorNotExist = -7
+    xpErrorNotExist = -7,
+    xpErrorTimeout = -8,
+    xpErrorUnAuthenticated = -9
 };
 
 typedef int xpError_t;
@@ -87,5 +97,19 @@ enum class PayingMethod : int
     CASH = 0,
     CARD
 };
+
+
+/***************************************************
+ *              Functions
+ **************************************************/
+/**
+ * @brief waitForComplete
+ * @param _status
+ * @param _waitCondition
+ * @param _secWaitTime
+ * @return
+ */
+template <class T>
+xpError_t waitForComplete( T *_status, T _waitCondition, const int _secWaitTime );
 
 #endif // XPOS_H

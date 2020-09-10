@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "842092717322",
+    "firebase_url": "https://xposproject.firebaseio.com",
+    "project_id": "xposproject",
+    "storage_bucket": "xposproject.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:842092717322:android:cbffe5530bc1dcd019c6f3",
+        "android_client_info": {
+          "package_name": "xpos.store"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "842092717322-n56fuogd8j8dmrok5t8apfq5fvsp0qbb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEyvm6VOevCoKL1TfUSdRQmhAg0DrRq0E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "842092717322-n56fuogd8j8dmrok5t8apfq5fvsp0qbb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

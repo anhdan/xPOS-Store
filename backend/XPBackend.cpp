@@ -7,24 +7,10 @@ XPBackend::XPBackend(QQmlApplicationEngine *engine, xpos_store::InventoryDatabas
                      xpos_store::UserDatabase *_usersDB, xpos_store::SellingDatabase *_sellingDB )
     : m_engine(engine), m_inventoryDB( _inventoryDB ), m_usersDB(_usersDB), m_sellingDB(_sellingDB)
 {
-    // Initialize network manager
-    m_httpManager = new QNetworkAccessManager(this);
-//    QObject::connect(m_httpManager, &QNetworkAccessManager::finished,
-//                     this, [=](QNetworkReply *reply) {
-//        if (reply->error()) {
-//            qDebug() << reply->errorString();
-//            return;
-//        }
-
-//        QString answer = reply->readAll();
-
-//        qDebug() << answer;
-//    }
-//    );
-    QObject::connect(m_httpManager, &QNetworkAccessManager::finished,
-                     this, &XPBackend::httpReplyFinished );
-
-    LOG_MSG( "[DEB]: an xpos-store backend has been created\n" );
+    m_httpManager = nullptr;
+    m_fbApp = nullptr;
+    m_fbAuth = nullptr;
+    m_fbFunc = nullptr;
 }
 
 
@@ -38,6 +24,117 @@ XPBackend::~XPBackend()
     m_usersDB = nullptr;
     m_sellingDB = nullptr;
     delete m_httpManager;
+
+    LOG_MSG("[DEB] %s:%d: Shutting down Firebase App.\n", __FUNCTION__, __LINE__ );
+    delete m_fbFunc;
+    m_fbFunc = nullptr;
+    m_fbAuth->SignOut();
+    delete m_fbAuth;
+    m_fbAuth = nullptr;
+    delete m_fbApp;
+}
+
+
+/**
+ * @brief XPBackend::init
+ * @return
+ */
+int XPBackend::init()
+{
+    //===== 1. Initialize network manager
+    m_httpManager = new QNetworkAccessManager(this);
+    QObject::connect(m_httpManager, &QNetworkAccessManager::finished,
+                     this, &XPBackend::httpReplyFinished );
+
+    //===== 2. Initialize firebase
+    LOG_MSG( "[DEB] %s:%d: Initializing Firebase App.\n", __FUNCTION__, __LINE__ );
+    m_fbApp = firebase::App::Create( firebase::AppOptions() );
+    if( m_fbApp == nullptr )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to initialized Firebase app\n",
+                 xpErrorNotAllocated, __FILE__, __LINE__ );
+        delete m_httpManager;
+        return xpErrorNotAllocated;
+    }
+
+    void* initialize_targets[] = {&m_fbAuth, &m_fbFunc};
+    const firebase::ModuleInitializer::InitializerFn initializers[] = {
+        [](::firebase::App* app, void* data) {
+            void** targets = reinterpret_cast<void**>(data);
+            ::firebase::InitResult result;
+            *reinterpret_cast<::firebase::auth::Auth**>(targets[0]) =
+            ::firebase::auth::Auth::GetAuth(app, &result);
+            return result;
+        },
+        [](::firebase::App* app, void* data) {
+            void** targets = reinterpret_cast<void**>(data);
+            ::firebase::InitResult result;
+            *reinterpret_cast<::firebase::functions::Functions**>(targets[1]) =
+            ::firebase::functions::Functions::GetInstance(app, "asia-east2", &result);
+            return result;
+        }};
+
+    firebase::ModuleInitializer initializer;
+    initializer.Initialize(m_fbApp, initialize_targets, initializers,
+                           sizeof(initializers) / sizeof(initializers[0]));
+    float sWaitTime = 0;
+    while( initializer.InitializeLastResult().status() == firebase::kFutureStatusPending )
+    {
+        usleep( 100000 );   // wait for initialization complete
+        sWaitTime += 100000.0/1000000.0;
+        if( sWaitTime > 5 ) // timeout
+        {
+            LOG_MSG( "[ERR:%d] %s:%d: Initialization timeout\n",
+                     xpErrorTimeout, __FILE__, __LINE__ );
+            return xpErrorTimeout;
+        }
+    }
+
+    if (initializer.InitializeLastResult().error() != 0) {
+        LOG_MSG( "[ERR:%d] %s:%d: to initialize Firebase libraries: %s\n",
+                 xpErrorNotAllocated, __FILE__, __LINE__,
+                 initializer.InitializeLastResult().error_message() );
+        delete m_fbApp;
+        return xpErrorNotAllocated;
+    }
+
+
+    //===== 3. Authenticate this app with server
+    //! TODO:
+    //!     - Read encrypt account from local database
+    //!     - Decrypt to email and password to authenticate firebase
+    std::string email = "anhdan.do@gmail.com";
+    std::string pwd = "123456aA@";
+
+    firebase::Future<firebase::auth::User*> result =
+            m_fbAuth->SignInWithEmailAndPassword(email.c_str(), pwd.c_str());
+    sWaitTime = 0;
+    while( result.status() == firebase::kFutureStatusPending )
+    {
+        usleep( 100000 );   // wait for initialization complete
+        sWaitTime += 100000.0/1000000.0;
+        if( sWaitTime > 5 ) // timeout
+        {
+            LOG_MSG( "[ERR:%d] %s:%d: Authentication timeout\n",
+                     xpErrorTimeout, __FILE__, __LINE__ );
+            return xpErrorTimeout;
+        }
+    }
+
+    if (result.error() == firebase::auth::kAuthErrorNone) {
+        firebase::auth::User* user = *result.result();
+        LOG_MSG( "[DEB] %s:%d: User sign-in succeeded for email %s\n",
+                 __FUNCTION__, __LINE__, user->email().c_str());
+    } else {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to authenticate user\n",
+                 xpErrorUnAuthenticated, __FILE__, __LINE__ );
+        return xpErrorUnAuthenticated;
+    }
+
+
+    LOG_MSG( "[DEB] %s:%d: An xpos-store backend has been created\n",
+             __FUNCTION__, __LINE__ );
+    return xpSuccess;
 }
 
 
@@ -314,8 +411,35 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
     QUrl url("https://asia-east2-xposproject.cloudfunctions.net/addNewBill");
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    QByteArray jsonData= jsonDoc.toJson();
-    m_httpManager->post(request, jsonData);
+    QByteArray jsonData= jsonDoc.toJson();    
+//    m_httpManager->post(request, jsonData);
+
+    // add bill using firebase functions
+    firebase::functions::HttpsCallableReference fbFunction
+            = m_fbFunc->GetHttpsCallable( "addNewBillCall" );
+    firebase::Future<firebase::functions::HttpsCallableResult> future
+            = fbFunction.Call( m_bill.toFirebaseVar() );
+    float sWaitTime = 0;
+    while( future.status() == firebase::kFutureStatusPending )
+    {
+        usleep( 100000 );   // wait for initialization complete
+        sWaitTime += 100000.0/1000000.0;
+        if( sWaitTime > 5 ) // timeout
+        {
+            LOG_MSG( "[ERR:%d] %s:%d: Function invoking timeout\n",
+                     xpErrorTimeout, __FILE__, __LINE__ );
+            return xpErrorTimeout;
+        }
+    }
+
+    if (future.error() != firebase::functions::kErrorNone) {
+        printf("[Err:%d] %s:%d: %s\n", xpErrorProcessFailure,
+               __FILE__, __LINE__, future.error_message());
+        return xpErrorProcessFailure;
+    } else {
+        firebase::Variant result = future.result()->data();
+        printf("CALL SUCCESS\n");
+    }
 
     return xpErr;
 }

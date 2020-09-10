@@ -9,7 +9,7 @@
 KeyEmitter::KeyEmitter( QQmlApplicationEngine *_engine )
     : m_engine( _engine )
 {
-    printf( "[DEB] %s:%d: A key emitter has been created\n", __FILE__, __LINE__ );
+    printf( "[DEB] %s:%d: A key emitter has been created\n", __FUNCTION__, __LINE__ );
 }
 
 KeyEmitter::~KeyEmitter()

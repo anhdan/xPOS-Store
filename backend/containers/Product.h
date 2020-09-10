@@ -44,6 +44,7 @@ public:
     bool isDiscountExpired();
     bool isDiscountActive();
     double getSellingPrice();
+    double getDiscountPercent();
 
     void setItemNum( const uint32_t _itemNum );
     uint32_t getItemNum();

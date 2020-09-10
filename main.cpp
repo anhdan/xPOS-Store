@@ -54,6 +54,13 @@ int main(int argc, char *argv[])
     }
 
     XPBackend xpBackend( &engine, &inventoryDB, &usersDB, &sellingDB );
+    xpErr = xpBackend.init();
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] :%s:%d: Failed to initialize xPOS backend processor\n",
+                 xpErr, __FILE__, __LINE__ );
+        exit( xpErr );
+    }
     KeyEmitter keyEmitter( &engine );
     QQmlContext *ctx = engine.rootContext();
     ctx->setContextProperty( "xpBackend", &xpBackend );

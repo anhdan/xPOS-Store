@@ -228,4 +228,42 @@ QString Bill::toJSONString()
 }
 
 
+/**
+ * @brief Bill::toFirebaseVar
+ * @return
+ */
+firebase::Variant Bill::toFirebaseVar()
+{
+    std::map<std::string, firebase::Variant> bill;
+    bill["time"] = firebase::Variant( (long)m_creationTime );
+    bill["store_id"] = firebase::Variant("6EGdPlfu70PvbnE6fHRk");
+    bill["bill_id"] = firebase::Variant( m_id );
+    bill["staff_name"] = firebase::Variant( "D.A Dan" );
+    bill["customer_id"] = firebase::Variant( "FfJopQRRQZPgxpCG9zcDHWtHEuJ3" );
+    bill["total_charging"] = firebase::Variant( m_payment.getTotalCharging() );
+    bill["discount"] = firebase::Variant( m_payment.getTotalDiscount() );
+    bill["used_point"] = firebase::Variant( m_payment.getUsedPoint() );
+    bill["rewarded_point"] = firebase::Variant( m_payment.getRewardedPoint() );
+    bill["paying_method"] = firebase::Variant( (int)m_payment.getPayingMethod() );
+    bill["paying_amount"] = firebase::Variant( m_payment.getCustomerPayment() );
+
+    std::vector<firebase::Variant> fbProducts;
+    std::map<std::string, firebase::Variant> fbProduct;
+    std::list<xpos_store::Product>::iterator it = m_products.begin();
+    for( int id = 0; id < (int)m_products.size()-1; id++ )
+    {
+        fbProduct["code"] = firebase::Variant( it->getBarcode() );
+        fbProduct["name"] = firebase::Variant( it->getName() + " @ " + it->getUnit() );
+        fbProduct["selling_price"] = firebase::Variant( it->getSellingPrice() );
+        fbProduct["discount_percent"] = firebase::Variant( it->getDiscountPercent() );
+        fbProduct["quantity"] = firebase::Variant( (int)it->getItemNum() );
+        std::advance( it, 1 );
+    }
+    fbProducts.push_back( firebase::Variant( fbProduct ) );
+    bill["products"] = firebase::Variant( fbProducts );
+
+    return firebase::Variant( bill );
+}
+
+
 }

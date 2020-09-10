@@ -10,4 +10,10 @@
 
 [Qt Virtual Keyboard](https://www.wisol.ch/w/articles/2015-07-26-virtual-keyboard-qt/)
 
+4. Add firebse SDK
+[Firebase doc](https://firebase.google.com/docs)
+[Add Firebase to C++ app](https://firebase.google.com/docs/cpp/setup?platform=android)
+[Firebase C++ SDK](https://github.com/firebase/firebase-cpp-sdk)
+[Qmake to Cmake](https://stackoverflow.com/questions/43763416/how-to-convert-qmake-to-cmake)
+
 

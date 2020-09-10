@@ -28,6 +28,7 @@ public:
     xpError_t fromQVariant( const QVariant &_item );
     bool isValid();
     QString toJSONString();
+    firebase::Variant toFirebaseVar();
 
     void setId( const std::string &_id );
     std::string getId();

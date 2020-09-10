@@ -65,6 +65,7 @@ public slots:
     int httpRequestCustomer( xpos_store::Customer &_customer );
 
 public:
+    int init();
     void httpReplyFinished( QNetworkReply *_reply );
 private:
     QQmlApplicationEngine *m_engine;
@@ -79,6 +80,11 @@ private:
 
     // HTTP objects
     QNetworkAccessManager *m_httpManager;
+
+    // Firebase objects
+    firebase::App *m_fbApp;
+    firebase::auth::Auth *m_fbAuth;
+    firebase::functions::Functions *m_fbFunc;
 };
 
 #endif // XPBACKEND_H

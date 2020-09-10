@@ -468,6 +468,16 @@ double Product::getSellingPrice()
 
 
 /**
+ * @brief Product::getDiscountPercent
+ */
+double Product::getDiscountPercent()
+{
+    double sellingPrice = getSellingPrice();
+    return ((m_unitPrice - sellingPrice) / m_unitPrice * 100);
+}
+
+
+/**
  * @brief Product::setItemNum
  */
 void Product::setItemNum(const uint32_t _itemNum)
