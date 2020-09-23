@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(xPOS-Store-CMake LANGUAGES CXX)
+project(xPOS-Store LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #=====<Dando> Add target name
-set(target_name "xPOS-Store-CMake")
+set(target_name "xPOS-Store")
 
 # Add include path
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILD_TESTING=OFF")

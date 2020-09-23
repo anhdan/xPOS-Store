@@ -67,6 +67,17 @@ typedef int xpError_t;
 
 
 /**
+ * @brief The Category_enum enum
+ */
+enum class Category : int
+{
+    NONE = 0
+};
+
+const std::string CATEGORIES_NAME[] = {"None"};
+
+
+/**
  * @brief Enumurate class of gender types
  */
 enum class Gender : int
@@ -97,6 +108,12 @@ enum class PayingMethod : int
     CASH = 0,
     CARD
 };
+
+
+/***************************************************
+ *              Contants
+ **************************************************/
+#define SECS_IN_DAY         86400
 
 
 /***************************************************

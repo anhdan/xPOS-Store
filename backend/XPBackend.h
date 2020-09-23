@@ -26,10 +26,14 @@
 class XPBackend : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QVariant qTodayShift READ qTodayShift WRITE setQTodayShift NOTIFY qTodayShiftChanged)
+    Q_PROPERTY(QVariant qYesterdayShift READ qYesterdayShift WRITE setQYesterdayShift NOTIFY qYesterdayShiftChanged)
+    Q_PROPERTY(QVariantList top5Model READ top5Model NOTIFY top5ModelChanged)
+
 public:
     XPBackend( QQmlApplicationEngine *engine, xpos_store::InventoryDatabase *_inventoryDB,
                xpos_store::UserDatabase *_usersDB, xpos_store::SellingDatabase *_sellingDB );
-    ~XPBackend();
+    ~XPBackend();    
 
 signals:
     void sigProductFound( QVariant _product );
@@ -40,6 +44,19 @@ signals:
 
     void sigCustomerFound( QVariant _customer );
     void sigCustomerNotFound();
+
+    // Properties signal
+    void qTodayShiftChanged(QVariant);
+    void qYesterdayShiftChanged(QVariant);
+    void top5ModelChanged(QVariant);
+
+public:
+    // Properties get set function
+    QVariant qTodayShift();
+    void setQTodayShift(QVariant _qTodayShift );
+    QVariant qYesterdayShift();
+    void setQYesterdayShift( QVariant _qYesterdayShift );
+    QVariantList top5Model();
 
 public slots:
     // Inventory methods
@@ -58,15 +75,10 @@ public slots:
     // Authentication methods
     int login( QString _name, QString _pwd );
     int getPrivilege();
-    int logout();
-
-    // Http methods
-    int httpPostInvoice();
-    int httpRequestCustomer( xpos_store::Customer &_customer );
+    int logout();    
 
 public:
     int init();
-    void httpReplyFinished( QNetworkReply *_reply );
 private:
     QQmlApplicationEngine *m_engine;
     xpos_store::InventoryDatabase *m_inventoryDB;  
@@ -78,8 +90,10 @@ private:
     xpos_store::Customer m_currCustomer;
     xpos_store::Bill m_bill;
 
-    // HTTP objects
-    QNetworkAccessManager *m_httpManager;
+    // For realtime analytics
+    xpos_store::WorkShift m_todayShift;
+    xpos_store::WorkShift m_yesterdayShift;
+    QVariantList m_top5Model;
 
     // Firebase objects
     firebase::App *m_fbApp;

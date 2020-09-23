@@ -1,8 +1,12 @@
 # xPOS-GUI
 GUI of xPOS machine 
 
-# Change list
+# Release notes
 
-**10/09/2020:** 
-  - Change Qmake project to Cmake
-  - Add firebase C++ SDK to communicate with Firebase server
+## version 1.0
+  - User REST API to communicate with server
+  - Available functions: Invoice Composition & Inventory Management & Login
+
+## version 2.0
+  - Use Firebase API to communicate with server, increasing the security
+  - Update database fields to storage more data for analysis function

@@ -15,5 +15,8 @@
         <file>frontend/UIMaterials.qml</file>
         <file>resource/fonts/FontAwesomeRegular-400.otf</file>
         <file>resource/fonts/FontAwesomeSolid-900.otf</file>
+        <file>frontend/IndicatorCard.qml</file>
+        <file>frontend/RealtimeAnalytics.qml</file>
+        <file>frontend/Top5ListView.qml</file>
     </qresource>
 </RCC>

@@ -11,6 +11,7 @@ void Bill::setDefault()
     m_creationTime = 0;
     m_products.clear();
     m_payment.setDefault();
+    m_profit = 0;
 }
 
 
@@ -27,6 +28,7 @@ void Bill::copyTo(Item *_item)
         bill->m_customerId = m_customerId;
         bill->m_creationTime = m_creationTime;
         m_payment.copyTo( &(bill->m_payment) );
+        bill->m_profit = m_profit;
         bill->m_products = m_products;
     }
 }
@@ -41,8 +43,9 @@ void Bill::printInfo()
     LOG_MSG( ". ID:                 %s\n", m_id.c_str() );
     LOG_MSG( ". STAFF ID:           %s\n", m_staffId.c_str() );
     LOG_MSG( ". CUSTOMER ID:        %s\n", m_customerId.c_str() );
-    LOG_MSG( ". CREATION TIME:      %ld\n", (unsigned long)m_creationTime );
+    LOG_MSG( ". CREATION TIME:      %ld\n", (unsigned long)m_creationTime );    
     m_payment.printInfo();
+    LOG_MSG( ". PROFIT:             %f\n", m_profit );
     std::list<Product>::iterator it = m_products.begin();
     for( int id = 0; id < (int)m_products.size(); id++ )
     {
@@ -182,7 +185,42 @@ void Bill::getPayment( Payment &_payment )
 xpError_t Bill::addProduct( Product &_product)
 {
     m_products.push_back( _product );
+    m_profit += _product.getItemNum() * (_product.getSellingPrice() - _product.getInputPrice());
     return xpSuccess;
+}
+
+
+/**
+ * @brief Bill::getSellingRecords
+ */
+std::vector<SellingRecord> Bill::getSellingRecords()
+{
+    std::vector<SellingRecord> records;
+    SellingRecord record;
+    std::list<xpos_store::Product>::iterator it = m_products.begin();
+    record.setBillId( m_id );
+    record.setCreationTime( m_creationTime );
+    for( int id = 0; id < (int)m_products.size(); id++ )
+    {
+        record.setProductBarcode( it->getBarcode() );
+        record.setDescription( it->getName() );
+        record.setTotalProfit( it->getItemNum() * (it->getSellingPrice() - it->getInputPrice()) );
+        record.setTotalPrice( it->getSellingPrice() * it->getItemNum() );
+        record.setDiscountPercent( it->getDiscountPercent() );
+        records.push_back( record );
+        std::advance( it, 1 );
+    }
+
+    return records;
+}
+
+
+/**
+ * @brief Bill::getProfit
+ */
+double Bill::getProfit()
+{
+    return m_profit;
 }
 
 /**
@@ -199,6 +237,7 @@ QString Bill::toJSONString()
                         "\"bill_id\": \"%s\",\n" \
                         "\"customer_id\": \"%s\",\n" \
                         "\"total_charging\": %f,\n" \
+                        "\"tax\": %f,\n" \
                         "\"discount\": %f,\n" \
                         "\"used_point\": %d,\n" \
                         "\"rewarded_point\": %d,\n" \
@@ -206,8 +245,8 @@ QString Bill::toJSONString()
                         "\"paying_amount\": %f,\n" \
                         "\"products\":\n" \
                         "[\n", (uint64_t)m_creationTime, "65KWa1nJ5D6WhSMmQFqY", m_id.c_str(),
-                        m_customerId.c_str(), m_payment.getTotalCharging(), m_payment.getTotalDiscount(),
-                        m_payment.getUsedPoint(), m_payment.getRewardedPoint(),
+                        m_customerId.c_str(), m_payment.getTotalCharging(), m_payment.getTax(),
+                        m_payment.getTotalDiscount(), m_payment.getUsedPoint(), m_payment.getRewardedPoint(),
                         (int)m_payment.getPayingMethod(), m_payment.getCustomerPayment() );
     QString qBillJSON = QString::fromStdString( std::string(cJSONStr) );
 
@@ -239,8 +278,9 @@ firebase::Variant Bill::toFirebaseVar()
     bill["store_id"] = firebase::Variant("6EGdPlfu70PvbnE6fHRk");
     bill["bill_id"] = firebase::Variant( m_id );
     bill["staff_name"] = firebase::Variant( "D.A Dan" );
-    bill["customer_id"] = firebase::Variant( "FfJopQRRQZPgxpCG9zcDHWtHEuJ3" );
+    bill["customer_id"] = firebase::Variant( m_customerId );
     bill["total_charging"] = firebase::Variant( m_payment.getTotalCharging() );
+    bill["tax"] = firebase::Variant( m_payment.getTax() );
     bill["discount"] = firebase::Variant( m_payment.getTotalDiscount() );
     bill["used_point"] = firebase::Variant( m_payment.getUsedPoint() );
     bill["rewarded_point"] = firebase::Variant( m_payment.getRewardedPoint() );

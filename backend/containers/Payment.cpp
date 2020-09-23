@@ -7,7 +7,7 @@ namespace xpos_store {
  */
 void Payment::setDefault()
 {
-    m_totalCharging = m_totalDiscount = m_customerPayment = 0;
+    m_totalCharging = m_totalDiscount = m_customerPayment = m_tax = 0;
     m_usedPoint = m_rewardedPoint = 0;
     m_payingMethod = PayingMethod::CASH;
 }
@@ -27,6 +27,7 @@ void Payment::copyTo( Item *_item )
         payment->m_customerPayment = m_customerPayment;
         payment->m_usedPoint = m_usedPoint;
         payment->m_rewardedPoint = m_rewardedPoint;
+        payment->m_tax = m_tax;
     }
 }
 
@@ -38,6 +39,7 @@ void Payment::printInfo()
 {
     LOG_MSG( "\n---------PAYMENT---------\n" );
     LOG_MSG( ". TOTAL CHARGING:     %f\n", m_totalCharging );
+    LOG_MSG( ". TOTAL TAX:          %f\n", m_tax );
     LOG_MSG( ". TOTAL DISCOUNT:     %f\n", m_totalDiscount );
     LOG_MSG( ". PAYING METHOD:      %s\n", (m_payingMethod == PayingMethod::CASH) ? "CASH" : "CARD" );
     LOG_MSG( ". CUSTOMER PAYMENT:   %f\n", m_customerPayment );
@@ -228,6 +230,22 @@ double Payment::getReturnToCustomer()
     return ((m_customerPayment > m_totalCharging) ? (m_customerPayment - m_totalCharging) : 0);
 }
 
+/**
+ * @brief Payment::setTax
+ */
+void Payment::setTax(const double _tax)
+{
+    m_tax = _tax;
+}
+
+
+/**
+ * @brief Payment::getTax
+ */
+double Payment::getTax()
+{
+    return  m_tax;
+}
 
 /**
  * @brief Payment::setUsedPoints

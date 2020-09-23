@@ -104,4 +104,10 @@ QtObject {
         return payment
     }
 
+    function secsToStopWatchString( secs )
+    {
+        var mins_ = Math.floor( secs / 60.0 )
+        var hours_ = Math.floor( secs / 3600.0 )
+        return (Number(hours_).toString().padStart(2, "0") + ":" + Number(mins_).toString().padStart(2, "0") )
+    }
 }

@@ -46,6 +46,9 @@ public:
     void getPayment( Payment &_payment );
 
     xpError_t addProduct( Product &_product );
+    std::vector<SellingRecord> getSellingRecords();
+
+    double getProfit();
 
 private:
     std::string m_id;
@@ -53,6 +56,7 @@ private:
     std::string m_staffId;
     time_t m_creationTime;
     Payment m_payment;
+    double m_profit;
     std::list<Product> m_products;
 };
 

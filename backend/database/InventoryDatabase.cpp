@@ -55,6 +55,8 @@ xpError_t InventoryDatabase::create(const std::string &_dbPath)
                             "   NAME                TEXT        NOT NULL,\n" \
                             "   DESC                TEXT        NOT NULL,\n" \
                             "   UNIT                TEXT        NOT NULL,\n" \
+                            "   CATEGORY            INTEGER     NOT NULL,\n" \
+                            "   INPUT_PRICE         REAL        NOT NULL,\n" \
                             "   UNIT_PRICE          REAL        NOT NULL,\n" \
                             "   DISCOUNT_PRICE      REAL        NOT NULL,\n" \
                             "   DISCOUNT_START      INTEGER     NOT NULL,\n" \
@@ -127,8 +129,8 @@ xpError_t InventoryDatabase::insertProduct(Product &_product)
         return xpErrorNotPermited;
     }
 
-    std::string cmdFormat = "INSERT INTO PRODUCT (BARCODE, NAME, DESC, UNIT, UNIT_PRICE, DISCOUNT_PRICE, DISCOUNT_START, DISCOUNT_END, NUM_INSTOCK, NUM_SOLD, NUM_DISQUALIFIED) " \
-                            "VALUES('%s', '%s', '%s', '%s', %f, %f, %ld, %ld, %d, %d, %d);";
+    std::string cmdFormat = "INSERT INTO PRODUCT (BARCODE, NAME, DESC, UNIT, CATEGORY, INPUT_PRICE, UNIT_PRICE, DISCOUNT_PRICE, DISCOUNT_START, DISCOUNT_END, NUM_INSTOCK, NUM_SOLD, NUM_DISQUALIFIED) " \
+                            "VALUES('%s', '%s', '%s', '%s', %d, %f, %f, %f, %ld, %ld, %d, %d, %d);";
     char sqliteCmd[1000];
     double discountPrice = 0;
     time_t discountStart = 0,
@@ -136,8 +138,8 @@ xpError_t InventoryDatabase::insertProduct(Product &_product)
     _product.getDiscountInfo( &discountPrice, &discountStart, &discountEnd );
     sprintf( sqliteCmd, cmdFormat.c_str(),
              _product.getBarcode().c_str(), _product.getName().c_str(), _product.getDescription().c_str(),
-             _product.getUnit().c_str(), _product.getUnitPrice(),
-             discountPrice, (uint32_t)discountStart, (uint32_t)discountEnd,
+             _product.getUnit().c_str(), (int)_product.getCategory(), _product.getInputPrice(),
+             _product.getUnitPrice(), discountPrice, (uint32_t)discountStart, (uint32_t)discountEnd,
              _product.getNumInstock(), _product.getNumSold(), _product.getNumDisqualified() );
     printf( "====> insert product cmd: %s\n", sqliteCmd );
 
@@ -214,6 +216,8 @@ xpError_t InventoryDatabase::updateProduct( Product &_productInfo , bool _isQuan
                             "SET    NAME            = '%s',\n" \
                             "       DESC            = '%s',\n" \
                             "       UNIT            = '%s',\n" \
+                            "       CATEGORY        = %d,\n" \
+                            "       INPUT_PRICE     = %f,\n" \
                             "       UNIT_PRICE      = %f,\n" \
                             "       DISCOUNT_PRICE  = %f,\n" \
                             "       DISCOUNT_START  = %ld,\n" \
@@ -229,8 +233,8 @@ xpError_t InventoryDatabase::updateProduct( Product &_productInfo , bool _isQuan
         _productInfo.getDiscountInfo( &discountPrice, &discountStart, &discountEnd );
         sprintf( sqliteCmd, sqliteCmdFormat.c_str(),
                  _productInfo.getName().c_str(), _productInfo.getDescription().c_str(),
-                 _productInfo.getUnit().c_str(), _productInfo.getUnitPrice(),
-                 discountPrice, (uint64_t)discountStart, (uint64_t)discountEnd,
+                 _productInfo.getUnit().c_str(), (int)_productInfo.getCategory(), _productInfo.getInputPrice(),
+                 _productInfo.getUnitPrice(), discountPrice, (uint64_t)discountStart, (uint64_t)discountEnd,
                  _productInfo.getNumInstock(), _productInfo.getNumSold(),
                  _productInfo.getNumDisqualified(), _productInfo.getBarcode().c_str() );
     }

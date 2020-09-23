@@ -33,6 +33,8 @@ public:
     void setCustmomerPayment( const double _customerPayment );
     double getCustomerPayment();
     double getReturnToCustomer();
+    void setTax( const double _tax );
+    double getTax();
 
     void setUsedPoints( const int _usedPoint );
     int getUsedPoint();
@@ -42,6 +44,7 @@ public:
 private:
     double m_totalCharging;
     double m_totalDiscount;
+    double m_tax;
     PayingMethod m_payingMethod;
     double m_customerPayment;
     int m_usedPoint;

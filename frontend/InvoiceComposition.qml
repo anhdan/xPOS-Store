@@ -67,7 +67,7 @@ Rectangle {
     //===================== 1. Panel of control buttons and price screen
     Rectangle {
         id: pnControl
-        width: 3*parent.width / 8
+        width: parent.width / 3
         height: parent.height
         x: 0
         y: 0
@@ -350,7 +350,6 @@ Rectangle {
             }
         }
 
-
         Menu {
             id: menu
             x: btnMenu.x
@@ -426,7 +425,7 @@ Rectangle {
 
     Rectangle {
         id: pnInvoiceTabs
-        width: 5*parent.width / 8
+        width: 2*parent.width / 3
         height: parent.height
         y: 0
         anchors.left: pnControl.right
@@ -499,7 +498,7 @@ Rectangle {
             }
         }
 
-
+        //================== Control button
         Button {
             id: btnAddItem
             width: 60
@@ -537,7 +536,6 @@ Rectangle {
                 pnBarcodeInput.visible = true
             }
         }
-
 
         Button {
             id: btnDeleteItem
@@ -578,6 +576,46 @@ Rectangle {
             }
         }
 
+        Button {
+            id: btnRtAnalytics
+            width: 60
+            height: 60
+            anchors.right: pnRtAnalytics.left
+            anchors.bottom: pnRtAnalytics.bottom
+
+            background: Rectangle {
+                id: rectBtnRtAnalytics
+                anchors.fill: parent
+                color: "transparent"
+                radius: 10
+            }
+
+            Text {
+                id: txtBtnRtAnalytics
+                text: "\uf201"
+                anchors.centerIn: parent
+                color: (pnRtAnalytics.state === "visible") ? UIMaterials.grayLight
+                                                           : UIMaterials.grayPrimary
+                font {
+                    pixelSize: 40;
+                    weight: Font.Bold
+                    family: UIMaterials.solidFont
+                }
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            onClicked: {
+                if( pnRtAnalytics.state === "visible" )
+                {
+                    pnRtAnalytics.state = "invisible"
+                }
+                else
+                {
+                    pnRtAnalytics.state = "visible"
+                }
+            }
+
+        }
 
         //================== Barcode typing panel
         Rectangle {
@@ -627,7 +665,6 @@ Rectangle {
             }
 
         }
-
 
         //================== Payment panel
         Payment {
@@ -701,6 +738,48 @@ Rectangle {
                 duration: 250
             }
         }                        
+
+        //=================== Realtime Analytics Panel
+        RealtimeAnalytics {
+            id: pnRtAnalytics
+            width: root.width * 3/8
+            height: parent.height
+            y: 0
+            z: parent.z + 10
+            color: UIMaterials.grayPrimary
+            state: "invisible"
+
+            states: [
+                State {
+                    name: "visible"
+                    PropertyChanges {
+                        target: pnRtAnalytics
+                        x: parent.width-pnRtAnalytics.width
+                    }
+                },
+
+                State {
+                    name: "invisible"
+                    PropertyChanges {
+                        target: pnRtAnalytics
+                        x: parent.width
+                    }
+                }
+            ]
+
+            transitions: Transition {
+                from: "invisible"
+                to: "visible"
+                reversible: true
+                SequentialAnimation {
+                    NumberAnimation {
+                        properties: "x"
+                        duration: 500
+                        easing.type: Easing.InOutQuad
+                    }
+                }
+            }
+        }
     }
 
     //=================== Notification Popup
@@ -741,16 +820,6 @@ Rectangle {
                     duration: 500
                     easing.type: Easing.InOutQuad
                 }
-
-//                PropertyAnimation {
-//                    properties: "focus"
-//                    from: false
-//                    to: true
-//                }
-
-//                PauseAnimation {
-//                    duration: 500
-//                }
             }
         }
 
@@ -771,5 +840,5 @@ Rectangle {
                 state = "invisible"
             }
         }
-    }
+    }    
 }

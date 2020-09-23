@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
     QQmlContext *ctx = engine.rootContext();
     ctx->setContextProperty( "xpBackend", &xpBackend );
     ctx->setContextProperty( "keyEmitter", &keyEmitter );
+//    ctx->setContextProperty( "top5Model", QVariant::fromValue(xpBackend.top5Model()) );
 
     //
     //============ II. Load application engine and excute

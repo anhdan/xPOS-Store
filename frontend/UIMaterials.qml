@@ -4,6 +4,11 @@ import QtQuick 2.0
 
 QtObject {
 
+    // Timer property
+    property var currDateTime
+    property var currSecs: 0
+    property string stopWatchTime: "00:00"
+
     //============ Application background color ============
     readonly property color appBgrColorPrimary : "#2a4863"
     readonly property color appBgrColorLight: "#577391"
@@ -30,11 +35,17 @@ QtObject {
     readonly property color greenLight: "#8bc34a"
     readonly property color greenDark: "#388e3c"
 
+    readonly property color redPrimary: "#f44336"
+    readonly property color redLight: "#ff7961"
+    readonly property color redDark: "#ba000d"
+
+
     //=========== Font
     readonly property int fontSizeLargeLarge: 36
     readonly property int fontSizeLarge: 26
     readonly property int fontSizeMedium: 22
     readonly property int fontSizeSmall: 18
+    readonly property int fontSizeTiny: 16
 
 
     readonly property FontLoader fontAwesomeRegular: FontLoader {

@@ -20,6 +20,11 @@ Window {
         onApproved: {
             stack.pop()
             stack.push( formInvoice )
+
+            // restart timer
+            UIMaterials.currDateTime = Date()
+            UIMaterials.currSecs = 0
+            timer.restart()
         }
     }
 
@@ -55,6 +60,19 @@ Window {
         }
     }
 
+    //============ GLobal timer
+    Timer {
+        id: timer
+        interval: 30000
+        repeat: true
+        running: false
+        onTriggered: {
+            UIMaterials.currDateTime = new Date()
+            UIMaterials.currSecs = UIMaterials.currSecs + 60
+            UIMaterials.stopWatchTime = Helper.secsToStopWatchString( UIMaterials.currSecs )
+        }
+    }
+
     /*****************************************************
      *
      * Put all the above forms to a stack view
@@ -63,7 +81,7 @@ Window {
     StackView {
         id: stack
 
-        initialItem: formInvoice
+        initialItem: formLogin
         anchors.fill: parent
 
         pushEnter: Transition {

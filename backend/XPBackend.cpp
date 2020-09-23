@@ -7,10 +7,10 @@ XPBackend::XPBackend(QQmlApplicationEngine *engine, xpos_store::InventoryDatabas
                      xpos_store::UserDatabase *_usersDB, xpos_store::SellingDatabase *_sellingDB )
     : m_engine(engine), m_inventoryDB( _inventoryDB ), m_usersDB(_usersDB), m_sellingDB(_sellingDB)
 {
-    m_httpManager = nullptr;
     m_fbApp = nullptr;
     m_fbAuth = nullptr;
     m_fbFunc = nullptr;
+    m_top5Model.clear();
 }
 
 
@@ -23,7 +23,7 @@ XPBackend::~XPBackend()
     m_inventoryDB = nullptr;
     m_usersDB = nullptr;
     m_sellingDB = nullptr;
-    delete m_httpManager;
+    m_top5Model.clear();
 
     LOG_MSG("[DEB] %s:%d: Shutting down Firebase App.\n", __FUNCTION__, __LINE__ );
     delete m_fbFunc;
@@ -41,10 +41,6 @@ XPBackend::~XPBackend()
  */
 int XPBackend::init()
 {
-    //===== 1. Initialize network manager
-    m_httpManager = new QNetworkAccessManager(this);
-    QObject::connect(m_httpManager, &QNetworkAccessManager::finished,
-                     this, &XPBackend::httpReplyFinished );
 
     //===== 2. Initialize firebase
     LOG_MSG( "[DEB] %s:%d: Initializing Firebase App.\n", __FUNCTION__, __LINE__ );
@@ -53,7 +49,6 @@ int XPBackend::init()
     {
         LOG_MSG( "[ERR:%d] %s:%d: Failed to initialized Firebase app\n",
                  xpErrorNotAllocated, __FILE__, __LINE__ );
-        delete m_httpManager;
         return xpErrorNotAllocated;
     }
 
@@ -137,6 +132,58 @@ int XPBackend::init()
     return xpSuccess;
 }
 
+
+/**
+ * @brief XPBackend::qTodayShift
+ */
+QVariant XPBackend::qTodayShift()
+{
+    return m_todayShift.toQVariant();
+}
+
+
+/**
+ * @brief XPBackend::setQTodayShift
+ */
+void XPBackend::setQTodayShift(QVariant _qTodayShift)
+{
+    if( m_todayShift.fromQVariant(_qTodayShift) != xpSuccess )
+    {
+        m_todayShift.setDefault();
+        emit qTodayShiftChanged( _qTodayShift );
+    }
+}
+
+
+/**
+ * @brief XPBackend::qYesterdayShift
+ */
+QVariant XPBackend::qYesterdayShift()
+{
+    return m_yesterdayShift.toQVariant();
+}
+
+
+/**
+ * @brief XPBackend::setQYesterdayShift
+ */
+void XPBackend::setQYesterdayShift(QVariant _qYesterdayShift)
+{
+    if( m_yesterdayShift.fromQVariant(_qYesterdayShift) != xpSuccess )
+    {
+        m_yesterdayShift.setDefault();
+        emit qYesterdayShiftChanged( _qYesterdayShift );
+    }
+}
+
+
+/**
+ * @brief XPBackend::top5Model
+ */
+QVariantList XPBackend::top5Model()
+{
+    return m_top5Model;
+}
 
 /**
  * @brief XPBackend::searchForProduct
@@ -235,58 +282,6 @@ int XPBackend::initializePayment()
 
 
 /**
- * @brief XPBackend::httpPostInvoice
- */
-int XPBackend::httpPostInvoice()
-{
-    QString val;
-    QFile file;
-    file.setFileName("bill.json");
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
-    val = file.readAll();
-    file.close();
-    qWarning() << val;
-    QString test = QString("\n\n\n this is test string" ) + QString( ": test ok\n\n\n" );
-    qWarning() << test;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(val.toUtf8());
-
-    QUrl url("https://asia-east2-xposproject.cloudfunctions.net/addNewBill");
-    QNetworkRequest request(url);
-
-//    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("Content-Type: application/json"));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-//    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/plain");
-    QByteArray jsonData= jsonDoc.toJson();
-    m_httpManager->post(request, jsonData);
-
-
-    return xpSuccess;
-}
-
-
-/**
- * @brief XPBackend::httpRequestCustomer
- */
-int XPBackend::httpRequestCustomer(xpos_store::Customer &_customer)
-{
-    // Set query params
-    QUrlQuery query;
-    query.addQueryItem( "id", QString::fromStdString(_customer.getId()) );
-    query.addQueryItem( "phone", QString::fromStdString(_customer.getPhone()) );
-
-    // Send request
-    QUrl url("https://asia-east2-xposproject.cloudfunctions.net/getUserInfo");
-    url.setQuery( query );
-    QNetworkRequest request(url);
-//    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-
-    m_httpManager->get( request );
-
-    return xpSuccess;
-}
-
-
-/**
  * @brief XPBackend::sellProduct
  */
 int XPBackend::sellProduct(const QVariant &_qProduct, const int _numSold)
@@ -322,7 +317,7 @@ int XPBackend::sellProduct(const QVariant &_qProduct, const int _numSold)
         m_sellingDB->open();
     }
 
-    xpErr |= m_sellingDB->insertSellingRecord( product, m_bill.getId() );
+    xpErr |= m_sellingDB->insertSellingRecord( product, m_bill.getId(), m_bill.getCreationTime() );
     if( xpErr != xpSuccess )
     {
         LOG_MSG( "[ERR:%d] %s:%d: Failed to update selling record info to database\n",
@@ -376,19 +371,20 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
         }
     }
 
-    //===== Add payment income to total earning of the current workshift
-    xpErr |= m_currWorkshift.increaseEarning( payment.getTotalCharging() );
+    //===== Send bill to maintenance server
+    // create bill
+    m_bill.setCustomerId( m_currCustomer.getId() );
+    m_bill.setPayment( payment );
+    // Add payment income to total earning of the current workshift and today shift
+    xpErr |= m_currWorkshift.recordBill( m_bill );
+    xpErr |= m_todayShift.recordBill( m_bill );
+    emit qTodayShiftChanged( m_todayShift.toQVariant() );
     if( xpErr != xpSuccess )
     {
         LOG_MSG( "[ERR:%d] %s:%d: Failed to add payment to current workshift income\n",
                  xpErr, __FILE__, __LINE__ );
         return xpErr;
     }
-
-    //===== Send bill to maintenance server
-    // create bill
-    m_bill.setCustomerId( m_currCustomer.getId() );
-    m_bill.setPayment( payment );
 
     // save bill to database
     if( !m_sellingDB->isOpen() )
@@ -404,16 +400,6 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
         return xpErr;
     }
 
-    // http post bill
-    QString json = m_bill.toJSONString();
-    qDebug() << json;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(json.toUtf8());
-    QUrl url("https://asia-east2-xposproject.cloudfunctions.net/addNewBill");
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    QByteArray jsonData= jsonDoc.toJson();    
-//    m_httpManager->post(request, jsonData);
-
     // add bill using firebase functions
     firebase::functions::HttpsCallableReference fbFunction
             = m_fbFunc->GetHttpsCallable( "addNewBillCall" );
@@ -423,7 +409,7 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
     while( future.status() == firebase::kFutureStatusPending )
     {
         usleep( 100000 );   // wait for initialization complete
-        sWaitTime += 100000.0/1000000.0;
+        sWaitTime += 0.1;
         if( sWaitTime > 5 ) // timeout
         {
             LOG_MSG( "[ERR:%d] %s:%d: Function invoking timeout\n",
@@ -433,12 +419,37 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
     }
 
     if (future.error() != firebase::functions::kErrorNone) {
-        printf("[Err:%d] %s:%d: %s\n", xpErrorProcessFailure,
+        LOG_MSG("[Err:%d] %s:%d: %s\n", xpErrorProcessFailure,
                __FILE__, __LINE__, future.error_message());
         return xpErrorProcessFailure;
     } else {
         firebase::Variant result = future.result()->data();
-        printf("CALL SUCCESS\n");
+        if( result.is_map() )
+        {
+            std::map<firebase::Variant, firebase::Variant> retMap = result.map();
+            if( retMap[firebase::Variant("status")].is_string() )
+            {
+                std::string retStatus = retMap[firebase::Variant("status")].string_value();
+                if( retStatus != "200" )
+                {
+                    LOG_MSG("[Err:%d] %s:%d: Server error response status %s\n",
+                           xpErrorProcessFailure, __FILE__, __LINE__, retStatus.c_str());
+                    return xpErrorProcessFailure;
+                }
+            }
+            else
+            {
+                LOG_MSG("[Err:%d] %s:%d: Invalid server response\n",
+                       xpErrorInvalidParameters, __FILE__, __LINE__ );
+                return xpErrorInvalidParameters;
+            }
+        }
+        else
+        {
+            LOG_MSG("[Err:%d] %s:%d: Invalid server response\n",
+                   xpErrorInvalidParameters, __FILE__, __LINE__ );
+            return xpErrorInvalidParameters;
+        }
     }
 
     return xpErr;
@@ -450,6 +461,7 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
  */
 int XPBackend::login(QString _name, QString _pwd)
 {
+    //===== 1. Authenticate staff
     bool authenticated = false;
     m_currStaff.setLoginName( _name.toStdString() );
     m_currStaff.setLoginPwd( _pwd.toStdString() );
@@ -471,6 +483,59 @@ int XPBackend::login(QString _name, QString _pwd)
     {
         emit sigStaffDisapproved();
     }
+
+    //===== 2. In-day selling summary of until this workshift start
+    time_t currTime = time( NULL );
+    time_t yesterdayStart = ((currTime / SECS_IN_DAY) - 1) * SECS_IN_DAY;
+    time_t todayStart = yesterdayStart + SECS_IN_DAY;
+    std::vector<xpos_store::WorkShift> workshifts;
+
+    // Summarize trading situation on yesterday
+    xpErr |= m_sellingDB->searchWorkShift( workshifts, yesterdayStart, todayStart );
+    m_yesterdayShift.setDefault();
+    xpErr |= m_yesterdayShift.combine( workshifts );
+
+    // Summarize trading situation today until this workshift
+    xpErr |= m_sellingDB->searchWorkShift( workshifts, todayStart, currTime );
+    m_todayShift.setDefault();
+    xpErr |= m_todayShift.combine( workshifts );
+
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to summarize trading situation\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+    emit qYesterdayShiftChanged( m_yesterdayShift.toQVariant() );
+    emit qTodayShiftChanged( m_todayShift.toQVariant() );
+
+    //===== 3. Summary today selling records by product barcode
+    std::vector<xpos_store::SellingRecord> records;
+    xpErr |= m_sellingDB->groupHistoryRecordByBarcode( records, todayStart, currTime );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to summarize today selling records by product barcode\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    m_top5Model.clear();
+    xpos_store::Product product;
+    for( int i = 0; i < (int)records.size(); i++ )
+    {
+        xpErr |= m_inventoryDB->searchProductByBarcode( records[i].getProductBarcode(), product );
+        records[i].setDescription( product.getName() );
+        m_top5Model.append( records[i].toQVariant() );
+        records[i].printInfo();
+    }
+
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to retrieve product description from selling records\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+    emit top5ModelChanged( m_top5Model );
 
     return xpErr;
 }
@@ -542,9 +607,109 @@ int XPBackend::searchForCustomer(QString _id)
         customer.copyTo( (xpos_store::Item*)&m_currCustomer );
     }
 
-    //===== Request customer info from xPOS Bank
-    m_currCustomer.setId( _id.toStdString() );
-    httpRequestCustomer( m_currCustomer );
+    //===== Firebase request customer info
+    std::map<std::string, firebase::Variant> userKeys;
+    if(_id[0] == '0' || (_id[0] == '8' && _id[1] == '4'))
+    {
+        userKeys["phone"] = firebase::Variant( _id.toStdString() );
+        userKeys["id"] = firebase::Variant( "" );
+    }
+    else
+    {
+        userKeys["phone"] = firebase::Variant( "" );
+        userKeys["id"] = firebase::Variant( _id.toStdString() );
+    }
+
+    firebase::functions::HttpsCallableReference fbFuncGetUser
+            = m_fbFunc->GetHttpsCallable( "getUserInfoCall" );
+    firebase::Future<firebase::functions::HttpsCallableResult> future
+            = fbFuncGetUser.Call( firebase::Variant( userKeys ) );
+    float sWaitTime = 0;
+    while( future.status() == firebase::kFutureStatusPending )
+    {
+        usleep( 100000 );   // wait for initialization complete
+        sWaitTime += 0.1;
+        if( sWaitTime > 5 ) // timeout
+        {
+            LOG_MSG( "[ERR:%d] %s:%d: Function invoking timeout\n",
+                     xpErrorTimeout, __FILE__, __LINE__ );
+            return xpErrorTimeout;
+        }
+    }
+
+    if (future.error() != firebase::functions::kErrorNone)
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n", xpErrorProcessFailure,
+                 __FILE__, __LINE__, future.error_message() );
+        return xpErrorProcessFailure;
+    } else {
+        firebase::Variant result = future.result()->data();
+        std::map<firebase::Variant, firebase::Variant> retMap = result.map();
+        if( retMap.count( firebase::Variant("status") ) > 0 )
+        {
+            std::string retStatus = retMap[firebase::Variant("status")].string_value();
+            if( retStatus != "200" )
+            {
+                LOG_MSG( "[ERR:%d] %s:%d: Server response error %s\n",
+                         xpErrorProcessFailure, __FILE__, __LINE__, retStatus.c_str() );
+                return xpErrorProcessFailure;
+            }
+
+            if( retMap.count( firebase::Variant("info") ) > 0
+                    && retMap[firebase::Variant("info")].is_map() )
+            {
+                // Parse return data for customer info
+                std::map<firebase::Variant, firebase::Variant> infoMap
+                        = retMap[firebase::Variant("info")].map();
+
+                bool isInfoValid = true;
+                if( isInfoValid &= infoMap[firebase::Variant("code")].is_string() )
+                {
+                    m_currCustomer.setId( infoMap[firebase::Variant("code")].string_value() );
+                }
+
+                if( isInfoValid &= infoMap[firebase::Variant("name")].is_string() )
+                {
+                    m_currCustomer.setName( infoMap[firebase::Variant("name")].string_value() );
+                }
+
+                if( isInfoValid &= infoMap[firebase::Variant("phone_number")].is_string() )
+                {
+                    m_currCustomer.setPhone( infoMap[firebase::Variant("phone_number")].string_value() );
+                }
+
+                if( isInfoValid &= infoMap[firebase::Variant("point")].is_int64() )
+                {
+                    m_currCustomer.setRewardedPoint( (int)infoMap[firebase::Variant("point")].int64_value() );
+                }
+
+                // Emit customer found signal
+                if( isInfoValid )
+                {
+                    emit sigCustomerFound( m_currCustomer.toQVariant() );
+                }
+                else
+                {
+                    LOG_MSG( "[ERR:%d] %s:%d: Invalid return data\n",
+                             xpErrorInvalidParameters, __FILE__, __LINE__);
+                    return xpErrorInvalidParameters;
+                }
+            }
+            else
+            {
+                LOG_MSG( "[ERR:%d] %s:%d: Invalid return data\n",
+                         xpErrorInvalidParameters, __FILE__, __LINE__);
+                return xpErrorInvalidParameters;
+            }
+        }
+        else
+        {
+            LOG_MSG( "[ERR:%d] %s:%d: Invalid return data\n",
+                     xpErrorInvalidParameters, __FILE__, __LINE__);
+            return xpErrorInvalidParameters;
+        }
+    }
+
 
     return xpSuccess;
 }
@@ -557,71 +722,4 @@ double XPBackend::getPoint2MoneyRate()
     //! TODO:
     //! Use a CURRENCY table to store conversion rate of many currency
     return 1000.0;
-}
-
-
-/**
- * @brief XPBackend::httpReplyFinished
- */
-void XPBackend::httpReplyFinished(QNetworkReply *_reply )
-{
-    if (_reply->error()) {
-        qDebug() << _reply->errorString();
-        _reply->deleteLater();
-        return;
-    }
-
-    // Json parsing
-    QString answer = _reply->readAll();
-    QJsonParseError jsonErr;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson( answer.toUtf8(), &jsonErr );
-    if( jsonErr.error != QJsonParseError::NoError )
-    {
-        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
-                 xpErrorProcessFailure, __FILE__, __LINE__, jsonErr.errorString().toStdString().c_str() );
-        _reply->deleteLater();
-        return;
-    }
-
-    QVariant jsonVar = jsonDoc.toVariant();
-    if( jsonVar.canConvert<QVariantMap>() )
-    {
-        QVariantMap map = jsonVar.toMap();
-        if( !map.empty() )
-        {
-            m_currCustomer.setName( map["name"].toString().toStdString() );
-            m_currCustomer.setPhone( map["phone_number"].toString().toStdString() );
-            int ix =0;
-            bool ret = true;
-            ix = map["point"].toString().toInt( &ret );
-            m_currCustomer.setRewardedPoint( ix );
-            if( !ret )
-            {
-                m_currCustomer.setDefault();
-                LOG_MSG( "[WAR] %s:%d: Customer not found\n",
-                         __FILE__, __LINE__ );
-                emit sigCustomerNotFound();
-                _reply->deleteLater();
-                return;
-            }
-            m_currCustomer.printInfo();
-
-            emit sigCustomerFound( m_currCustomer.toQVariant() );
-        }
-        else
-        {
-            m_currCustomer.setDefault();
-            LOG_MSG( "[WAR] %s:%d: Customer not found\n",
-                     __FILE__, __LINE__ );
-            emit sigCustomerNotFound();
-        }
-    }
-    else
-    {
-        LOG_MSG( "[ERR:%d] %s:%d: Failed to convert QVariant to QVariantMap\n",
-                 xpErrorInvalidParameters, __FILE__, __LINE__ );
-    }
-
-    _reply->deleteLater();
-    return;
 }

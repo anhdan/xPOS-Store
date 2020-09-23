@@ -35,7 +35,12 @@ public:
     std::string getDescription();
     void setUnit( const std::string &_unit );
     std::string getUnit();
+    void setCategory( const Category &_category );
+    Category getCategory();
+    std::string getCategoryName();
 
+    void setInputPrice( const double _price );
+    double getInputPrice();
     void setUnitPrice( const double _price );
     double getUnitPrice();
     xpError_t runDiscount( const double _discountPrice, const time_t _start, const time_t _end );
@@ -64,7 +69,9 @@ private:
     std::string m_name;
     std::string m_description;
     std::string m_unit;
+    Category    m_category;
 
+    double m_inputPrice;
     double m_unitPrice;
     double m_discountPrice;
     time_t m_discountStart;

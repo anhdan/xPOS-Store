@@ -12,8 +12,9 @@ void Product::setDefault()
     m_name = "";
     m_description = "";
     m_unit = "";
+    m_category = Category::NONE;
 
-    m_unitPrice = m_discountPrice = 0.0;
+    m_inputPrice = m_unitPrice = m_discountPrice = 0.0;
     m_discountStart = m_discountEnd = 0;
 
     m_itemNum = m_numInstock = m_numSold = m_numDisqualified = 0;
@@ -32,6 +33,8 @@ void Product::copyTo(Item *_item)
         _prod->m_name = m_name;
         _prod->m_description = m_description;
         _prod->m_unit = m_unit;
+        _prod->m_category = m_category;
+        _prod->m_inputPrice = m_inputPrice;
         _prod->m_unitPrice = m_unitPrice;
         _prod->m_discountPrice = m_discountPrice;
         _prod->m_discountStart = m_discountStart;
@@ -54,6 +57,8 @@ void Product::printInfo()
     LOG_MSG( ". NAME:           %s\n", m_name.c_str() );
     LOG_MSG( ". DESCRIPTION:    %s\n", m_description.c_str() );
     LOG_MSG( ". UNIT:           %s\n", m_unit.c_str() );
+    LOG_MSG( ". CATEGORY:       %s\n", CATEGORIES_NAME[(int)m_category].c_str());
+    LOG_MSG( ". INPUT PRICE:    %f\n", m_inputPrice );
     LOG_MSG( ". UNIT PRICE:     %f\n", m_unitPrice );
     LOG_MSG( ". DISCOUNT PRICE: %f\n", m_discountPrice );
     LOG_MSG( ". DISCOUNT START: %ld\n", m_discountStart );
@@ -76,6 +81,7 @@ QVariant Product::toQVariant( )
     map["name"] = QString::fromStdString( getName() );
     map["desc"] = QString::fromStdString( getDescription() );
     map["unit"] = QString::fromStdString( getUnit() );
+    map["input_price"] = getInputPrice();
     map["unit_price"] = getUnitPrice();
     map["item_num"] = getItemNum();
 
@@ -118,6 +124,8 @@ xpError_t Product::fromQVariant( const QVariant &_item )
         m_name = map["name"].toString().toStdString();
         m_description = map["desc"].toString().toStdString();
         m_unit = map["unit"].toString().toStdString();               
+        m_inputPrice = map["input_price"].toDouble(&ret);
+        finalRet &= ret;
         m_unitPrice = map["unit_price"].toDouble(&ret);
         finalRet &= ret;
 
@@ -191,6 +199,8 @@ bool Product::isIdenticalTo(const Product &_product)
     ret &= (m_name == _product.m_name);
     ret &= (m_description == _product.m_description);
     ret &= (m_unit == _product.m_unit);
+    ret &= (m_category == _product.m_category);
+    ret &= (m_inputPrice == _product.m_inputPrice);
     ret &= (m_unitPrice == _product.m_unitPrice);
     ret &= (m_discountPrice == _product.m_discountPrice);
     ret &= (m_discountStart == _product.m_discountStart);
@@ -226,6 +236,14 @@ xpError_t Product::searchCallBack(void *data, int fieldsNum, char **fieldVal, ch
         else if( !strcmp(fieldName[fieldId], "UNIT") )
         {
             product->m_unit = fieldVal[fieldId] ? fieldVal[fieldId] : "Không có thông tin";
+        }
+        else if( !strcmp(fieldName[fieldId], "CATEGORY") )
+        {
+            product->m_category = fieldVal[fieldId] ? (Category)atoi(fieldVal[fieldId]) : Category::NONE;
+        }
+        else if( !strcmp(fieldName[fieldId], "INPUT_PRICE") )
+        {
+            product->m_inputPrice = fieldVal[fieldId] ? atof( fieldVal[fieldId] ) : 0.0;
         }
         else if( !strcmp(fieldName[fieldId], "UNIT_PRICE") )
         {
@@ -341,6 +359,50 @@ void Product::setUnit(const std::string &_unit)
 std::string Product::getUnit()
 {
     return m_unit;
+}
+
+
+/**
+ * @brief Product::setCategory
+ */
+void Product::setCategory(const Category &_category)
+{
+    m_category = _category;
+}
+
+
+/**
+ * @brief Product::getCategory
+ */
+Category Product::getCategory()
+{
+    return m_category;
+}
+
+/**
+ * @brief Product::getCategoryName
+ */
+std::string Product::getCategoryName()
+{
+    return CATEGORIES_NAME[(int)m_category];
+}
+
+
+/**
+ * @brief Product::setInputPrice
+ */
+void Product::setInputPrice(const double _price)
+{
+    m_inputPrice = _price;
+}
+
+
+/**
+ * @brief Product::getInputPrice
+ */
+double Product::getInputPrice()
+{
+    return m_inputPrice;
 }
 
 

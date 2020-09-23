@@ -35,23 +35,33 @@ public:
     void setDescription( const std::string &_desc );
     std::string getDescription();
 
+    void setCreationTime( const time_t _creationTime );
+    time_t getCreationTime();
+
     void setQuantity( const int _quantity );
     int getQuantity();
 
-    void setSellingPrice( const double _sellingPrice );
-    double getSellingPrice();
+    void setTotalProfit( const double _profit );
+    double getTotalProfit();
+
+    void setTotalPrice( const double _sellingPrice );
+    double getTotalPrice();
 
     void setDiscountPercent( const double _discountPercent );
     void setDiscountPercent( const double _unitPrice, const double _sellingPrice );
     double getDiscountPercent();
 
+    static xpError_t searchCallBack(void *data, int fieldsNum, char **fieldVal, char **fieldName);
+    static xpError_t searchCallBackGroup(void *data, int fieldsNum, char **fieldVal, char **fieldName);
 
 private:
     std::string m_billId;
     std::string m_productBarcode;
     std::string m_desc;
+    time_t m_creationTime;
     int m_quantity;
-    double m_sellingPrice;
+    double m_totalProfit;
+    double m_totalPrice;
     double m_discountPercent;
 };
 
