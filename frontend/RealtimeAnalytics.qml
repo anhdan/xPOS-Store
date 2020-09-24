@@ -12,7 +12,8 @@ Rectangle {
     id: root
 
     property var todayShift: xpBackend.qTodayShift
-    property var yesterdayShift: xpBackend.qYesterdayShift  
+    property var yesterdayShift: xpBackend.qYesterdayShift
+    property alias categoryText: lvTop5.categoryText
 
     Label {
         id: titRAName
@@ -128,6 +129,21 @@ Rectangle {
             anchors.topMargin: 5
             anchors.horizontalCenter: parent.horizontalCenter
             model: xpBackend.top5Model
+
+            onCategoryTextChanged: {
+                if( categoryText === "Doanh thu(đ)" )
+                {
+                    xpBackend.sortTop5( 1 )
+                }
+                else if( categoryText === "Lợi nhuận(đ)" )
+                {
+                    xpBackend.sortTop5( 2 )
+                }
+                else
+                {
+                    xpBackend.sortTop5( 3 )
+                }
+            }
         }
 
         Label {

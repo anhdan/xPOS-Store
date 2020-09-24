@@ -51,6 +51,8 @@ public:
     void setDiscountPercent( const double _unitPrice, const double _sellingPrice );
     double getDiscountPercent();
 
+    static SellingRecord fromProduct( Product &_product );
+
     static xpError_t searchCallBack(void *data, int fieldsNum, char **fieldVal, char **fieldName);
     static xpError_t searchCallBackGroup(void *data, int fieldsNum, char **fieldVal, char **fieldName);
 

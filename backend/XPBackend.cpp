@@ -11,6 +11,8 @@ XPBackend::XPBackend(QQmlApplicationEngine *engine, xpos_store::InventoryDatabas
     m_fbAuth = nullptr;
     m_fbFunc = nullptr;
     m_top5Model.clear();
+    m_recordGroups.clear();
+    m_top5Criteria = Top5Criteria::NONE;
 }
 
 
@@ -24,6 +26,7 @@ XPBackend::~XPBackend()
     m_usersDB = nullptr;
     m_sellingDB = nullptr;
     m_top5Model.clear();
+    m_recordGroups.clear();
 
     LOG_MSG("[DEB] %s:%d: Shutting down Firebase App.\n", __FUNCTION__, __LINE__ );
     delete m_fbFunc;
@@ -324,6 +327,24 @@ int XPBackend::sellProduct(const QVariant &_qProduct, const int _numSold)
                  xpErr, __FILE__, __LINE__ );
     }
 
+    // Add selling record to today record groups by barcode for top 5 bestsellers display
+    bool exist = false;
+    for( auto it : m_recordGroups )
+    {
+        if( product.getBarcode() == it.getProductBarcode() )
+        {
+            it.setTotalPrice( it.getTotalPrice() + product.getItemNum() * product.getSellingPrice() );
+            it.setTotalProfit( it.getTotalProfit() + product.getItemNum() * (product.getSellingPrice() - product.getInputPrice()) );
+            it.setQuantity( it.getQuantity() + product.getItemNum() );
+            exist = true;
+            break;
+        }
+    }
+    if( !exist )
+    {
+        m_recordGroups.push_back( xpos_store::SellingRecord::fromProduct( product ) );
+    }
+
     return xpErr;
 }
 
@@ -519,13 +540,13 @@ int XPBackend::login(QString _name, QString _pwd)
         return xpErr;
     }
 
-    m_top5Model.clear();
+    m_recordGroups.clear();
     xpos_store::Product product;
     for( int i = 0; i < (int)records.size(); i++ )
     {
         xpErr |= m_inventoryDB->searchProductByBarcode( records[i].getProductBarcode(), product );
         records[i].setDescription( product.getName() );
-        m_top5Model.append( records[i].toQVariant() );
+        m_recordGroups.push_back( records[i] );
         records[i].printInfo();
     }
 
@@ -535,7 +556,6 @@ int XPBackend::login(QString _name, QString _pwd)
                  xpErr, __FILE__, __LINE__ );
         return xpErr;
     }
-    emit top5ModelChanged( m_top5Model );
 
     return xpErr;
 }
@@ -577,6 +597,50 @@ int XPBackend::logout()
     }
 
     return xpErr;
+}
+
+
+/**
+ * @brief XPBackend::sortTop5
+ */
+int XPBackend::sortTop5(int _criteria)
+{
+    if( _criteria == (int)m_top5Criteria )
+    {
+        return xpSuccess;
+    }
+
+    std::vector<float> sortValues;
+    for( auto it : m_recordGroups )
+    {
+        switch ( _criteria )
+        {
+        case(int)Top5Criteria::REVENUE:
+            sortValues.push_back( it.getTotalPrice() );
+            break;
+        case (int)Top5Criteria::PROFIT:
+            sortValues.push_back( it.getTotalProfit() );
+            break;
+        case (int)Top5Criteria::QUANTITY:
+            sortValues.push_back( (float)it.getQuantity());
+            break;
+        default:
+            LOG_MSG( "[ERR:%d] %s:%d: Invalid sorting criteria\n",
+                     xpErrorInvalidValues, __FILE__, __LINE__ );
+            return xpErrorInvalidValues;
+        }
+    }
+
+    std::vector<size_t> idx = sort_indexes( sortValues, false );
+    m_top5Model.clear();
+    int num = ( idx.size() < 5 ) ? idx.size() : 5;
+    for( int id = 0; id < num; id++ )
+    {
+        m_top5Model.append( std::next(m_recordGroups.begin(), idx[id] )->toQVariant() );
+    }
+    emit top5ModelChanged( m_top5Model );
+
+    return xpSuccess;
 }
 
 

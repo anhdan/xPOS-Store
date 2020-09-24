@@ -75,7 +75,10 @@ public slots:
     // Authentication methods
     int login( QString _name, QString _pwd );
     int getPrivilege();
-    int logout();    
+    int logout();
+
+    // Analytics functions
+    int sortTop5( int _criteria );
 
 public:
     int init();
@@ -94,6 +97,8 @@ private:
     xpos_store::WorkShift m_todayShift;
     xpos_store::WorkShift m_yesterdayShift;
     QVariantList m_top5Model;
+    std::list<xpos_store::SellingRecord> m_recordGroups;
+    Top5Criteria m_top5Criteria;
 
     // Firebase objects
     firebase::App *m_fbApp;

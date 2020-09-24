@@ -47,7 +47,9 @@ set(firebase_libs firebase_functions firebase_auth firebase_app)
 #    endif()
 #endif()
 
+#set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH} /opt/Qt/5.12.9/gcc_64/lib/cmake")
 find_package(Qt5 COMPONENTS Core Quick REQUIRED)
+#find_package(Qt5 COMPONENTS Core Widgets Qml Quick REQUIRED)
 
 if(ANDROID)
     add_library(${target_name} SHARED
@@ -81,3 +83,5 @@ target_compile_definitions(${target_name}
 #<Dando> Add firebase lib and additional lib
 target_link_libraries(${target_name}
     PRIVATE Qt5::Core Qt5::Quick "${firebase_libs}" ${ADDITIONAL_LIBS})
+#target_link_libraries(${target_name}
+#    PRIVATE Qt5::Core Qt5::Quick Qt5::Widgets Qt5:VirtualKeyboard "${firebase_libs}" ${ADDITIONAL_LIBS})

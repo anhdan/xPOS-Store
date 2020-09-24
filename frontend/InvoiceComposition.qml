@@ -779,6 +779,24 @@ Rectangle {
                     }
                 }
             }
+
+            onStateChanged: {
+                if( state === "visible" )
+                {
+                    if( categoryText === "Doanh thu(đ)" )
+                    {
+                        xpBackend.sortTop5( 1 )
+                    }
+                    else if( categoryText === "Lợi nhuận(đ)" )
+                    {
+                        xpBackend.sortTop5( 2 )
+                    }
+                    else
+                    {
+                        xpBackend.sortTop5( 3 )
+                    }
+                }
+            }
         }
     }
 

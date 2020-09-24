@@ -282,6 +282,23 @@ double SellingRecord::getDiscountPercent()
 
 
 /**
+ * @brief SellingRecord::fromProduct
+ */
+SellingRecord SellingRecord::fromProduct(Product &_product)
+{
+    SellingRecord record;
+    record.setProductBarcode( _product.getBarcode() );
+    record.setDescription( _product.getName() );
+    record.setQuantity( _product.getItemNum() );
+    record.setTotalPrice( _product.getItemNum() * _product.getSellingPrice() );
+    record.setTotalProfit( _product.getItemNum() * (_product.getSellingPrice() - _product.getInputPrice()) );
+    record.setDiscountPercent( (_product.getUnitPrice() - _product.getSellingPrice()) / _product.getUnitPrice() );
+
+    return record;
+}
+
+
+/**
  * @brief SellingRecord::searchCallBack
  */
 xpError_t SellingRecord::searchCallBack(void *data, int fieldsNum, char **fieldVal, char **fieldName)

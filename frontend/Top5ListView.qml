@@ -33,6 +33,8 @@ ListView {
             spacing: 0
 
             Label {
+                property bool isName: true
+
                 id: lblName
                 width: parent.width * 28/43
                 height: parent.height
@@ -41,6 +43,24 @@ ListView {
                 font.pixelSize: delegateFontSize
                 color: delegateFontColor
                 text: modelData["desc"]
+
+                MouseArea {
+                    id: maLblName
+                    anchors.fill: parent
+                    onPressed: {
+                        lblName.text = (lblName.isName === true) ? modelData["product_barcode"] : modelData["desc"]
+                        lblName.isName = !lblName.isName
+                        focus = true
+                    }
+
+                    onFocusChanged: {
+                        if( focus === false )
+                        {
+                            lblName.text = modelData["desc"]
+                            lblName.isName = true
+                        }
+                    }
+                }
             }
 
             Label {
