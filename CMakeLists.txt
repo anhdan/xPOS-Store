@@ -22,8 +22,8 @@ link_directories( "/usr/lib" )
 set(ADDITIONAL_LIBS pthread sqlite3)
 
 
-#set(FIREBASE_CPP_SDK_DIR "/home/martin/Workspace/xPOS/src/firebase-cpp-sdk")
-set(FIREBASE_CPP_SDK_DIR "/home/xpos/Workspace/xpos/firebase-cpp-sdk")
+set(FIREBASE_CPP_SDK_DIR "/home/martin/Workspace/xPOS/src/firebase-cpp-sdk")
+#set(FIREBASE_CPP_SDK_DIR "/home/xpos/Workspace/xpos/firebase-cpp-sdk")
 if(NOT EXISTS ${FIREBASE_CPP_SDK_DIR})
   message(FATAL_ERROR "The Firebase C++ SDK directory does not exist: ${FIREBASE_CPP_SDK_DIR}. See the readme.md for more information")
 endif()
