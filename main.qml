@@ -81,7 +81,7 @@ Window {
     StackView {
         id: stack
 
-        initialItem: formLogin
+        initialItem: formInvoice
         anchors.fill: parent
 
         pushEnter: Transition {

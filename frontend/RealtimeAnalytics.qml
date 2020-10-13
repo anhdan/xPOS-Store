@@ -18,10 +18,10 @@ Rectangle {
     Label {
         id: titRAName
         anchors.top: parent.top
-        anchors.topMargin: 10
+        anchors.topMargin: 20
         anchors.left: colIndicators.left
         font.pixelSize: UIMaterials.fontSizeLarge
-        color: UIMaterials.grayLight
+        color: "black"
         text: "Chỉ số kinh doanh trong ngày"
     }
 
@@ -29,7 +29,7 @@ Rectangle {
     Column {
         id: colIndicators
         anchors.top: titRAName.bottom
-        anchors.topMargin: 20
+        anchors.topMargin: 15
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: 15
 
@@ -42,8 +42,8 @@ Rectangle {
                 id: indRevenue
                 width: root.width * 5/12
                 height: 0.14*root.height
-                color: UIMaterials.grayLight
-                name: "DOANH THU"
+                color: "white"
+                name: "Doanh Thu"
                 value: todayShift["total_earning"]
                 compareSign: "\uf783"
                 compareValue: (yesterdayShift["total_earning"] > 0) ? (todayShift["total_earnning"] / yesterdayShift["total_earning"] * 100)
@@ -55,7 +55,7 @@ Rectangle {
                 width: indRevenue.width
                 height: indRevenue.height
                 color: indRevenue.color
-                name: "LỢI NHUẬN"
+                name: "Lợi Nhuận"
                 value: todayShift["total_profit"]
                 compareSign: "\uf783"
                 compareValue: (yesterdayShift["total_profit"] > 0) ? (todayShift["total_profit"] / yesterdayShift["total_profit"] * 100)
@@ -73,7 +73,7 @@ Rectangle {
                 width: indRevenue.width
                 height: indRevenue.height
                 color: indRevenue.color
-                name: "LƯỢNG KHÁCH"
+                name: "Lượng Khách"
                 value: todayShift["total_customers"]
                 isCurrency: false
                 compareSign: "\uf783"
@@ -86,7 +86,7 @@ Rectangle {
                 width: indRevenue.width
                 height: indRevenue.height
                 color: indRevenue.color
-                name: "ĐIỂM THƯỞNG"
+                name: "Điểm Thưởng"
                 value: todayShift["total_rewarded_points"]
                 isCurrency: false
                 compareSign: "\uf53a"
@@ -107,18 +107,18 @@ Rectangle {
         width: colIndicators.width
         height: root.height * 4/9
         anchors.top: colIndicators.bottom
-        anchors.topMargin: 20
+        anchors.topMargin: 50
         anchors.horizontalCenter: parent.horizontalCenter
-        color: UIMaterials.grayLight
+        color: "white"
 
         Label {
             id: titTop5
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.left: parent.left
             anchors.top: parent.top
             anchors.topMargin: 5
-            font.pixelSize: UIMaterials.fontSizeMedium
-            color: UIMaterials.grayDark
-            text: "TOP 5 SẢN PHẨM BÁN CHẠY"
+            font.pixelSize: UIMaterials.fontSizeLarge
+            color: "black"
+            text: "Top 5 sản phẩm bán chạy"
         }
 
         Top5ListView {
@@ -126,7 +126,7 @@ Rectangle {
             width: parent.width * 43/44
             height: parent.height * 3/4
             anchors.top: titTop5.bottom
-            anchors.topMargin: 5
+            anchors.topMargin: 15
             anchors.horizontalCenter: parent.horizontalCenter
             model: xpBackend.top5Model
 
@@ -147,6 +147,20 @@ Rectangle {
         }
 
         Label {
+            id: lblTop5OverallSign
+            anchors.verticalCenter: lblTop5Overall.verticalCenter
+            anchors.right: lblTop5Overall.left
+            anchors.rightMargin: 10
+            color: UIMaterials.grayPrimary
+            font {
+                pixelSize: UIMaterials.fontSizeSmall
+                weight: Font.Bold
+                family: UIMaterials.solidFont
+            }
+            text: "\uf53a"
+        }
+
+        Label {
             id: lblTop5Overall
             anchors.top: lvTop5.bottom
             anchors.topMargin: 10
@@ -154,36 +168,36 @@ Rectangle {
             font.pixelSize: UIMaterials.fontSizeSmall
             color: UIMaterials.greenPrimary
             horizontalAlignment: Text.AlignRight
-            text: "50% Tổng DT"
+            text: "0 %"
         }
     }
 
-    //===== 3. Workshift timer
-    Row {
-        id: rowTimer
-        width: colIndicators.width
-        anchors.top: pnTop5.bottom
-        anchors.topMargin: 20
-        anchors.left: colIndicators.left
+//    //===== 3. Workshift timer
+//    Row {
+//        id: rowTimer
+//        width: colIndicators.width
+//        anchors.top: pnTop5.bottom
+//        anchors.topMargin: 20
+//        anchors.left: colIndicators.left
 
-        Label {
-            width: parent.width/2
-            font.pixelSize: UIMaterials.fontSizeSmall
-            color: "black"
-            horizontalAlignment: Text.AlignLeft
-            verticalAlignment: Text.AlignVCenter
-            text: "Thời gian ca làm việc:"
-        }
+//        Label {
+//            width: parent.width/2
+//            font.pixelSize: UIMaterials.fontSizeSmall
+//            color: "black"
+//            horizontalAlignment: Text.AlignLeft
+//            verticalAlignment: Text.AlignVCenter
+//            text: "Thời gian ca làm việc:"
+//        }
 
-        Label {
-            width: parent.width/2
-            font.pixelSize: UIMaterials.fontSizeSmall
-            color: "black"
-            horizontalAlignment: Text.AlignLeft
-            verticalAlignment: Text.AlignVCenter
-            text: UIMaterials.stopWatchTime
-        }
-    }
+//        Label {
+//            width: parent.width/2
+//            font.pixelSize: UIMaterials.fontSizeSmall
+//            color: "black"
+//            horizontalAlignment: Text.AlignLeft
+//            verticalAlignment: Text.AlignVCenter
+//            text: UIMaterials.stopWatchTime
+//        }
+//    }
     
     //===== 4. Footer
     Row {
@@ -201,7 +215,7 @@ Rectangle {
                 id: lblCalendarSign
                 anchors.top: parent.top
                 anchors.left: parent.left
-                color: UIMaterials.grayDark
+                color: UIMaterials.grayPrimary
                 font {
                     pixelSize: UIMaterials.fontSizeSmall
                     weight: Font.Bold
@@ -213,7 +227,7 @@ Rectangle {
                 anchors.verticalCenter: lblCalendarSign.verticalCenter
                 anchors.left: lblCalendarSign.right
                 anchors.leftMargin: 5
-                color: UIMaterials.grayDark
+                color: UIMaterials.grayPrimary
                 font.pixelSize: UIMaterials.fontSizeTiny
                 text: "So với ngày hôm trước"
             }
@@ -228,19 +242,19 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.right: lblPortionNote.left
                 anchors.rightMargin: 5
-                color: UIMaterials.grayDark
+                color: UIMaterials.grayPrimary
                 font {
                     pixelSize: UIMaterials.fontSizeSmall
                     weight: Font.Bold
                     family: UIMaterials.solidFont
                 }
-                text: "\uf783"
+                text: "\uf53a"
             }
             Label {
                 id: lblPortionNote
                 anchors.verticalCenter: lblPortionSign.verticalCenter
                 anchors.right: parent.right
-                color: UIMaterials.grayDark
+                color: UIMaterials.grayPrimary
                 font.pixelSize: UIMaterials.fontSizeTiny
                 text: "Phần trăm trên doanh thu"
             }

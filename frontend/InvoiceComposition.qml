@@ -746,7 +746,7 @@ Rectangle {
             height: parent.height
             y: 0
             z: parent.z + 10
-            color: UIMaterials.grayPrimary
+            color: "white"
             state: "invisible"
 
             states: [

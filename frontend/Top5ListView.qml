@@ -14,10 +14,10 @@ ListView {
     //===== Properties
     property var delegateFontSize: UIMaterials.fontSizeSmall
     property string delegateFontColor: "black"
-    property string delegateBgrColor: UIMaterials.grayLight
+    property string delegateBgrColor: "white"
     property var headerFontSize: UIMaterials.fontSizeSmall
-    property string headerFontColor: "black"
-    property string headerBgrColor: UIMaterials.grayPrimary
+    property string headerFontColor: UIMaterials.grayDark
+    property string headerBgrColor: UIMaterials.grayLight
     property string categoryText: "Doanh thu(đ)"
 
     //===== 2. Listview Delegate
@@ -70,7 +70,7 @@ ListView {
                 horizontalAlignment: Text.AlignRight
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: delegateFontSize
-                color: delegateFontColor
+                color: UIMaterials.bluePrimary
                 text: (categoryText === "Doanh thu(đ)") ? modelData["total_price"]
                                                         : (categoryText === "Lợi nhuận(đ)") ? modelData["total_profit"]
                                                                                             : modelData["quantity"]
@@ -127,7 +127,7 @@ ListView {
                     context.lineTo(width, 0);
                     context.lineTo(width / 2, height);
                     context.closePath();
-                    context.fillStyle = "#ffffff"
+                    context.fillStyle = UIMaterials.grayDark
                     context.fill();
                 }                
             }

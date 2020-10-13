@@ -39,6 +39,10 @@ QtObject {
     readonly property color redLight: "#ff7961"
     readonly property color redDark: "#ba000d"
 
+    readonly property color bluePrimary: "#2C93F2"
+    readonly property color blueLight: "#2C93F2"
+    readonly property color blueDark: "#2C93F2"
+
 
     //=========== Font
     readonly property int fontSizeLargeLarge: 36

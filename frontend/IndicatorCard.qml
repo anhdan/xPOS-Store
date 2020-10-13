@@ -38,7 +38,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: lblName.left
         font.pixelSize: UIMaterials.fontSizeMedium
-        color: UIMaterials.goldDark
+        color: UIMaterials.bluePrimary
         text: isCurrency ? (value.toLocaleString( Qt.locale(), "f", 0 ) + " vnd")
                          : value
     }
@@ -77,5 +77,15 @@ Rectangle {
         font.pixelSize: UIMaterials.fontSizeSmall
         color: lblCompareValue.color
         text: "%"
+    }
+
+    // Dropshadow effect
+    layer.enabled: true
+    layer.effect: DropShadow {
+        transparentBorder: true
+        color: UIMaterials.grayPrimary
+        horizontalOffset: 4
+        verticalOffset: 4
+        radius: 4
     }
 }
