@@ -81,7 +81,7 @@ Window {
     StackView {
         id: stack
 
-        initialItem: formInvoice
+        initialItem: formInventory
         anchors.fill: parent
 
         pushEnter: Transition {

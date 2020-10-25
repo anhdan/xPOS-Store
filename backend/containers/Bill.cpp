@@ -294,6 +294,7 @@ firebase::Variant Bill::toFirebaseVar()
     {
         fbProduct["code"] = firebase::Variant( it->getBarcode() );
         fbProduct["name"] = firebase::Variant( it->getName() + " @ " + it->getUnit() );
+        fbProduct["category"] = firebase::Variant((int)it->getCategory() );
         fbProduct["selling_price"] = firebase::Variant( it->getSellingPrice() );
         fbProduct["discount_percent"] = firebase::Variant( it->getDiscountPercent() );
         fbProduct["quantity"] = firebase::Variant( (int)it->getItemNum() );

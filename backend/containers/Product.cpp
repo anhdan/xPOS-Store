@@ -123,7 +123,7 @@ xpError_t Product::fromQVariant( const QVariant &_item )
         m_barcode = map["barcode"].toString().toStdString();
         m_name = map["name"].toString().toStdString();
         m_description = map["desc"].toString().toStdString();
-        m_unit = map["unit"].toString().toStdString();               
+        m_unit = map["unit"].toString().toStdString();
         m_inputPrice = map["input_price"].toDouble(&ret);
         finalRet &= ret;
         m_unitPrice = map["unit_price"].toDouble(&ret);

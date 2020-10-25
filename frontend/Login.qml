@@ -10,7 +10,7 @@ Rectangle {
     id: root
     implicitWidth: 1280
     implicitHeight: 720
-    color: UIMaterials.appBgrColorPrimary
+    color: UIMaterials.colorNearWhite
 
     //====================== Signal and slot definition
     signal approved()
@@ -55,15 +55,15 @@ Rectangle {
     }
 
     //============== Account input area
-    Label {
-        id: titXPOS
+    Image {
+        id: imgLogo
         anchors.horizontalCenter: txtId.horizontalCenter
         anchors.bottom: txtId.top
         anchors.bottomMargin: UIMaterials.fontSizeMedium
-        color: UIMaterials.goldPrimary
-        font.pixelSize: 72
-        text: "xPOS"
-        enabled: false
+        source: "qrc:/resource/imgs/Logo_withName_tr.png"
+        width: 200
+        height: 200
+        smooth: true
     }
 
     TextField {

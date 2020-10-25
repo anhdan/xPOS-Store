@@ -73,10 +73,19 @@ typedef int xpError_t;
  */
 enum class Category : int
 {
-    NONE = 0
+    NONE = 0,
+    FOOD,
+    DRINK,
+    HH_APPLIANCE,
+    FASHION,
+    ELECTRONICS,
+    EDUCATION_OFFICE,
+    HEALTH,
+    BABY
 };
 
-const std::string CATEGORIES_NAME[] = {"None"};
+const std::string CATEGORIES_NAME[9] = {"None", "Thực phẩm", "Đồ uống", "Đồ dùng gia đình", "Thời trang",
+                                       "Điện tử", "Giáo dục - Văn phòng", "Sức khỏe", "Trẻ em" };
 
 
 /**
