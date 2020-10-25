@@ -8,8 +8,8 @@ import "."
 
 Rectangle {
     id: root
-    implicitWidth: 1280
-    implicitHeight: 720
+    implicitWidth: UIMaterials.windowWidth
+    implicitHeight: UIMaterials.windowHeight
 
     property var currProduct
     property var updateProduct

@@ -6,30 +6,27 @@ Rectangle {
     height: 3*width/2
     color: "transparent"
 
-    property string keyBgrColor: UIMaterials.grayPrimary
-    property string keyBgrColorSecondary: UIMaterials.grayLight
-    property string keyTxtColor: "white"
-    property int keyTxtFontSize: UIMaterials.fontSizeLargeLarge
-    readonly property alias keySize: btnOne.width
+    property string keyBgrColor: UIMaterials.colorNearWhite
+    property string keyBgrColorPressed: "white"
+    property string keyTxtColor: UIMaterials.colorTaskBar
 
     Column {
         anchors.fill: parent
-        spacing: 15
+        spacing: 0.05 * btnOne.width
 
         Row {
-            spacing: 15
+            spacing: 0.05 * btnOne.width
 
             Button {
                 id: btnOne
-                width: 3*root.width/10
-                height: 3*root.width/10
+                width: 0.3226 * root.width
+                height: 0.1875 * root.height
                 focusPolicy: Qt.NoFocus
 
                 background: Rectangle {
                     id: rectBtnOne
                     anchors.fill: parent
                     color: keyBgrColor
-                    radius: 5
                 }
 
                 Text {
@@ -37,11 +34,14 @@ Rectangle {
                     anchors.centerIn: parent
                     color: keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: keyTxtFontSize
+                    font {
+                        pixelSize: Math.floor( 0.26 * btnOne.width )
+                        family: UIMaterials.fontRobotoLight
+                    }
                 }
 
                 onPressed: {
-                    rectBtnOne.color = keyBgrColorSecondary
+                    rectBtnOne.color = keyBgrColorPressed
                 }
 
                 onReleased: {
@@ -60,7 +60,6 @@ Rectangle {
                     id: rectBtnTwo
                     anchors.fill: parent
                     color: keyBgrColor
-                    radius: 5
                 }
 
                 Text {
@@ -68,11 +67,14 @@ Rectangle {
                     anchors.centerIn: parent
                     color: keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: keyTxtFontSize
+                    font {
+                        pixelSize: Math.floor( 0.26 * btnOne.width )
+                        family: UIMaterials.fontRobotoLight
+                    }
                 }
 
                 onPressed: {
-                    rectBtnTwo.color = keyBgrColorSecondary
+                    rectBtnTwo.color = keyBgrColorPressed
                 }
 
                 onReleased: {
@@ -91,19 +93,21 @@ Rectangle {
                     id: rectBtnThree
                     anchors.fill: parent
                     color: keyBgrColor
-                    radius: 5
                 }
 
                 Text {
-                    text: qsTr("3")
+                    text: qsTr("1")
                     anchors.centerIn: parent
                     color: keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: keyTxtFontSize
+                    font {
+                        pixelSize: Math.floor( 0.26 * btnOne.width )
+                        family: UIMaterials.fontRobotoLight
+                    }
                 }
 
                 onPressed: {
-                    rectBtnThree.color = keyBgrColorSecondary
+                    rectBtnThree.color = keyBgrColorPressed
                 }
 
                 onReleased: {
@@ -115,7 +119,8 @@ Rectangle {
 
 
         Row {
-            spacing: 15
+            spacing: 0.05 * btnOne.width
+
             Button {
                 id: btnFour
                 width: btnOne.width
@@ -126,7 +131,6 @@ Rectangle {
                     id: rectBtnFour
                     anchors.fill: parent
                     color: keyBgrColor
-                    radius: 5
                 }
 
                 Text {
@@ -134,11 +138,14 @@ Rectangle {
                     anchors.centerIn: parent
                     color: keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: keyTxtFontSize
+                    font {
+                        pixelSize: Math.floor( 0.26 * btnOne.width )
+                        family: UIMaterials.fontRobotoLight
+                    }
                 }
 
                 onPressed: {
-                    rectBtnFour.color = keyBgrColorSecondary
+                    rectBtnFour.color = keyBgrColorPressed
                 }
 
                 onReleased: {
@@ -157,19 +164,21 @@ Rectangle {
                     id: rectBtnFive
                     anchors.fill: parent
                     color: keyBgrColor
-                    radius: 5
                 }
 
                 Text {
-                    text: qsTr("5")
+                    text: qsTr("2")
                     anchors.centerIn: parent
                     color: keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: keyTxtFontSize
+                    font {
+                        pixelSize: Math.floor( 0.26 * btnOne.width )
+                        family: UIMaterials.fontRobotoLight
+                    }
                 }
 
                 onPressed: {
-                    rectBtnFive.color = keyBgrColorSecondary
+                    rectBtnFive.color = keyBgrColorPressed
                 }
 
                 onReleased: {
@@ -188,7 +197,6 @@ Rectangle {
                     id: rectBtnSix
                     anchors.fill: parent
                     color: keyBgrColor
-                    radius: 5
                 }
 
                 Text {
@@ -196,11 +204,14 @@ Rectangle {
                     anchors.centerIn: parent
                     color: keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: keyTxtFontSize
+                    font {
+                        pixelSize: Math.floor( 0.26 * btnOne.width )
+                        family: UIMaterials.fontRobotoLight
+                    }
                 }
 
                 onPressed: {
-                    rectBtnSix.color = keyBgrColorSecondary
+                    rectBtnSix.color = keyBgrColorPressed
                 }
 
                 onReleased: {
@@ -211,7 +222,8 @@ Rectangle {
         }
 
         Row {
-            spacing: 15
+            spacing: 0.05 * btnOne.width
+
             Button {
                 id: btnSeven
                 width: btnOne.width
@@ -222,7 +234,6 @@ Rectangle {
                     id: rectBtnSeven
                     anchors.fill: parent
                     color: keyBgrColor
-                    radius: 5
                 }
 
                 Text {
@@ -230,11 +241,14 @@ Rectangle {
                     anchors.centerIn: parent
                     color: keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: keyTxtFontSize
+                    font {
+                        pixelSize: Math.floor( 0.26 * btnOne.width )
+                        family: UIMaterials.fontRobotoLight
+                    }
                 }
 
                 onPressed: {
-                    rectBtnSeven.color = keyBgrColorSecondary
+                    rectBtnSeven.color = keyBgrColorPressed
                 }
 
                 onReleased: {
@@ -253,7 +267,6 @@ Rectangle {
                     id: rectBtnEight
                     anchors.fill: parent
                     color: keyBgrColor
-                    radius: 5
                 }
 
                 Text {
@@ -261,11 +274,14 @@ Rectangle {
                     anchors.centerIn: parent
                     color: keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: keyTxtFontSize
+                    font {
+                        pixelSize: Math.floor( 0.26 * btnOne.width )
+                        family: UIMaterials.fontRobotoLight
+                    }
                 }
 
                 onPressed: {
-                    rectBtnEight.color = keyBgrColorSecondary
+                    rectBtnEight.color = keyBgrColorPressed
                 }
 
                 onReleased: {
@@ -284,7 +300,6 @@ Rectangle {
                     id: rectBtnNine
                     anchors.fill: parent
                     color: keyBgrColor
-                    radius: 5
                 }
 
                 Text {
@@ -292,11 +307,14 @@ Rectangle {
                     anchors.centerIn: parent
                     color: keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: keyTxtFontSize
+                    font {
+                        pixelSize: Math.floor( 0.26 * btnOne.width )
+                        family: UIMaterials.fontRobotoLight
+                    }
                 }
 
                 onPressed: {
-                    rectBtnNine.color = keyBgrColorSecondary
+                    rectBtnNine.color = keyBgrColorPressed
                 }
 
                 onReleased: {
@@ -307,35 +325,38 @@ Rectangle {
         }
 
         Row {
-            spacing: 15
+            spacing: 0.05 * btnOne.width
+
             Button {
-                id: btnClear
+                id: btnDot
                 width: btnOne.width
                 height: btnOne.height
                 focusPolicy: Qt.NoFocus
 
                 background: Rectangle {
-                    id: rectBtnClear
+                    id: rectBtnDot
                     anchors.fill: parent
                     color: keyBgrColor
-                    radius: 5
                 }
 
                 Text {
-                    text: qsTr("C")
+                    text: qsTr(".")
                     anchors.centerIn: parent
                     color: keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: keyTxtFontSize
+                    font {
+                        pixelSize: Math.floor( 0.26 * btnOne.width )
+                        family: UIMaterials.fontRobotoLight
+                    }
                 }
 
                 onPressed: {
-                    rectBtnClear.color = keyBgrColorSecondary
+                    rectBtnDot.color = keyBgrColorPressed
                 }
 
                 onReleased: {
-                    keyEmitter.emitKey( Qt.Key_Backspace )
-                    rectBtnClear.color = keyBgrColor
+                    keyEmitter.emitKey( Qt.Key_Period )
+                    rectBtnDot.color = keyBgrColor
                 }
             }
 
@@ -349,7 +370,6 @@ Rectangle {
                     id: rectBtnZero
                     anchors.fill: parent
                     color: keyBgrColor
-                    radius: 5
                 }
 
                 Text {
@@ -357,11 +377,14 @@ Rectangle {
                     anchors.centerIn: parent
                     color: keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: keyTxtFontSize
+                    font {
+                        pixelSize: Math.floor( 0.26 * btnOne.width )
+                        family: UIMaterials.fontRobotoLight
+                    }
                 }
 
                 onPressed: {
-                    rectBtnZero.color = keyBgrColorSecondary
+                    rectBtnZero.color = keyBgrColorPressed
                 }
 
                 onReleased: {
@@ -371,28 +394,104 @@ Rectangle {
             }
 
             Button {
-                id: btnEnter
+                id: btnTripleZero
                 width: btnOne.width
                 height: btnOne.height
+                focusPolicy: Qt.NoFocus
+
+                background: Rectangle {
+                    id: rectBtnTripleZero
+                    anchors.fill: parent
+                    color: keyBgrColor
+                }
+
+                Text {
+                    text: qsTr("000")
+                    anchors.centerIn: parent
+                    color: keyTxtColor
+                    horizontalAlignment: Text.AlignHCenter
+                    font {
+                        pixelSize: Math.floor( 0.26 * btnOne.width )
+                        family: UIMaterials.fontRobotoLight
+                    }
+                }
+
+                onPressed: {
+                    rectBtnTripleZero.color = keyBgrColorPressed
+                }
+
+                onReleased: {
+                    keyEmitter.emitKey( Qt.Key_0 )
+                    keyEmitter.emitKey( Qt.Key_0 )
+                    keyEmitter.emitKey( Qt.Key_0 )
+                    rectBtnTripleZero.color = keyBgrColor
+                }
+            }
+        }
+
+
+        Row {
+            spacing: 0.0667 * btnBackspace.width
+
+            Button {
+                id: btnBackspace
+                width: 0.4839 * root.width
+                height: 0.1875 * root.height
+                focusPolicy: Qt.NoFocus
+
+                background: Rectangle {
+                    id: rectBtnBackSpace
+                    anchors.fill: parent
+                    color: keyBgrColor
+                }
+
+                Text {
+                    text: "\uf55a"
+                    anchors.centerIn: parent
+                    color: keyTxtColor
+                    horizontalAlignment: Text.AlignHCenter
+                    font {
+                        pixelSize: Math.floor( 0.3 * btnOne.width )
+                        weight: Font.Bold
+                        family: UIMaterials.solidFont
+                    }
+                }
+
+                onPressed: {
+                    btnBackspace.color = keyBgrColorPressed
+                }
+
+                onReleased: {
+                    keyEmitter.emitKey( Qt.Key_Backspace )
+                    btnBackspace.color = keyBgrColor
+                }
+            }
+
+            Button {
+                id: btnEnter
+                width: 0.4839 * root.width
+                height: 0.1875 * root.height
                 focusPolicy: Qt.NoFocus
 
                 background: Rectangle {
                     id: rectBtnEnter
                     anchors.fill: parent
                     color: keyBgrColor
-                    radius: 5
                 }
 
                 Text {
-                    text: qsTr("Nhập")
+                    text: qsTr("Enter")
                     anchors.centerIn: parent
                     color: keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: UIMaterials.fontSizeLarge
+                    font {
+                        pixelSize: Math.floor( 0.26 * btnOne.width )
+                        family: UIMaterials.fontRobotoLight
+                    }
                 }
 
                 onPressed: {
-                    rectBtnEnter.color = keyBgrColorSecondary
+                    rectBtnEnter.color = keyBgrColorPressed
                 }
 
                 onReleased: {
@@ -400,6 +499,6 @@ Rectangle {
                     rectBtnEnter.color = keyBgrColor
                 }
             }
-        }       
+        }
     }
 }

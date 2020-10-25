@@ -10,8 +10,8 @@ import "."
 
 Rectangle {
     id: root
-    implicitWidth: 1280
-    implicitHeight: 720
+    implicitWidth: UIMaterials.windowWidth
+    implicitHeight: UIMaterials.windowHeight
 
     readonly property string priceTxtColor: UIMaterials.goldDark//"white"
     readonly property string priceTxtFontSize: UIMaterials.fontSizeLarge
@@ -71,192 +71,89 @@ Rectangle {
         height: parent.height
         x: 0
         y: 0
-        color: UIMaterials.appBgrColorPrimary
+        color: "white"
 
         //========= 1.1. Price screen panel
-        Rectangle {
-            id: pnPriceScreen
+        PriceScreen {
+            id: priceScreen
+            width: parent.width
+            height: 0.2344 * parent.height
             anchors.top: parent.top
             anchors.left: parent.left
-            width: parent.width
-            height: 7 * priceTxtFontSize
-            color: UIMaterials.appBgrColorDark
-
-            Column {
-                id: column
-                spacing: 10
-                anchors.centerIn: parent
-                width: parent.width - 20
-
-                Row {
-                    spacing: 0
-                    Label {
-                        id: titSumBeforeTax
-                        width: column.width / 2
-                        text: qsTr( "Tổng chưa thuế: " )
-                        font.pixelSize: priceTxtFontSize
-                        color: priceTxtColor
-                    }
-
-                    Label {
-                        id: lblSumBeforeTax
-                        width: column.width / 2
-                        text: qsTr( "0 vnd" )
-                        horizontalAlignment: Text.AlignRight
-                        font.pixelSize: priceTxtFontSize
-                        color: priceTxtColor
-                    }
-                }
-
-                Row {
-                    spacing: 0
-                    Label {
-                        id: titTax
-                        width: column.width / 2
-                        text: qsTr( "Thuế: " )
-                        font.pixelSize: priceTxtFontSize
-                        color: priceTxtColor
-                    }
-
-                    Label {
-                        id: lblTax
-                        width: column.width / 2
-                        text: qsTr( "0 vnd" )
-                        horizontalAlignment: Text.AlignRight
-                        font.pixelSize: priceTxtFontSize
-                        color: priceTxtColor
-                    }
-                }
-
-                Row {
-                    spacing: 0
-                    Label {
-                        id: titDiscount
-                        width: column.width / 2
-                        text: qsTr( "Khuyến mãi: " )
-                        font.pixelSize: priceTxtFontSize
-                        color: priceTxtColor
-                    }
-
-                    Label {
-                        id: lblDiscount
-                        width: column.width / 2
-                        text: qsTr( "0 vnd" )
-                        horizontalAlignment: Text.AlignRight
-                        font.pixelSize: priceTxtFontSize
-                        color: priceTxtColor
-                    }
-                }
-
-                Row {
-                    spacing: 0
-                    Label {
-                        id: titSumFinal
-                        width: column.width / 2
-                        text: qsTr( "Tổng tiền: " )
-                        font.pixelSize: priceTxtFontSize
-                        color: priceTxtColor
-                    }
-
-                    Label {
-                        id: lblSumFinal
-                        width: column.width / 2
-                        text: qsTr( "0.00 vnd" )
-                        horizontalAlignment: Text.AlignRight
-                        font.pixelSize: priceTxtFontSize
-                        color: priceTxtColor
-                    }
-                }
-            }
-
         }
 
-        //========= 1.2. Numpad panel
-        NumPad {
-            id: pnNumpad
-            anchors.top: pnPriceScreen.bottom
-            anchors.topMargin: 10
-            anchors.left: parent.left
-            anchors.leftMargin: 10
-            width: Math.min(2*parent.width/3, 300)
-        }
+        //========= 1.2. Numpad and control keys panel
 
-        //======== 1.3. Control key panel
-        Column {
-            id: columnControl
-            height: pnNumpad.height
-            anchors.top: pnNumpad.top
-            anchors.right: parent.right
-            anchors.rightMargin: 10
-            spacing: 15
+        Row {
+            y: 0.2604 * parent.height
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 0.05 * btnIncrease.width
 
             Button {
-                id: btnIncrease
-                width: pnNumpad.keySize * 1.2
-                height: pnNumpad.keySize
+                id: btnDelete
+                width: 0.3226 * pnNumpad.width
+                height: 0.2188 * pnNumpad.height
                 focusPolicy: Qt.NoFocus
 
                 background: Rectangle {
-                    id: rectBtnIncrease
+                    id: rectBtnDelete
                     anchors.fill: parent
-                    color: UIMaterials.appBgrColorLight
-                    radius: 5
+                    color: UIMaterials.colorNearWhite
                 }
 
                 Text {
-                    text: qsTr("+")
+                    text: "\uf1f8"
                     anchors.centerIn: parent
-                    color: "white"
+                    color: UIMaterials.colorTrueRed
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: UIMaterials.fontSizeLargeLarge
-                    font.bold: true
+                    font {
+                        pixelSize: Math.floor( 0.3 * rectBtnIncrease.width )
+                        weight: Font.Bold
+                        family: UIMaterials.solidFont
+                    }
                 }
 
                 onPressed: {
-                    rectBtnIncrease.color = UIMaterials.appBgrColorDark
+                    rectBtnDelete.color = "white"
                 }
 
                 onReleased: {
-                    rectBtnIncrease.color = UIMaterials.appBgrColorLight
+                    rectBtnDelete.color = UIMaterials.colorNearWhite
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
-                    var currItemQuant = tab.item.getCurrItemQuantity()
-                    var currItemInstock = tab.item.getCurrItemInstock()
-                    if( currItemInstock > currItemQuant )
-                    {
-                        currItemQuant++
-                    }
-                    tab.item.updateCurrItemQuantity( currItemQuant )
+                    tab.item.removeCurrItem()
                 }
             }
 
             Button {
                 id: btnDecrease
-                width: pnNumpad.keySize * 1.2
-                height: pnNumpad.keySize
+                width: 0.3226 * pnNumpad.width
+                height: 0.2188 * pnNumpad.height
                 focusPolicy: Qt.NoFocus
 
                 background: Rectangle {
                     id: rectBtnDecrease
                     anchors.fill: parent
-                    color: UIMaterials.appBgrColorLight
-                    radius: 5
+                    color: UIMaterials.colorNearWhite
                 }
 
                 Text {
-                    text: qsTr("-")
+                    text: "-"
                     anchors.centerIn: parent
-                    color: "white"
+                    color: UIMaterials.colorTrueBlue
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: UIMaterials.fontSizeLargeLarge
-                    font.bold: true
+                    verticalAlignment: Text.AlignVCenter
+                    font {
+                        pixelSize: Math.floor( 0.6 * rectBtnIncrease.width )
+                        weight: Font.Bold
+                    }
                 }
 
                 onPressed: {
-                    rectBtnDecrease.color = UIMaterials.appBgrColorDark
+                    rectBtnDecrease.color = "white"
                 }
 
                 onReleased: {
-                    rectBtnDecrease.color = UIMaterials.appBgrColorLight
+                    rectBtnDecrease.color = UIMaterials.colorNearWhite
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
                     var currItemQuant = tab.item.getCurrItemQuantity()
                     if( currItemQuant > 1 )
@@ -272,33 +169,122 @@ Rectangle {
             }
 
             Button {
-                id: btnMakePayment
-                width: pnNumpad.keySize * 1.2
-                height: pnNumpad.keySize * 2 + 15
+                id: btnIncrease
+                width: 0.3226 * pnNumpad.width
+                height: 0.2188 * pnNumpad.height
                 focusPolicy: Qt.NoFocus
 
                 background: Rectangle {
-                    id: rectBtnMskePayment
+                    id: rectBtnIncrease
                     anchors.fill: parent
-                    color: UIMaterials.goldDark
-                    radius: 5
+                    color: UIMaterials.colorNearWhite
                 }
 
                 Text {
-                    text: qsTr("Thanh\nToán")
+                    text: "\uf067"
                     anchors.centerIn: parent
-                    color: "white"
+                    color: UIMaterials.colorTrueBlue
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: UIMaterials.fontSizeLarge
-                    font.bold: true
+                    font {
+                        pixelSize: Math.floor( 0.3 * rectBtnIncrease.width )
+                        weight: Font.Bold
+                        family: UIMaterials.solidFont
+                    }
                 }
 
                 onPressed: {
-                    rectBtnMskePayment.color = UIMaterials.goldPrimary
+                    rectBtnIncrease.color = "white"
                 }
 
                 onReleased: {
-                    rectBtnMskePayment.color = UIMaterials.goldDark
+                    rectBtnIncrease.color = UIMaterials.colorNearWhite
+                    var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
+                    var currItemQuant = tab.item.getCurrItemQuantity()
+                    var currItemInstock = tab.item.getCurrItemInstock()
+                    if( currItemInstock > currItemQuant )
+                    {
+                        currItemQuant++
+                    }
+                    tab.item.updateCurrItemQuantity( currItemQuant )
+                }
+            }
+        }
+
+        NumPad {
+            id: pnNumpad
+            y: 0.3776 * parent.height
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: 0.9118 * parent.width
+            height: 0.4167 * parent.height
+        }
+
+        Row {
+            y: 0.8594 * parent.height
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 0.0645 * pnNumpad.width
+
+            Button {
+                id: btnQuickFinish
+                width: 0.3326 * pnNumpad.width
+                height: btnDelete.height
+                focusPolicy: Qt.NoFocus
+
+                background: Rectangle {
+                    id: rectBtnQuickFinish
+                    anchors.fill: parent
+                    color: UIMaterials.colorNearWhite
+                }
+
+                Text {
+                    text: qsTr("Xuất\nNhanh")
+                    anchors.centerIn: parent
+                    color: UIMaterials.colorTaskBar
+                    horizontalAlignment: Text.AlignHCenter
+                    font {
+                        pixelSize: 0.26 * btnQuickFinish.width
+                        family: UIMaterials.fontRobotoLight
+                    }
+
+                }
+
+                onPressed: {
+                    rectBtnQuickFinish.color = "white"
+                }
+
+                onReleased: {
+                    rectBtnQuickFinish.color = UIMaterials.colorNearWhite
+                }
+            }
+
+            Button {
+                id: btnMakePayment
+                width: 0.6129 * pnNumpad.width
+                height: btnQuickFinish.height
+                focusPolicy: Qt.NoFocus
+
+                background: Rectangle {
+                    id: rectBtnMakePayment
+                    anchors.fill: parent
+                    color: UIMaterials.colorAntLogo
+                }
+
+                Text {
+                    text: qsTr("Thanh Toán")
+                    anchors.centerIn: parent
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                    font {
+                        pixelSize: 0.26 * btnQuickFinish.width
+                        family: UIMaterials.fontRobotoLight
+                    }
+                }
+
+                onPressed: {
+                    rectBtnMakePayment.color = UIMaterials.goldPrimary
+                }
+
+                onReleased: {
+                    rectBtnMakePayment.color = UIMaterials.colorAntLogo
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
                     if( tab.item.count > 0 )
                     {
@@ -312,113 +298,6 @@ Rectangle {
                     }
                 }
             }
-        }
-
-        //========= Task bar sector
-        Button {
-            id: btnMenu
-            width: 60
-            height: 60
-            anchors.left: parent.left
-            anchors.bottom: parent.bottom
-
-            background: Rectangle {
-                anchors.fill: parent
-                color: "transparent"
-            }
-
-            Text {
-                id: txtBtnMenu
-                text: "\uf0c9"
-                anchors.centerIn: parent
-                color: UIMaterials.grayPrimary
-                font {
-                    pixelSize: 40;
-                    weight: Font.Bold
-                    family: UIMaterials.solidFont
-                }
-                horizontalAlignment: Text.AlignHCenter
-            }
-
-            onPressed: {
-                txtBtnMenu.color = UIMaterials.grayLight
-            }
-
-            onReleased: {
-                txtBtnMenu.color = UIMaterials.grayPrimary
-                menu.open()
-            }
-        }
-
-        Menu {
-            id: menu
-            x: btnMenu.x
-            y: btnMenu.y
-
-            MenuItem {
-                text: "Quản lý kho"
-                onTriggered: {
-                    toInventoryBoard()
-                }
-            }
-
-            MenuItem {
-                text: "Quản lý khách hàng"
-                onTriggered: {
-                    toCustomerBoard()
-                }
-            }
-
-            MenuItem {
-                text: "Phân tích kinh doanh"
-                onTriggered: {
-                    toAnalyticsBoard()
-                }
-            }
-
-            MenuItem {
-                text: "Cài đặt"
-                onTriggered: {
-                    toSetupBoard()
-                }
-            }
-
-            MenuSeparator{}
-
-            MenuItem {
-                text: "Đăng xuất"
-                onTriggered: {
-                    toLoginBoard()
-                    xpBackend.logout()
-                }
-            }
-
-        }
-
-        //======= Account infomation
-        Label {
-            id: lblAccSign
-            anchors.right: parent.right
-            anchors.rightMargin: 10
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 10
-            text: "\uf007"
-            color: "white"
-            font {
-                pixelSize: 40;
-                weight: Font.Bold;
-                family: UIMaterials.solidFont
-            }
-        }
-
-        Label {
-            id: lblAccText
-            anchors.right: lblAccSign.left
-            anchors.rightMargin: 10
-            anchors.bottom: lblAccSign.bottom
-            text: "Do Anh Dan"
-            font.pixelSize: UIMaterials.fontSizeSmall
-            color: "white"
         }
     }
 
@@ -537,44 +416,6 @@ Rectangle {
             }
         }
 
-        Button {
-            id: btnDeleteItem
-            width: 60
-            height: 60
-            anchors.left: btnAddItem.right
-            anchors.leftMargin: 15
-            anchors.bottom: parent.bottom
-
-            background: Rectangle {
-                id: rectBtnDeleteItem
-                anchors.fill: parent
-                color: "transparent"
-                radius: 10
-            }
-
-            Text {
-                id: txtBtnDeleteItem
-                text: "\uf2ed"
-                anchors.centerIn: parent
-                color: UIMaterials.grayPrimary
-                font {
-                    pixelSize: 40;
-                    weight: Font.Bold
-                    family: UIMaterials.solidFont
-                }
-                horizontalAlignment: Text.AlignHCenter
-            }
-
-            onPressed: {
-                txtBtnDeleteItem.color = UIMaterials.grayDark
-            }
-
-            onReleased: {
-                txtBtnDeleteItem.color = UIMaterials.grayPrimary
-                var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
-                tab.item.removeCurrItem()
-            }
-        }
 
         Button {
             id: btnRtAnalytics

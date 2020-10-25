@@ -44,5 +44,6 @@
         <file>resource/fonts/Roboto/Roboto-Regular.ttf</file>
         <file>resource/fonts/Roboto/Roboto-Thin.ttf</file>
         <file>resource/fonts/Roboto/Roboto-ThinItalic.ttf</file>
+        <file>frontend/PriceScreen.qml</file>
     </qresource>
 </RCC>

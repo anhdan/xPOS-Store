@@ -8,8 +8,8 @@ import "frontend"
 Window {
     id: root
     visible: true
-    width: 1280
-    height: 720
+    width: UIMaterials.windowWidth
+    height: UIMaterials.windowHeight
     title: qsTr("xPOS")
 
     //=========== Login Form
@@ -81,7 +81,7 @@ Window {
     StackView {
         id: stack
 
-        initialItem: formInventory
+        initialItem: formLogin
         anchors.fill: parent
 
         pushEnter: Transition {

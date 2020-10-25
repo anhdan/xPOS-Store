@@ -8,8 +8,8 @@ import "."
 
 Rectangle {
     id: root
-    implicitWidth: 1280
-    implicitHeight: 720
+    implicitWidth: 1024
+    implicitHeight: 768
     color: UIMaterials.colorNearWhite
 
     //====================== Signal and slot definition
@@ -57,35 +57,52 @@ Rectangle {
     //============== Account input area
     Image {
         id: imgLogo
-        anchors.horizontalCenter: txtId.horizontalCenter
-        anchors.bottom: txtId.top
-        anchors.bottomMargin: UIMaterials.fontSizeMedium
-        source: "qrc:/resource/imgs/Logo_withName_tr.png"
-        width: 200
-        height: 200
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: parent.top
+        anchors.topMargin: 20
+        source: "qrc:/resource/imgs/Logo_only_trans.png"
+        width: 160
+        height: 160
         smooth: true
+    }
+
+    Label {
+        id: titAppName
+        height: 50
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: imgLogo.bottom
+        anchors.topMargin: 20
+        color: UIMaterials.colorConcrete
+        text: "ANT THU NGÂN"
+        font {
+            pixelSize: 36
+//            weight: Font.Bold
+            family: UIMaterials.fontRobotoLight
+        }
     }
 
     TextField {
         id: txtId
-        width: 350
-        height: 2 * UIMaterials.fontSizeMedium
+        width: 400
+        height: 60
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: txtPwd.top
-        anchors.bottomMargin: 15
+        anchors.top: titAppName.bottom
+        anchors.topMargin: 20
 
         background: Rectangle {
             id: rectTxtId
             anchors.fill: parent
-            radius: 15
-            color: "transparent"
-            border.color: UIMaterials.textBorderColorPrimary
-            border.width: 1
+            radius: 30
+            color: "white"
         }
 
-        placeholderText: "Tên đăng nhập"
-        font.pixelSize: UIMaterials.fontSizeMedium
-        color: "white"
+        placeholderText: "Tên đăng nhập ..."
+        placeholderTextColor: UIMaterials.colorTrueGray
+        font {
+            pixelSize: UIMaterials.fontSizeLarge
+            family: UIMaterials.fontRobotoLight
+        }
+        color: UIMaterials.colorConcrete
         inputMethodHints: Qt.ImhNoAutoUppercase
 
         onPressed: {
@@ -109,26 +126,28 @@ Rectangle {
 
     TextField {
         id: txtPwd
-        width: 350
-        height: 2 * UIMaterials.fontSizeMedium
+        width: 400
+        height: 60
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.verticalCenter
-        anchors.bottomMargin: UIMaterials.fontSizeMedium
+        anchors.top: txtId.bottom
+        anchors.topMargin: 20
         echoMode: TextInput.Password
         passwordMaskDelay: 200
 
         background: Rectangle {
             id: rectTxtPwd
             anchors.fill: parent
-            radius: 15
-            color: "transparent"
-            border.color: UIMaterials.textBorderColorPrimary
-            border.width: 1
-        }
+            radius: 30
+            color: "white"
+        }        
 
-        placeholderText: "Mật khẩu"
-        font.pixelSize: UIMaterials.fontSizeMedium
-        color: "white"
+        placeholderText: "Mật khẩu ... "
+        placeholderTextColor: UIMaterials.colorTrueGray
+        font {
+            pixelSize: UIMaterials.fontSizeLarge
+            family: UIMaterials.fontRobotoLight
+        }
+        color: UIMaterials.colorConcrete
 //        inputMethodHints: Qt.ImhDialableCharactersOnly
 
         onPressed: {
@@ -159,24 +178,27 @@ Rectangle {
 
     Button {
         id: btnLogin
-        width: 120
-        height: 50
+        width: 200
+        height: 60
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.verticalCenter
-        anchors.topMargin: UIMaterials.fontSizeMedium
+        anchors.top: txtPwd.bottom
+        anchors.topMargin: 30
 
         background: Rectangle {
             id: rectBtnLogin
             anchors.fill: parent
-            radius: 10
-            color: UIMaterials.appBgrColorLight
+            radius: 30
+            color: UIMaterials.colorAntLogo
         }
 
         Text {
             id: txtBtnLogin
             anchors.centerIn: parent
             text: qsTr("Đăng nhập")
-            font.pixelSize: UIMaterials.fontSizeMedium
+            font {
+                pixelSize: UIMaterials.fontSizeLarge
+                family: UIMaterials.fontRobotoLight
+            }
             color: "white"
         }
 
@@ -190,6 +212,51 @@ Rectangle {
         }
     }
 
+    Button {
+        id: btnForgotPwd
+        width: 200
+        height: 60
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: btnLogin.bottom
+        anchors.topMargin: 10
 
+        background: Rectangle {
+            id: rectBtnForgotPwd
+            anchors.fill: parent
+            color: "transparent"
+        }
+
+        Text {
+            id: txtBtnForgotPwd
+            anchors.centerIn: parent
+            text: qsTr("Quên mật khẩu?")
+            font {
+                pixelSize: UIMaterials.fontSizeMedium
+                family: UIMaterials.fontRobotoLight
+            }
+
+            color: UIMaterials.grayPrimary
+        }
+
+        onPressed: {
+        }
+
+        onReleased: {
+        }
+    }
+
+    Label {
+        id: titSlogan
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+        text: "Đơn Giản . Hiệu Quả . Chuyên Nghiệp"
+        color: UIMaterials.colorTrueGray
+        font {
+            pixelSize: UIMaterials.fontSizeMedium
+//            weight: Font.Bold
+            family: UIMaterials.fontRobotoLight
+        }
+    }
 
 }

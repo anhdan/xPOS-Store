@@ -9,6 +9,9 @@ QtObject {
     property var currSecs: 0
     property string stopWatchTime: "00:00"
 
+    readonly property int windowWidth: 1024
+    readonly property int windowHeight: 768
+
     //============ Update 14/10/2020
     //= Change theme according to new logo
     readonly property color colorNearWhite: "#F2F2F2"
@@ -18,6 +21,7 @@ QtObject {
     readonly property color colorTrueYellow: "#FFD700"
     readonly property color colorTrueGray: "#C4C4C4"
     readonly property color colorAntLogo: "#CCAC01"
+    readonly property color colorTaskBar: "#2A4863"
 
     //============ Application background color ============
     readonly property color appBgrColorPrimary : "#2a4863"
@@ -73,9 +77,14 @@ QtObject {
         source: "qrc:/resource/fonts/Open_Sans/OpenSans-Light.ttf"
     }
 
+    readonly property FontLoader fontLDRobotoLight: FontLoader {
+        source: "qrc:/resource/fonts/Roboto/Roboto-Light.ttf"
+    }
+
     readonly property string solidFont: fontAwesomeSolid.name
     readonly property string regularFont: fontAwesomeRegular.name
     readonly property string fontOpenSansLight: fontLDOpenSansLight.name
+    readonly property string fontRobotoLight: fontLDRobotoLight.name
 
     //=========== Icon font
     readonly property string iconSuccess: "\uf058"
