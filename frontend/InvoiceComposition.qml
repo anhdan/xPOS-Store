@@ -5,6 +5,7 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.0
 import QtQuick.Controls.Styles 1.4
 import QtQuick.VirtualKeyboard 2.2
+import QtGraphicalEffects 1.0
 
 import "."
 
@@ -21,10 +22,10 @@ Rectangle {
     function showCost( cost, tax, discount )
     {
         var vietnam = Qt.locale( )
-        lblSumBeforeTax.text = Number(cost).toLocaleString( vietnam, "f", 0 ) + " vnd"
-        lblTax.text = Number(tax).toLocaleString( vietnam, "f", 0 ) + " vnd"
-        lblDiscount.text = Number(discount).toLocaleString( vietnam, "f", 0 ) + " vnd"
-        lblSumFinal.text = Number(cost + tax - discount).toLocaleString( vietnam, "f", 0 ) + " vnd"
+        priceScreen.orgPriceStr = Number(cost).toLocaleString( vietnam, "f", 0 ) + " vnd"
+        priceScreen.taxStr = Number(tax).toLocaleString( vietnam, "f", 0 ) + " vnd"
+        priceScreen.discountStr = Number(discount).toLocaleString( vietnam, "f", 0 ) + " vnd"
+        priceScreen.totalChargeStr = Number(cost + tax - discount).toLocaleString( vietnam, "f", 0 ) + " vnd"
     }
 
     function showNotFoundNoti()
@@ -67,7 +68,7 @@ Rectangle {
     //===================== 1. Panel of control buttons and price screen
     Rectangle {
         id: pnControl
-        width: parent.width / 3
+        width: 0.332* parent.width
         height: parent.height
         x: 0
         y: 0
@@ -155,16 +156,7 @@ Rectangle {
                 onReleased: {
                     rectBtnDecrease.color = UIMaterials.colorNearWhite
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
-                    var currItemQuant = tab.item.getCurrItemQuantity()
-                    if( currItemQuant > 1 )
-                    {
-                        currItemQuant--
-                        tab.item.updateCurrItemQuantity( currItemQuant )
-                    }
-                    else
-                    {
-                        tab.item.removeCurrItem()
-                    }
+                    tab.item.decreaseItemQuantity()
                 }
             }
 
@@ -199,13 +191,7 @@ Rectangle {
                 onReleased: {
                     rectBtnIncrease.color = UIMaterials.colorNearWhite
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
-                    var currItemQuant = tab.item.getCurrItemQuantity()
-                    var currItemInstock = tab.item.getCurrItemInstock()
-                    if( currItemInstock > currItemQuant )
-                    {
-                        currItemQuant++
-                    }
-                    tab.item.updateCurrItemQuantity( currItemQuant )
+                    tab.item.increaseItemQuantity()
                 }
             }
         }
@@ -304,11 +290,11 @@ Rectangle {
 
     Rectangle {
         id: pnInvoiceTabs
-        width: 2*parent.width / 3
+        width: 0.668 * parent.width
         height: parent.height
         y: 0
         anchors.left: pnControl.right
-        color: "#dcdcdc"
+        color: UIMaterials.colorNearWhite
 
         //================= Invoice items tabview panel
         TabView {
@@ -321,7 +307,7 @@ Rectangle {
             Tab {
                 id: tab1
                 title: "Hóa Đơn 1"
-                source: "ItemsListView.qml"
+                source: "ItemsList.qml"
                 onLoaded: {
                     item.costCalculated.connect( root.showCost )
                     xpBackend.sigProductFound.connect( item.productFound )
@@ -332,7 +318,7 @@ Rectangle {
             Tab {
                 id: tab2
                 title: "Hóa Đơn 2"
-                source: "ItemsListView.qml"
+                source: "ItemsList.qml"
                 onLoaded: {
                     item.costCalculated.connect( root.showCost )
                 }
@@ -341,27 +327,35 @@ Rectangle {
             style: TabViewStyle {
                 frameOverlap: 1
                 tab: Rectangle {
-                    color: styleData.selected ? UIMaterials.appBgrColorLight : "#dcdcdc"
-                    implicitWidth: Math.max(text.width + 4, 200)
+                    id: rectTab
+                    color: styleData.selected ? UIMaterials.colorNearWhite : UIMaterials.colorTaskBar
+                    implicitWidth: 0.2924 * tabviewInvoice.width
                     implicitHeight: 60
-                    border.color: "white"
-                    border.width: 1
 
                     Rectangle {
-                        width: parent.width
-                        height: 5
-                        anchors.bottom: parent.bottom
-                        anchors.left: parent.left
-                        color: styleData.selected ? UIMaterials.goldPrimary : "transparent"
+                        width: 2
+                        height: parent.height
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
+                        color: UIMaterials.colorNearWhite
                     }
 
                     Text {
                         id: text
                         anchors.centerIn: parent
                         text: styleData.title
-                        color: styleData.selected ? "white" : "black"
-                        font.pixelSize: UIMaterials.fontSizeMedium
+                        color: styleData.selected ? UIMaterials.colorTaskBar : UIMaterials.colorNearWhite
+                        font {
+                            pixelSize: 0.13 * parent.width
+                            family: UIMaterials.fontRobotoLight
+                        }
                     }
+                }
+
+                tabBar: Rectangle {
+                    width: tabviewInvoice.width
+                    height: rectTab.height
+                    color: UIMaterials.colorTaskBar
                 }
             }
 
@@ -379,48 +373,9 @@ Rectangle {
 
         //================== Control button
         Button {
-            id: btnAddItem
-            width: 60
-            height: 60
-            anchors.left: parent.left
-            anchors.leftMargin: 10
-            anchors.bottom: parent.bottom
-            background: Rectangle {
-                id: rectBtnAddItem
-                anchors.fill: parent
-                color: "transparent"
-                radius: 10
-            }
-
-            Text {
-                id: txtBtnAddItem
-                text: "\uf11c"
-                anchors.centerIn: parent
-                color: UIMaterials.appBgrColorLight
-                font {
-                    pixelSize: 45;
-                    weight: Font.Bold
-                    family: UIMaterials.solidFont
-                }
-                horizontalAlignment: Text.AlignHCenter
-            }
-
-            onPressed: {
-                txtBtnAddItem.color = UIMaterials.appBgrColorDark
-            }
-
-            onReleased: {
-                txtBarcodeInput.focus = true
-                txtBarcodeInput.text = ""
-                pnBarcodeInput.visible = true
-            }
-        }
-
-
-        Button {
             id: btnRtAnalytics
-            width: 60
-            height: 60
+            width: height
+            height: 0.0781 * parent.height
             anchors.right: pnRtAnalytics.left
             anchors.bottom: pnRtAnalytics.bottom
 
@@ -428,21 +383,21 @@ Rectangle {
                 id: rectBtnRtAnalytics
                 anchors.fill: parent
                 color: "transparent"
-                radius: 10
             }
 
             Text {
                 id: txtBtnRtAnalytics
-                text: "\uf201"
+                text: "\uf200"
                 anchors.centerIn: parent
-                color: (pnRtAnalytics.state === "visible") ? UIMaterials.grayLight
-                                                           : UIMaterials.grayPrimary
+                color: UIMaterials.colorTaskBar
+                opacity: 0.6
                 font {
-                    pixelSize: 40;
+                    pixelSize: Math.floor( 0.5 * parent.width )
                     weight: Font.Bold
                     family: UIMaterials.solidFont
                 }
                 horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
             }
 
             onClicked: {
@@ -453,55 +408,6 @@ Rectangle {
                 else
                 {
                     pnRtAnalytics.state = "visible"
-                }
-            }
-
-        }
-
-        //================== Barcode typing panel
-        Rectangle {
-            id: pnBarcodeInput
-            width: Math.max( parent.width /2, 150 )
-            height: width / 3
-            z: tabviewInvoice.z + 10
-            anchors.centerIn: parent
-            color: UIMaterials.appBgrColorLight
-            visible: false
-
-            Label {
-                id: titBarcodeInput
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: txtBarcodeInput.top
-                anchors.bottomMargin: 10
-                text: "Nhập mã sản phẩm"
-                font.pixelSize: UIMaterials.fontSizeMedium
-                color: "white"
-                horizontalAlignment: Text.AlignHCenter
-            }
-
-            TextField {
-                id: txtBarcodeInput
-                width: parent.width * 2 / 3
-                height: 2 * UIMaterials.fontSizeMedium
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: 10
-                horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: UIMaterials.fontSizeMedium
-                color: "black"
-
-                background: Rectangle {
-                    anchors.fill: parent
-                    color: "white"
-                }
-
-                onAccepted: {
-                    txtBtnAddItem.color = UIMaterials.appBgrColorLight
-                    // Search for product with given code
-                    var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
-                    tab.item.addItem( text )
-                    txtBarcodeInput.focus = false
-                    pnBarcodeInput.visible = false
                 }
             }
 

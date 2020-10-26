@@ -97,7 +97,7 @@ Rectangle {
         }
 
         placeholderText: "Tên đăng nhập ..."
-        placeholderTextColor: UIMaterials.colorTrueGray
+//        placeholderTextColor: UIMaterials.colorTrueGray
         font {
             pixelSize: UIMaterials.fontSizeLarge
             family: UIMaterials.fontRobotoLight
@@ -142,7 +142,7 @@ Rectangle {
         }        
 
         placeholderText: "Mật khẩu ... "
-        placeholderTextColor: UIMaterials.colorTrueGray
+//        placeholderTextColor: UI/Materials.colorTrueGray
         font {
             pixelSize: UIMaterials.fontSizeLarge
             family: UIMaterials.fontRobotoLight

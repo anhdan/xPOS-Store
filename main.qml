@@ -10,7 +10,7 @@ Window {
     visible: true
     width: UIMaterials.windowWidth
     height: UIMaterials.windowHeight
-    title: qsTr("xPOS")
+    title: qsTr("Ant Thu Ngân")
 
     //=========== Login Form
     Login {
@@ -81,7 +81,7 @@ Window {
     StackView {
         id: stack
 
-        initialItem: formLogin
+        initialItem: formInvoice
         anchors.fill: parent
 
         pushEnter: Transition {
