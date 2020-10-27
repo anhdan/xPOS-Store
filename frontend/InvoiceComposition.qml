@@ -14,11 +14,8 @@ Rectangle {
     implicitWidth: UIMaterials.windowWidth
     implicitHeight: UIMaterials.windowHeight
 
-    readonly property string priceTxtColor: UIMaterials.goldDark//"white"
-    readonly property string priceTxtFontSize: UIMaterials.fontSizeLarge
 
-
-    //===================== Signal - Slot definition
+    //========================= I. Signal - Slot definition
     function showCost( cost, tax, discount )
     {
         var vietnam = Qt.locale( )
@@ -65,7 +62,7 @@ Rectangle {
     signal toLoginBoard()
 
 
-    //===================== 1. Panel of control buttons and price screen
+    //===================== II. Panel of control buttons and price screen
     Rectangle {
         id: pnControl
         width: 0.332* parent.width
@@ -74,17 +71,22 @@ Rectangle {
         y: 0
         color: "white"
 
-        //========= 1.1. Price screen panel
+        //----- 1.1. Price screen panel
         PriceScreen {
             id: priceScreen
             width: parent.width
             height: 0.2344 * parent.height
             anchors.top: parent.top
             anchors.left: parent.left
+            orgPriceStr: Number(tabviewInvoice.latestCost).toLocaleString( Qt.locale( ), "f", 0 ) + " vnd"
+            taxStr: Number(tabviewInvoice.latestTax).toLocaleString( Qt.locale( ), "f", 0 ) + " vnd"
+            discountStr:Number(tabviewInvoice.latestDiscount).toLocaleString( Qt.locale( ), "f", 0 ) + " vnd"
+            totalChargeStr: Number(tabviewInvoice.latestCost
+                                   + tabviewInvoice.latestTax
+                                   - tabviewInvoice.latestDiscount).toLocaleString( Qt.locale( ), "f", 0 ) + " vnd"
         }
 
-        //========= 1.2. Numpad and control keys panel
-
+        //----- 1.2. Numpad and control keys panel
         Row {
             y: 0.2604 * parent.height
             anchors.horizontalCenter: parent.horizontalCenter
@@ -288,6 +290,7 @@ Rectangle {
     }
 
 
+    //======================= III. Panel of item list tabs
     Rectangle {
         id: pnInvoiceTabs
         width: 0.668 * parent.width
@@ -310,8 +313,7 @@ Rectangle {
                 source: "ItemsList.qml"
                 onLoaded: {
                     item.costCalculated.connect( root.showCost )
-                    xpBackend.sigProductFound.connect( item.productFound )
-                    xpBackend.sigProductNotFound.connect( item.productNotFound )                    
+                    item.active = true
                 }
             }
 
@@ -360,14 +362,11 @@ Rectangle {
             }
 
             onCurrentIndexChanged: {
-                var prevTab = tabviewInvoice.getTab( 1- tabviewInvoice.currentIndex )
-                xpBackend.sigProductFound.disconnect( prevTab.item.productFound )
-                xpBackend.sigProductNotFound.disconnect( prevTab.item.productNotFound )
-
+                var prevTab = tabviewInvoice.getTab( 1 - tabviewInvoice.currentIndex )
+                prevTab.item.active = false
                 var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
-                xpBackend.sigProductFound.connect( tab.item.productFound )
-                xpBackend.sigProductNotFound.connect( tab.item.productNotFound )
-                showCost( tab.item.latestCost, tab.item.latestTax, tab.item.latestDiscount )
+                tab.item.active = true
+                showCost( tab.item.latestCost, tab.item.latestTax, tab.item.latestDiscount)
             }
         }
 

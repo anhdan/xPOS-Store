@@ -9,9 +9,16 @@ Rectangle {
     property alias placeholderText: txtSearchInput.placeholderText
     property alias text: txtSearchInput.text
     property alias textColor: txtSearchInput.color
+    property bool clearTextOnPressed: true
 
-    //===== I. Signals
+    //===== I. Signals & slots
     signal searchExecuted( var searchStr )
+
+    function clearText()
+    {
+        txtSearchInput.text = ""
+        txtSearchInput.focus = false
+    }
 
     //===== II. Search excution button
     Button {
@@ -72,7 +79,15 @@ Rectangle {
         }
         color: UIMaterials.colorTaskBar
 
+        onPressed: {
+            if( clearTextOnPressed )
+            {
+                text = ""
+            }
+        }
+
         onAccepted: {
+            focus = false
             searchExecuted( text )
         }
     }

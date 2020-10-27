@@ -15,9 +15,10 @@ Rectangle {
     property real latestCost: 0
     property real latestTax: 0
     property real latestDiscount: 0
+    property bool active: false
     property alias count: itemModel.count
 
-    //====================== Signals ============================
+    //======================= I. Signals
     signal itemAdded()
     signal currItemQuantityUpdated()
     signal itemRemoved()
@@ -25,7 +26,26 @@ Rectangle {
     signal productFound( var product )
     signal productNotFound()
 
-    //====================== Function ==========================
+    Component.onCompleted: {
+        xpBackend.sigProductFound.connect(
+                    function(product) {
+                        if( active )
+                        {
+                            var item = Helper.deepCopy( product )
+                            item["item_order"] = itemModel.count + 1
+                            item["item_num"] = 1
+                            itemModel.append( item )
+                            var newIndex = itemModel.count - 1
+                            changeHighLight( newIndex )
+                            itemAdded()
+                            calculateCost()
+                        }
+                    }
+                    )
+    }
+
+    //======================= II. Function
+
     function searchProductInList( code )
     {
         for( var idx = 0; idx < lvItems.model.count; idx++ )
@@ -90,6 +110,7 @@ Rectangle {
         if( currItem["item_num"] < currItem["num_instock"] )
         {
             currItem["item_num"]++
+            calculateCost()
         }
     }
 
@@ -104,42 +125,8 @@ Rectangle {
         if( currItem["item_num"] > 1 )
         {
             currItem["item_num"]--
+            calculateCost()
         }
-    }
-
-    function updateCurrItemQuantity( newQuant )
-    {
-        if( lvItems.currentIndex === -1 )
-        {
-            return
-        }
-
-        var currItem = lvItems.model.get( lvItems.currentIndex )
-        currItem["item_num"] = newQuant
-        currItemQuantityUpdated()
-        calculateCost()
-    }
-
-
-    function calculateCost()
-    {
-        latestCost = latestDiscount = latestTax = 0
-        if( lvItems.model.count > 0 )
-        {
-            for( var idx = 0; idx < lvItems.model.count; idx++ )
-            {
-                var item = lvItems.model.get( idx )
-                latestCost += Number( item["unit_price"] ) * Number(item["item_num"])
-                latestDiscount += Number( item["unit_price"] - item["selling_price"] ) * Number(item["item_num"])
-            }
-//            latestCost = cost
-        }
-//        else
-//        {
-//            latestCost = latestDiscount = latestTax = 0
-//        }
-
-        costCalculated( latestCost, latestTax, latestDiscount )
     }
 
     function removeCurrItem()
@@ -160,6 +147,27 @@ Rectangle {
             calculateCost()
         }
     }
+
+    function calculateCost()
+    {
+        latestCost = latestDiscount = latestTax = 0
+        if( lvItems.model.count > 0 )
+        {
+            for( var idx = 0; idx < lvItems.model.count; idx++ )
+            {
+                var item = lvItems.model.get( idx )
+                latestCost += Number( item["unit_price"] ) * Number(item["item_num"])
+                latestDiscount += Number( item["unit_price"] - item["selling_price"] ) * Number(item["item_num"])
+            }
+//            latestCost = cost
+        }
+//        else
+//        {
+//            latestCost = latestDiscount = latestTax = 0
+//        }
+
+        costCalculated( latestCost, latestTax, latestDiscount )
+    }    
 
     function clearList()
     {
@@ -198,6 +206,7 @@ Rectangle {
                 itemAdded()
             }
 
+            clearText()
             focus = false
         }
     }
@@ -217,16 +226,6 @@ Rectangle {
         //===== II.1 List model
         ListModel {
             id: itemModel
-
-            ListElement {
-                item_order: 1
-                barcode: "0839029028482"
-                name: "Ant POS machine"
-                unit: "Chiec"
-                selling_price: 6500000
-                item_num: 3
-                num_instock: 1000
-            }
         }
 
         //===== II.2. Item delegate
@@ -288,6 +287,8 @@ Rectangle {
                 color: "transparent"
 
                 TextField {
+                    property string prevText
+
                     id: txtQuantity
                     width: 0.8 * parent.width
                     height: 0.6 * parent.height
@@ -299,6 +300,7 @@ Rectangle {
                         border.width: 1
                         radius: 10
                     }
+                    inputMethodHints: Qt.ImhDigitsOnly
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font {
@@ -307,6 +309,43 @@ Rectangle {
                     }
                     text: item_num
 
+                    onPressed: {
+                        changeHighLight( index )
+                        prevText = text
+                        focus = true
+                    }
+
+//                    onTextEdited: {
+//                        text = text.replace( /./g, "" )
+//                        var newQuant = parseInt( text, 10 )
+//                        console.log( "------> text: " + newQuant )
+//                        var item = itemModel.get( index )
+//                        if( newQuant <= item["num_instock"] )
+//                        {
+//                            item["item_num"] = newQuant
+//                            calculateCost()
+//                        }
+//                        else
+//                        {
+//                            text = text.substring(0, text.length-1)
+//                        }
+//                    }
+
+                    onAccepted: {
+                        var newQuant = parseInt( text, 10 )
+                        var item = itemModel.get( index )
+                        if( newQuant <= item["num_instock"] )
+                        {
+                            item["item_num"] = newQuant
+                            calculateCost()
+                            prevText = text
+                        }
+                        else
+                        {
+                            text = prevText
+                        }
+                        focus = false
+                    }
                 }
             }
 

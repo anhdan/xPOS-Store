@@ -167,7 +167,7 @@ Rectangle {
                 }
 
                 Text {
-                    text: qsTr("2")
+                    text: qsTr("5")
                     anchors.centerIn: parent
                     color: keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
@@ -458,12 +458,12 @@ Rectangle {
                 }
 
                 onPressed: {
-                    btnBackspace.color = keyBgrColorPressed
+                    rectBtnBackSpace.color = keyBgrColorPressed
                 }
 
                 onReleased: {
                     keyEmitter.emitKey( Qt.Key_Backspace )
-                    btnBackspace.color = keyBgrColor
+                    rectBtnBackSpace.color = keyBgrColor
                 }
             }
 
