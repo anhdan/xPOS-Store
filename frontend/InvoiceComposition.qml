@@ -69,7 +69,7 @@ Rectangle {
         height: parent.height
         x: 0
         y: 0
-        color: "white"
+        color: UIMaterials.colorTaskBar
 
         //----- 1.1. Price screen panel
         PriceScreen {
@@ -78,17 +78,20 @@ Rectangle {
             height: 0.2344 * parent.height
             anchors.top: parent.top
             anchors.left: parent.left
-            orgPriceStr: Number(tabviewInvoice.latestCost).toLocaleString( Qt.locale( ), "f", 0 ) + " vnd"
-            taxStr: Number(tabviewInvoice.latestTax).toLocaleString( Qt.locale( ), "f", 0 ) + " vnd"
-            discountStr:Number(tabviewInvoice.latestDiscount).toLocaleString( Qt.locale( ), "f", 0 ) + " vnd"
-            totalChargeStr: Number(tabviewInvoice.latestCost
-                                   + tabviewInvoice.latestTax
-                                   - tabviewInvoice.latestDiscount).toLocaleString( Qt.locale( ), "f", 0 ) + " vnd"
+        }
+
+        Rectangle {
+            width: parent.width
+            height: 1
+            anchors.top: priceScreen.bottom
+            anchors.left: parent.left
+            color: pnNumpad.keyBgrColor
+            opacity: pnNumpad.keyOpacity
         }
 
         //----- 1.2. Numpad and control keys panel
         Row {
-            y: 0.2604 * parent.height
+            y: 0.2734 * parent.height
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: 0.05 * btnIncrease.width
 
@@ -101,7 +104,8 @@ Rectangle {
                 background: Rectangle {
                     id: rectBtnDelete
                     anchors.fill: parent
-                    color: UIMaterials.colorNearWhite
+                    color: pnNumpad.keyBgrColor
+                    opacity: pnNumpad.keyOpacity
                 }
 
                 Text {
@@ -117,11 +121,11 @@ Rectangle {
                 }
 
                 onPressed: {
-                    rectBtnDelete.color = "white"
+                    rectBtnDelete.color = pnNumpad.keyBgrColorPressed
                 }
 
                 onReleased: {
-                    rectBtnDelete.color = UIMaterials.colorNearWhite
+                    rectBtnDelete.color = pnNumpad.keyBgrColor
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
                     tab.item.removeCurrItem()
                 }
@@ -137,12 +141,13 @@ Rectangle {
                     id: rectBtnDecrease
                     anchors.fill: parent
                     color: UIMaterials.colorNearWhite
+                    opacity: pnNumpad.keyOpacity
                 }
 
                 Text {
                     text: "-"
                     anchors.centerIn: parent
-                    color: UIMaterials.colorTrueBlue
+                    color: pnNumpad.keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font {
@@ -152,11 +157,11 @@ Rectangle {
                 }
 
                 onPressed: {
-                    rectBtnDecrease.color = "white"
+                    rectBtnDecrease.color = pnNumpad.keyBgrColorPressed
                 }
 
                 onReleased: {
-                    rectBtnDecrease.color = UIMaterials.colorNearWhite
+                    rectBtnDecrease.color = pnNumpad.keyBgrColor
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
                     tab.item.decreaseItemQuantity()
                 }
@@ -171,13 +176,14 @@ Rectangle {
                 background: Rectangle {
                     id: rectBtnIncrease
                     anchors.fill: parent
-                    color: UIMaterials.colorNearWhite
+                    color: pnNumpad.keyTxtColor
+                    opacity: pnNumpad.keyOpacity
                 }
 
                 Text {
                     text: "\uf067"
                     anchors.centerIn: parent
-                    color: UIMaterials.colorTrueBlue
+                    color: pnNumpad.keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
                     font {
                         pixelSize: Math.floor( 0.3 * rectBtnIncrease.width )
@@ -187,11 +193,11 @@ Rectangle {
                 }
 
                 onPressed: {
-                    rectBtnIncrease.color = "white"
+                    rectBtnIncrease.color = pnNumpad.keyBgrColorPressed
                 }
 
                 onReleased: {
-                    rectBtnIncrease.color = UIMaterials.colorNearWhite
+                    rectBtnIncrease.color = pnNumpad.keyBgrColor
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
                     tab.item.increaseItemQuantity()
                 }
@@ -200,14 +206,14 @@ Rectangle {
 
         NumPad {
             id: pnNumpad
-            y: 0.3776 * parent.height
+            y: 0.4036 * parent.height
             anchors.horizontalCenter: parent.horizontalCenter
             width: 0.9118 * parent.width
             height: 0.4167 * parent.height
         }
 
         Row {
-            y: 0.8594 * parent.height
+            y: 0.8854 * parent.height
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: 0.0645 * pnNumpad.width
 
@@ -220,13 +226,14 @@ Rectangle {
                 background: Rectangle {
                     id: rectBtnQuickFinish
                     anchors.fill: parent
-                    color: UIMaterials.colorNearWhite
+                    color: pnNumpad.keyBgrColor
+                    opacity: pnNumpad.keyOpacity
                 }
 
                 Text {
                     text: qsTr("Xuất\nNhanh")
                     anchors.centerIn: parent
-                    color: UIMaterials.colorTaskBar
+                    color: pnNumpad.keyTxtColor
                     horizontalAlignment: Text.AlignHCenter
                     font {
                         pixelSize: 0.26 * btnQuickFinish.width
@@ -236,11 +243,11 @@ Rectangle {
                 }
 
                 onPressed: {
-                    rectBtnQuickFinish.color = "white"
+                    rectBtnQuickFinish.color = pnNumpad.keyBgrColorPressed
                 }
 
                 onReleased: {
-                    rectBtnQuickFinish.color = UIMaterials.colorNearWhite
+                    rectBtnQuickFinish.color = pnNumpad.keyBgrColor
                 }
             }
 
@@ -278,10 +285,9 @@ Rectangle {
                     {
                         pnPayment.initialize(tab.item.latestCost, tab.item.latestTax, tab.item.latestDiscount, tab.item.model)
 
-                        if( pnPayment.opacity === 0 )
+                        if( pnPayment.state === "deactivated" )
                         {
-                            payTransitionOnY.start()
-                            tabviewInvoice.enabled = false
+                            pnPayment.state = "activated"
                         }
                     }
                 }
@@ -413,27 +419,60 @@ Rectangle {
         }
 
         //================== Payment panel
-        Payment {
+        PaymentForm {
             id: pnPayment
-            width: 3*parent.width / 5
+            width: parent.width
             height: parent.height
-            opacity: 0
             x: 0
             y: 0
-            z: 20
             clip: true
+            state: "activated"
+
+            states: [
+                State {
+                    name: "activated"
+                    PropertyChanges {
+                        target: pnPayment
+                        opacity: 1
+                        enabled: true
+                    }
+                },
+
+                State {
+                    name: "deactivated"
+                    PropertyChanges {
+                        target: pnPayment
+                        opacity: 0
+                        enabled: false
+                    }
+                }
+            ]
+
+            transitions: Transition {
+                from: "deactivated"
+                to: "activated"
+                reversible: true
+                SequentialAnimation {
+                    NumberAnimation {
+                        properties: "opacity"
+                        duration: 500
+                        easing.type: Easing.InOutQuad
+                    }
+                }
+            }
 
             //================== Signal handling
             onColapse: {
-                payTransitionOnYRev.start()
-                tabviewInvoice.enabled = true
+                if( state === "activated" )
+                {
+                    state = "deactivated"
+                }
             }
 
             onPayCompleted: {
                 showCost(0, 0, 0)
                 var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
                 tab.item.clearList()
-                pnPayment.setDefaultDisplay()
 
                 // notification
                 if( noti.state == "visible" )
@@ -463,25 +502,6 @@ Rectangle {
 
             onCustomerNotFound: {
                 showNotFoundNoti()
-            }
-
-            //================== Animation
-            NumberAnimation {
-                id: payTransitionOnY
-                target: pnPayment
-                property: "opacity"
-                from: 0
-                to: 1
-                duration: 250
-            }
-
-            NumberAnimation {
-                id: payTransitionOnYRev
-                target: pnPayment
-                property: "opacity"
-                from: 1
-                to: 0
-                duration: 250
             }
         }                        
 

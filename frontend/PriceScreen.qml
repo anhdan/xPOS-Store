@@ -16,7 +16,7 @@ Rectangle {
     Column{
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
-        spacing: 0
+        spacing: 0.1 * titOrgPrice.height
 
         //===== Original total price display
         Row {
@@ -38,7 +38,7 @@ Rectangle {
                 id: lblOrgPrice
                 width: root.width - titOrgPrice.width
                 height: titOrgPrice.height
-                text: "0"
+                text: "0 vnd"
                 horizontalAlignment: Text.AlignRight
                 font {
                     pixelSize: UIMaterials.fontSizeLarge
@@ -69,7 +69,7 @@ Rectangle {
                 id: lblTax
                 width: lblOrgPrice.width
                 height: lblOrgPrice.height
-                text: "0"
+                text: "0 vnd"
                 horizontalAlignment: Text.AlignRight
                 font {
                     pixelSize: UIMaterials.fontSizeLarge
@@ -99,7 +99,7 @@ Rectangle {
                 id: lblDiscount
                 width: lblOrgPrice.width
                 height: lblOrgPrice.height
-                text: "0"
+                text: "0 vnd"
                 horizontalAlignment: Text.AlignRight
                 font {
                     pixelSize: UIMaterials.fontSizeLarge
@@ -129,7 +129,7 @@ Rectangle {
                 id: lblTotalCharge
                 width: lblOrgPrice.width
                 height: lblOrgPrice.height
-                text: "0"
+                text: "0 vnd"
                 horizontalAlignment: Text.AlignRight
                 font {
                     pixelSize: UIMaterials.fontSizeLarge

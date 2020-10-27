@@ -9,6 +9,13 @@ QtObject {
     property var currSecs: 0
     property string stopWatchTime: "00:00"
 
+    property int fontsizeXS: 20
+    property int fontsizeS: 22
+    property int fontsizeM: 26
+    property int fontsizeL: 30
+    property int fontsizeXL: 36
+    property int fontsizeXXL: 42
+
     readonly property int windowWidth: 1024
     readonly property int windowHeight: 768
 

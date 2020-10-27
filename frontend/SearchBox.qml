@@ -9,6 +9,7 @@ Rectangle {
     property alias placeholderText: txtSearchInput.placeholderText
     property alias text: txtSearchInput.text
     property alias textColor: txtSearchInput.color
+    property alias backgroundColor: root.color
     property bool clearTextOnPressed: true
 
     //===== I. Signals & slots

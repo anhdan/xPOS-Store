@@ -7,8 +7,9 @@ Rectangle {
     color: "transparent"
 
     property string keyBgrColor: UIMaterials.colorNearWhite
-    property string keyBgrColorPressed: "white"
-    property string keyTxtColor: UIMaterials.colorTaskBar
+    property string keyBgrColorPressed: UIMaterials.colorTaskBar
+    property string keyTxtColor: "white"
+    property real keyOpacity: 0.2
 
     Column {
         anchors.fill: parent
@@ -27,6 +28,7 @@ Rectangle {
                     id: rectBtnOne
                     anchors.fill: parent
                     color: keyBgrColor
+                    opacity: keyOpacity
                 }
 
                 Text {
@@ -60,6 +62,7 @@ Rectangle {
                     id: rectBtnTwo
                     anchors.fill: parent
                     color: keyBgrColor
+                    opacity: keyOpacity
                 }
 
                 Text {
@@ -93,6 +96,7 @@ Rectangle {
                     id: rectBtnThree
                     anchors.fill: parent
                     color: keyBgrColor
+                    opacity: keyOpacity
                 }
 
                 Text {
@@ -131,6 +135,7 @@ Rectangle {
                     id: rectBtnFour
                     anchors.fill: parent
                     color: keyBgrColor
+                    opacity: keyOpacity
                 }
 
                 Text {
@@ -164,6 +169,7 @@ Rectangle {
                     id: rectBtnFive
                     anchors.fill: parent
                     color: keyBgrColor
+                    opacity: keyOpacity
                 }
 
                 Text {
@@ -197,6 +203,7 @@ Rectangle {
                     id: rectBtnSix
                     anchors.fill: parent
                     color: keyBgrColor
+                    opacity: keyOpacity
                 }
 
                 Text {
@@ -234,6 +241,7 @@ Rectangle {
                     id: rectBtnSeven
                     anchors.fill: parent
                     color: keyBgrColor
+                    opacity: keyOpacity
                 }
 
                 Text {
@@ -267,6 +275,7 @@ Rectangle {
                     id: rectBtnEight
                     anchors.fill: parent
                     color: keyBgrColor
+                    opacity: keyOpacity
                 }
 
                 Text {
@@ -300,6 +309,7 @@ Rectangle {
                     id: rectBtnNine
                     anchors.fill: parent
                     color: keyBgrColor
+                    opacity: keyOpacity
                 }
 
                 Text {
@@ -337,6 +347,7 @@ Rectangle {
                     id: rectBtnDot
                     anchors.fill: parent
                     color: keyBgrColor
+                    opacity: keyOpacity
                 }
 
                 Text {
@@ -370,6 +381,7 @@ Rectangle {
                     id: rectBtnZero
                     anchors.fill: parent
                     color: keyBgrColor
+                    opacity: keyOpacity
                 }
 
                 Text {
@@ -403,6 +415,7 @@ Rectangle {
                     id: rectBtnTripleZero
                     anchors.fill: parent
                     color: keyBgrColor
+                    opacity: keyOpacity
                 }
 
                 Text {
@@ -443,6 +456,7 @@ Rectangle {
                     id: rectBtnBackSpace
                     anchors.fill: parent
                     color: keyBgrColor
+                    opacity: keyOpacity
                 }
 
                 Text {
@@ -477,6 +491,7 @@ Rectangle {
                     id: rectBtnEnter
                     anchors.fill: parent
                     color: keyBgrColor
+                    opacity: keyOpacity
                 }
 
                 Text {

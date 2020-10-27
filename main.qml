@@ -12,6 +12,15 @@ Window {
     height: UIMaterials.windowHeight
     title: qsTr("Ant Thu Ngân")
 
+    onWidthChanged: {
+        UIMaterials.fontsizeXS = Math.round(0.0195 * width)
+        UIMaterials.fontsizeS = Math.round(0.0215 * width)
+        UIMaterials.fontsizeM = Math.round(0.0254 * width)
+        UIMaterials.fontsizeL = Math.round(0.0293 * width)
+        UIMaterials.fontsizeXL = Math.round(0.0352 * width)
+        UIMaterials.fontsizeXXL = Math.round(0.0410 * width)
+    }
+
     //=========== Login Form
     Login {
         id: formLogin

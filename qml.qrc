@@ -47,5 +47,7 @@
         <file>frontend/PriceScreen.qml</file>
         <file>frontend/SearchBox.qml</file>
         <file>frontend/ItemsList.qml</file>
+        <file>frontend/PaymentForm.qml</file>
+        <file>frontend/CustomerInfoBoard.qml</file>
     </qresource>
 </RCC>
