@@ -13,9 +13,11 @@ Rectangle {
     id: root
     implicitWidth: UIMaterials.windowWidth
     implicitHeight: UIMaterials.windowHeight
+    color: UIMaterials.colorNearWhite
+    state: "invisible"
 
 
-    //========================= I. Signal - Slot definition
+    //========================== I. Signal - Slot definition
     function showCost( cost, tax, discount )
     {
         var vietnam = Qt.locale( )
@@ -60,9 +62,10 @@ Rectangle {
     signal toAnalyticsBoard()
     signal toSetupBoard()
     signal toLoginBoard()
+    signal menuClicked()
 
 
-    //===================== II. Panel of control buttons and price screen
+    //========================= II. Panel of control buttons and price screen
     Rectangle {
         id: pnControl
         width: 0.332* parent.width
@@ -295,278 +298,295 @@ Rectangle {
         }
     }
 
-
-    //======================= III. Panel of item list tabs
-    Rectangle {
-        id: pnInvoiceTabs
-        width: 0.668 * parent.width
-        height: parent.height
-        y: 0
+    //======================== III. Invoice item tabview
+    TabView {
+        id: tabviewInvoice
         anchors.left: pnControl.right
-        color: UIMaterials.colorNearWhite
+        anchors.top: parent.top
+        width: parent.width - pnControl.width
+        height: parent.height
 
-        //================= Invoice items tabview panel
-        TabView {
-            id: tabviewInvoice
-            x: 0
-            y: 0
-            width: parent.width
-            height: parent.height
-
-            Tab {
-                id: tab1
-                title: "Hóa Đơn 1"
-                source: "ItemsList.qml"
-                onLoaded: {
-                    item.costCalculated.connect( root.showCost )
-                    item.active = true
-                }
-            }
-
-            Tab {
-                id: tab2
-                title: "Hóa Đơn 2"
-                source: "ItemsList.qml"
-                onLoaded: {
-                    item.costCalculated.connect( root.showCost )
-                }
-            }
-
-            style: TabViewStyle {
-                frameOverlap: 1
-                tab: Rectangle {
-                    id: rectTab
-                    color: styleData.selected ? UIMaterials.colorNearWhite : UIMaterials.colorTaskBar
-                    implicitWidth: 0.2924 * tabviewInvoice.width
-                    implicitHeight: 60
-
-                    Rectangle {
-                        width: 2
-                        height: parent.height
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.right: parent.right
-                        color: UIMaterials.colorNearWhite
-                    }
-
-                    Text {
-                        id: text
-                        anchors.centerIn: parent
-                        text: styleData.title
-                        color: styleData.selected ? UIMaterials.colorTaskBar : UIMaterials.colorNearWhite
-                        font {
-                            pixelSize: 0.13 * parent.width
-                            family: UIMaterials.fontRobotoLight
-                        }
-                    }
-                }
-
-                tabBar: Rectangle {
-                    width: tabviewInvoice.width
-                    height: rectTab.height
-                    color: UIMaterials.colorTaskBar
-                }
-            }
-
-            onCurrentIndexChanged: {
-                var prevTab = tabviewInvoice.getTab( 1 - tabviewInvoice.currentIndex )
-                prevTab.item.active = false
-                var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
-                tab.item.active = true
-                showCost( tab.item.latestCost, tab.item.latestTax, tab.item.latestDiscount)
+        Tab {
+            id: tab1
+            title: "Hóa Đơn 1"
+            source: "ItemsList.qml"
+            onLoaded: {
+                item.costCalculated.connect( root.showCost )
+                item.active = true
             }
         }
 
-        //================== Control button
-        Button {
-            id: btnRtAnalytics
-            width: height
-            height: 0.0781 * parent.height
-            anchors.right: pnRtAnalytics.left
-            anchors.bottom: pnRtAnalytics.bottom
-
-            background: Rectangle {
-                id: rectBtnRtAnalytics
-                anchors.fill: parent
-                color: "transparent"
+        Tab {
+            id: tab2
+            title: "Hóa Đơn 2"
+            source: "ItemsList.qml"
+            onLoaded: {
+                item.costCalculated.connect( root.showCost )
             }
+        }
 
-            Text {
-                id: txtBtnRtAnalytics
-                text: "\uf200"
-                anchors.centerIn: parent
-                color: UIMaterials.colorTaskBar
-                opacity: 0.6
-                font {
-                    pixelSize: Math.floor( 0.5 * parent.width )
-                    weight: Font.Bold
-                    family: UIMaterials.solidFont
+        style: TabViewStyle {
+            frameOverlap: 1
+            tab: Rectangle {
+                id: rectTab
+                color: styleData.selected ? UIMaterials.colorNearWhite : UIMaterials.colorTaskBar
+                implicitWidth: 0.2924 * tabviewInvoice.width
+                implicitHeight: 60
+
+                Rectangle {
+                    width: 2
+                    height: parent.height
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    color: UIMaterials.colorNearWhite
                 }
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+
+                Text {
+                    id: text
+                    anchors.centerIn: parent
+                    text: styleData.title
+                    color: styleData.selected ? UIMaterials.colorTaskBar : UIMaterials.colorNearWhite
+                    font {
+                        pixelSize: 0.13 * parent.width
+                        family: UIMaterials.fontRobotoLight
+                    }
+                }
             }
 
-            onClicked: {
-                if( pnRtAnalytics.state === "visible" )
+            tabBar: Rectangle {
+                width: tabviewInvoice.width
+                height: rectTab.height
+                color: UIMaterials.colorTaskBar
+
+                Button {
+                    id: btnMenu
+                    width: height
+                    height: 0.8333 * parent.height
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    anchors.rightMargin: y
+
+                    background: Rectangle {
+                        id: rectBtnMenu
+                        anchors.fill: parent
+                        color: UIMaterials.colorNearWhite
+                        radius: 10
+
+                        Image {
+                            id: imgBtnMenu
+                            source: "qrc:/resource/imgs/Logo_withName_tr_40.png"
+                            anchors.centerIn: parent
+                            smooth: true
+                        }
+                    }
+
+                    onPressed: {
+                        rectBtnMenu.opacity = 0.6
+                    }
+
+                    onReleased: {
+                        rectBtnMenu.opacity = 1
+                        menuClicked()
+                    }
+                }
+            }
+        }
+
+        onCurrentIndexChanged: {
+            var prevTab = tabviewInvoice.getTab( 1 - tabviewInvoice.currentIndex )
+            prevTab.item.active = false
+            var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
+            tab.item.active = true
+            showCost( tab.item.latestCost, tab.item.latestTax, tab.item.latestDiscount)
+        }
+    }
+
+    //======================== IV. Payment form
+    PaymentForm {
+        id: pnPayment
+        width: tabviewInvoice.width
+        height: tabviewInvoice.height
+        anchors.left: tabviewInvoice.left
+        anchors.top: tabviewInvoice.top
+        state: "deactivated"
+
+        states: [
+            State {
+                name: "activated"
+                PropertyChanges {
+                    target: pnPayment
+                    opacity: 1
+                    enabled: true
+                }
+            },
+
+            State {
+                name: "deactivated"
+                PropertyChanges {
+                    target: pnPayment
+                    opacity: 0
+                    enabled: false
+                }
+            }
+        ]
+
+        transitions: Transition {
+            from: "deactivated"
+            to: "activated"
+            reversible: true
+            SequentialAnimation {
+                NumberAnimation {
+                    properties: "opacity"
+                    duration: 500
+                    easing.type: Easing.InOutQuad
+                }
+            }
+        }
+
+        onColapse: {
+            if( state === "activated" )
+            {
+                state = "deactivated"
+            }
+        }
+
+        onPayCompleted: {
+            showCost(0, 0, 0)
+            var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
+            tab.item.clearList()
+
+            // notification
+            if( noti.state == "visible" )
+            {
+                noti.state = "invisible"
+            }
+            noti.showNoti( "Hoàn tất 01 đơn hàng", "success" )
+            noti.state = "visible"
+            noti.focus = true
+        }
+
+        onPointUsed: {
+            var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
+            showCost( tab.item.latestCost, tab.item.latestTax, newDiscount )
+        }
+
+        onNeedMorePayingAmount: {
+            // notification
+            if( noti.state == "visible" )
+            {
+                noti.state = "invisible"
+            }
+            noti.showNoti( "Tiền khách trả chưa đủ!", "error" )
+            noti.state = "visible"
+            noti.focus = true
+        }
+
+        onCustomerNotFound: {
+            showNotFoundNoti()
+        }
+    }
+
+    //======================== V. Realtime selling analytics
+    Button {
+        id: btnRtAnalytics
+        width: height
+        height: 0.0781 * parent.height
+        anchors.right: pnRtAnalytics.left
+        anchors.bottom: pnRtAnalytics.bottom
+
+        background: Rectangle {
+            id: rectBtnRtAnalytics
+            anchors.fill: parent
+            color: "transparent"
+        }
+
+        Text {
+            id: txtBtnRtAnalytics
+            text: "\uf200"
+            anchors.centerIn: parent
+            color: UIMaterials.colorTaskBar
+            opacity: 0.6
+            font {
+                pixelSize: Math.floor( 0.5 * parent.width )
+                weight: Font.Bold
+                family: UIMaterials.solidFont
+            }
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+
+        onClicked: {
+            if( pnRtAnalytics.state === "visible" )
+            {
+                pnRtAnalytics.state = "invisible"
+            }
+            else
+            {
+                pnRtAnalytics.state = "visible"
+            }
+        }
+
+    }
+
+    RealtimeAnalytics {
+        id: pnRtAnalytics
+        width: tabviewInvoice.width * 3/8
+        height: tabviewInvoice.height
+        y: 0
+        color: "white"
+        state: "invisible"
+
+        states: [
+            State {
+                name: "visible"
+                PropertyChanges {
+                    target: pnRtAnalytics
+                    x: parent.width-pnRtAnalytics.width
+                }
+            },
+
+            State {
+                name: "invisible"
+                PropertyChanges {
+                    target: pnRtAnalytics
+                    x: parent.width
+                }
+            }
+        ]
+
+        transitions: Transition {
+            from: "invisible"
+            to: "visible"
+            reversible: true
+            SequentialAnimation {
+                NumberAnimation {
+                    properties: "x"
+                    duration: 500
+                    easing.type: Easing.InOutQuad
+                }
+            }
+        }
+
+        onStateChanged: {
+            if( state === "visible" )
+            {
+                if( categoryText === "Doanh thu(đ)" )
                 {
-                    pnRtAnalytics.state = "invisible"
+                    xpBackend.sortTop5( 1 )
+                }
+                else if( categoryText === "Lợi nhuận(đ)" )
+                {
+                    xpBackend.sortTop5( 2 )
                 }
                 else
                 {
-                    pnRtAnalytics.state = "visible"
-                }
-            }
-
-        }
-
-        //================== Payment panel
-        PaymentForm {
-            id: pnPayment
-            width: parent.width
-            height: parent.height
-            x: 0
-            y: 0
-            clip: true
-            state: "activated"
-
-            states: [
-                State {
-                    name: "activated"
-                    PropertyChanges {
-                        target: pnPayment
-                        opacity: 1
-                        enabled: true
-                    }
-                },
-
-                State {
-                    name: "deactivated"
-                    PropertyChanges {
-                        target: pnPayment
-                        opacity: 0
-                        enabled: false
-                    }
-                }
-            ]
-
-            transitions: Transition {
-                from: "deactivated"
-                to: "activated"
-                reversible: true
-                SequentialAnimation {
-                    NumberAnimation {
-                        properties: "opacity"
-                        duration: 500
-                        easing.type: Easing.InOutQuad
-                    }
-                }
-            }
-
-            //================== Signal handling
-            onColapse: {
-                if( state === "activated" )
-                {
-                    state = "deactivated"
-                }
-            }
-
-            onPayCompleted: {
-                showCost(0, 0, 0)
-                var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
-                tab.item.clearList()
-
-                // notification
-                if( noti.state == "visible" )
-                {
-                    noti.state = "invisible"
-                }
-                noti.showNoti( "Hoàn tất 01 đơn hàng", "success" )
-                noti.state = "visible"
-                noti.focus = true
-            }
-
-            onPointUsed: {
-                var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
-                showCost( tab.item.latestCost, tab.item.latestTax, newDiscount )
-            }
-
-            onNeedMorePayingAmount: {
-                // notification
-                if( noti.state == "visible" )
-                {
-                    noti.state = "invisible"
-                }
-                noti.showNoti( "Tiền khách trả chưa đủ!", "error" )
-                noti.state = "visible"
-                noti.focus = true
-            }
-
-            onCustomerNotFound: {
-                showNotFoundNoti()
-            }
-        }                        
-
-        //=================== Realtime Analytics Panel
-        RealtimeAnalytics {
-            id: pnRtAnalytics
-            width: root.width * 3/8
-            height: parent.height
-            y: 0
-            z: parent.z + 10
-            color: "white"
-            state: "invisible"
-
-            states: [
-                State {
-                    name: "visible"
-                    PropertyChanges {
-                        target: pnRtAnalytics
-                        x: parent.width-pnRtAnalytics.width
-                    }
-                },
-
-                State {
-                    name: "invisible"
-                    PropertyChanges {
-                        target: pnRtAnalytics
-                        x: parent.width
-                    }
-                }
-            ]
-
-            transitions: Transition {
-                from: "invisible"
-                to: "visible"
-                reversible: true
-                SequentialAnimation {
-                    NumberAnimation {
-                        properties: "x"
-                        duration: 500
-                        easing.type: Easing.InOutQuad
-                    }
-                }
-            }
-
-            onStateChanged: {
-                if( state === "visible" )
-                {
-                    if( categoryText === "Doanh thu(đ)" )
-                    {
-                        xpBackend.sortTop5( 1 )
-                    }
-                    else if( categoryText === "Lợi nhuận(đ)" )
-                    {
-                        xpBackend.sortTop5( 2 )
-                    }
-                    else
-                    {
-                        xpBackend.sortTop5( 3 )
-                    }
+                    xpBackend.sortTop5( 3 )
                 }
             }
         }
     }
 
-    //=================== Notification Popup
+    //======================= VI. Notification Popup
     NotificationPopup {
         id: noti
         width: 3*pnControl.width/4
@@ -624,5 +644,36 @@ Rectangle {
                 state = "invisible"
             }
         }
-    }    
+    }
+
+
+    //========================== VII. States and transition
+    states: [
+        State {
+            name: "visible"
+            PropertyChanges {
+                target: root
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: root
+                enabled: true
+            }
+        },
+
+        State {
+            name: "invisible"
+            PropertyChanges {
+                target: root
+                opacity: 0
+            }
+
+            PropertyChanges {
+                target: root
+                enabled: false
+            }
+        }
+    ]
+
 }

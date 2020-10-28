@@ -13,6 +13,7 @@ Rectangle {
 
     property var currProduct
     property var updateProduct
+    state: "invisible"
 
     //====================== Signal and slot definition
     function showProduct( product )
@@ -1625,4 +1626,34 @@ Rectangle {
             }
         }
     }
+
+
+    //========================== III. States and transition
+    states: [
+        State {
+            name: "visible"
+            PropertyChanges {
+                target: root
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: root
+                enabled: true
+            }
+        },
+
+        State {
+            name: "invisible"
+            PropertyChanges {
+                target: root
+                opacity: 0
+            }
+
+            PropertyChanges {
+                target: root
+                enabled: false
+            }
+        }
+    ]
 }

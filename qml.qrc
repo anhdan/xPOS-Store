@@ -49,5 +49,14 @@
         <file>frontend/ItemsList.qml</file>
         <file>frontend/PaymentForm.qml</file>
         <file>frontend/CustomerInfoBoard.qml</file>
+        <file>frontend/InfoCard.qml</file>
+        <file>resource/imgs/Logo_withName_tr_24.png</file>
+        <file>resource/imgs/Logo_withName_tr_40.png</file>
+        <file>frontend/MenuForm.qml</file>
+        <file>resource/imgs/Logo_only_trans_50.png</file>
+        <file>frontend/MenuInstance.qml</file>
+        <file>frontend/InventoryMgmtForm.qml</file>
+        <file>frontend/InventoryUpdate.qml</file>
+        <file>frontend/InventoryStatus.qml</file>
     </qresource>
 </RCC>

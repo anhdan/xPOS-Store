@@ -6,36 +6,77 @@ import QtQuick.Layouts 1.3
 import "."
 
 
-Row {
-    id: root
+Column {
     spacing: 0
+
     property string textColor: UIMaterials.colorTaskBar
     property alias customerName: lblCustomerName.text
-    property alias customerPhone: lblCustomerPhone.text
     property alias shoppingCount: lblShoppingTime.text
+    property alias customerPoint: lblShoppingPoint.text
     property alias totalPayment: lblTotalPayment.text
     property alias receivedDiscount: lblTotalDiscount.text
 
-    //================ I. Basic info
-    Column {
+    //============== Name
+    Label {
+        id: lblCustomerName
+        width: parent.width
+        height: 1.538 * UIMaterials.fontsizeM
+        font {
+            pixelSize: UIMaterials.fontsizeM
+            weight: Font.Bold
+            family: UIMaterials.fontRobotoLight
+        }
+        color: textColor
+        text: ""
+    }
+
+    //============== Shopping info row 1
+    Row {
         spacing: 0
+        width: parent.width
 
         Label {
-            id: lblCustomerName
-            width: root.width / 2
-            height: 1.538 * UIMaterials.fontsizeM
+            id: titShoppingTime
+            width: 0.1846 * parent.width
+            height: lblCustomerName.height
+            font {
+                pixelSize: UIMaterials.fontsizeS
+                family: UIMaterials.fontRobotoLight
+            }
+            color: textColor
+            opacity: 0.6
+            text: "Lần mua:"
+        }
+
+        Label {
+            id: lblShoppingTime
+            width: 0.3154 * parent.width
+            height: lblCustomerName.height
             font {
                 pixelSize: UIMaterials.fontsizeM
-                weight: Font.Bold
                 family: UIMaterials.fontRobotoLight
             }
             color: textColor
             text: ""
         }
 
+
         Label {
-            id: lblCustomerPhone
-            width: lblCustomerName.width
+            id: titTotalPayment
+            width: 0.1846 * parent.width
+            height: lblCustomerName.height
+            font {
+                pixelSize: UIMaterials.fontsizeS
+                family: UIMaterials.fontRobotoLight
+            }
+            color: textColor
+            opacity: 0.6
+            text: "Tổng chi:"
+        }
+
+        Label {
+            id: lblTotalPayment
+            width: 0.3154 * parent.width
             height: lblCustomerName.height
             font {
                 pixelSize: UIMaterials.fontsizeM
@@ -46,96 +87,61 @@ Row {
         }
     }
 
-    //================ II. Shopping Info
-    Column {
+    //================= Shopping info row 2
+    Row
+    {
         spacing: 0
+        width: parent.width
 
-        Row {
-            spacing: 0
-
-            Label {
-                id: titShoppingTime
-                width: 0.106 * root.width
-                height: lblCustomerName.height
-                font {
-                    pixelSize: UIMaterials.fontsizeS
-                    family: UIMaterials.fontRobotoLight
-                }
-                color: textColor
-                opacity: 0.6
-                text: "Lần mua:"
+        Label {
+            id: titShoppingPoint
+            width: 0.1846 * parent.width
+            height: lblCustomerName.height
+            font {
+                pixelSize: UIMaterials.fontsizeS
+                family: UIMaterials.fontRobotoLight
             }
-
-            Label {
-                id: lblShoppingTime
-                width: 0.1376 * root.width
-                height: lblCustomerName.height
-                font {
-                    pixelSize: UIMaterials.fontsizeM
-                    family: UIMaterials.fontRobotoLight
-                }
-                color: textColor
-                text: ""
-            }
+            color: textColor
+            opacity: 0.6
+            text: "Điểm:"
         }
 
-        Row {
-            spacing: 0
-
-            Label {
-                id: titTotalPayment
-                width: 0.106 * root.width
-                height: lblCustomerName.height
-                font {
-                    pixelSize: UIMaterials.fontsizeS
-                    family: UIMaterials.fontRobotoLight
-                }
-                color: textColor
-                opacity: 0.6
-                text: "Đã chi:"
+        Label {
+            id: lblShoppingPoint
+            width: 0.3154 * parent.width
+            height: lblCustomerName.height
+            font {
+                pixelSize: UIMaterials.fontsizeM
+                family: UIMaterials.fontRobotoLight
             }
-
-            Label {
-                id: lblTotalPayment
-                width: 0.1376 * root.width
-                height: lblCustomerName.height
-                font {
-                    pixelSize: UIMaterials.fontsizeM
-                    family: UIMaterials.fontRobotoLight
-                }
-                color: textColor
-                text: ""
-            }
+            color: UIMaterials.colorAntLogo
+            text: ""
         }
 
-        Row {
-            spacing: 0
 
-            Label {
-                id: titTotalDiscount
-                width: 0.106 * root.width
-                height: lblCustomerName.height
-                font {
-                    pixelSize: UIMaterials.fontsizeS
-                    family: UIMaterials.fontRobotoLight
-                }
-                color: textColor
-                opacity: 0.6
-                text: "Nhận ưu đãi:"
+        Label {
+            id: titTotalDiscount
+            width: 0.1846 * parent.width
+            height: lblCustomerName.height
+            font {
+                pixelSize: UIMaterials.fontsizeS
+                family: UIMaterials.fontRobotoLight
             }
+            color: textColor
+            opacity: 0.6
+            text: "Chiết khấu:"
+        }
 
-            Label {
-                id: lblTotalDiscount
-                width: 0.1376 * root.width
-                height: lblCustomerName.height
-                font {
-                    pixelSize: UIMaterials.fontsizeM
-                    family: UIMaterials.fontRobotoLight
-                }
-                color: textColor
-                text: ""
+        Label {
+            id: lblTotalDiscount
+            width: 0.3154 * parent.width
+            height: lblCustomerName.height
+            font {
+                pixelSize: UIMaterials.fontsizeM
+                family: UIMaterials.fontRobotoLight
             }
+            color: textColor
+            text: ""
         }
     }
 }
-

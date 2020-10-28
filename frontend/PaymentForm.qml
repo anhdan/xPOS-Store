@@ -19,7 +19,7 @@ Rectangle {
 
     property alias discountStr: txtDiscountAmount.text
     property alias payingStr: txtPayingAmount.text
-    property alias returnStr: lblReturnAmount.text
+    property alias returnStr: icReturnAmount.infoText
 
     function initialize( latestCost, latesTax, latestDiscount, itemList )
     {
@@ -46,7 +46,7 @@ Rectangle {
     Label {
         id: titCustomerInfo
         x: 0.0146 * parent.width
-        y: 0.0260 * parent.height
+        y: 0.1823 * parent.height
         font {
             pixelSize: UIMaterials.fontsizeS
             weight: Font.Bold
@@ -64,6 +64,7 @@ Rectangle {
         anchors.top: titCustomerInfo.bottom
         anchors.topMargin: 0.0130*root.height
         backgroundColor: UIMaterials.colorNearWhite
+        radius: 10
         placeholderText: "Nhập mã hoặc sđt khách hàng ..."
     }
 
@@ -79,7 +80,7 @@ Rectangle {
     Label {
         id: titDiscountInfo
         anchors.left: titCustomerInfo.left
-        y: 0.2995 * parent.height
+        y: 0.3906 * parent.height
         font {
             pixelSize: UIMaterials.fontsizeS
             weight: Font.Bold
@@ -113,6 +114,45 @@ Rectangle {
         text: "0 vnd"
     }
 
+    Button {
+        id: btnUsePoint
+        width: btnComplete.width
+        height: txtDiscountAmount.height
+        anchors.verticalCenter: txtDiscountAmount.verticalCenter
+        anchors.right: searchBox.right
+
+        background: Rectangle{
+            id: rectBtnUsePoint
+            anchors.fill: parent
+            color: UIMaterials.colorAntLogo
+            radius: 10
+        }
+
+        Text {
+            id: txtBtnUsePoint
+            anchors.centerIn: parent
+            text: "Dùng Điểm"
+            font {
+                pixelSize: UIMaterials.fontsizeM
+                family: UIMaterials.fontRobotoLight
+            }
+            horizontalAlignment: Text.AlignHCenter
+            color: "white"
+        }
+
+        onClicked: {
+            if( rectBtnUsePoint.color === UIMaterials.colorTrueGray )
+            {
+                rectBtnUsePoint.color = UIMaterials.colorAntLogo
+                txtBtnUsePoint.text = "Dùng Điểm"
+            }
+            else
+            {
+                rectBtnUsePoint.color = UIMaterials.colorTrueGray
+                txtBtnUsePoint.text = "Hủy Dùng Điểm"
+            }
+        }
+    }
 
     //=========== III. Paying info
     Label {
@@ -177,6 +217,7 @@ Rectangle {
             id: bgrBtnCash
             anchors.fill: parent
             color: "transparent"
+            radius: 10
         }
 
         Text {
@@ -221,6 +262,7 @@ Rectangle {
             id: bgrBtnCard
             anchors.fill: parent
             color: "transparent"
+            radius: 10
         }
 
         Text {
@@ -242,58 +284,36 @@ Rectangle {
     }
 
     // Return amount text
-    Row {
+    InfoCard {
+        id: icReturnAmount
+        cardWidth: txtPayingAmount.width
+        titleHeight: 1.5385 * UIMaterials.fontsizeM
+        infoHeight: titleHeight
+        isBold: true
         anchors.top: txtPayingAmount.bottom
-        anchors.topMargin: 0.0130 * parent.height
+        anchors.topMargin: 0.0195 * parent.height
         anchors.left: txtPayingAmount.left
-        spacing: 0
-
-        Label {
-            id: titReturnAmount
-            width: 0.4375 * txtPayingAmount.width
-            height: 1.5385 * UIMaterials.fontsizeM
-            color: UIMaterials.colorTaskBar
-            opacity: 0.6
-            font {
-                pixelSize: UIMaterials.fontsizeS
-                family: UIMaterials.fontRobotoLight
-            }
-            verticalAlignment: Text.AlignVCenter
-            text: "Trả lại khách:"
-        }
-
-        Label {
-            id: lblReturnAmount
-            width: 0.5625 * txtPayingAmount.width
-            height: titReturnAmount.height
-            color: UIMaterials.colorTaskBar
-            font {
-                pixelSize: UIMaterials.fontsizeM
-                weight: Font.Bold
-                family: UIMaterials.fontRobotoLight
-            }
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignRight
-            text: "0 vnd"
-        }
+        titleText: "Trả lại khách"
+        infoText: "0 vnd"
     }
 
 
     //============== IV. Control buttons
     Row {
         spacing: 20
-        y: 0.8919 * root.height
-        anchors.horizontalCenter: root.horizontalCenter
+        y: 0.9049 * root.height
+        anchors.right: searchBox.right
 
         Button {
             id: btnDept
             width: 0.1462 * root.width
-            height: 0.0911 * root.height
+            height: 0.0781 * root.height
 
             background: Rectangle{
                 id: rectBtnDept
                 anchors.fill: parent
-                color: "#ff5358"
+                color: UIMaterials.colorTrueGray
+                radius: 10
             }
 
             Text {
@@ -307,11 +327,11 @@ Rectangle {
             }
 
             onPressed: {
-                rectBtnDept.color = UIMaterials.colorTrueRed
+                rectBtnDept.opacity = 0.6
             }
 
             onReleased: {
-                rectBtnDept.color = "#fff5358"
+                rectBtnDept.opacity = 1
             }
         }
 
@@ -324,11 +344,12 @@ Rectangle {
                 id: rectBtnComplete
                 anchors.fill: parent
                 color: UIMaterials.colorTrueBlue
+                radius: 10
             }
 
             Text {
                 anchors.centerIn: parent
-                text: "Thanh Toán\nXong"
+                text: "Đã Thanh Toán"
                 font {
                     pixelSize: UIMaterials.fontsizeM
                     family: UIMaterials.fontRobotoLight
@@ -338,11 +359,11 @@ Rectangle {
             }
 
             onPressed: {
-                rectBtnDept.color = "#5f9bf9"
+                rectBtnComplete.opacity = 0.6
             }
 
             onReleased: {
-                rectBtnDept.color = UIMaterials.colorTrueBlue
+                rectBtnComplete.opacity = 1
             }
         }
     }
@@ -357,6 +378,7 @@ Rectangle {
         background: Rectangle{
             anchors.fill: parent
             color: "transparent"
+            radius: 10
         }
 
         Text {

@@ -35,12 +35,17 @@ Window {
             UIMaterials.currSecs = 0
             timer.restart()
         }
+
+        onOpacityChanged: {
+            enabled = (opacity === 1) ? true : false
+        }
     }
 
     //=========== Invoice Composition Form
     InvoiceComposition {
         id: formInvoice
         anchors.fill: parent
+        state: "visible"
 
         onToInventoryBoard: {
             stack.pop()
@@ -50,6 +55,14 @@ Window {
         onToLoginBoard: {
             stack.pop()
             stack.push( formLogin )
+        }
+
+        onMenuClicked: {
+            formMenu.state = "visible"
+        }
+
+        onOpacityChanged: {
+            enabled = (opacity === 1) ? true : false
         }
     }
 
@@ -66,6 +79,23 @@ Window {
         onToLoginBoard: {
             stack.pop()
             stack.push( formLogin )
+        }
+
+        onOpacityChanged: {
+            enabled = (opacity === 1) ? true : false
+        }
+    }
+
+    InventoryMgmtForm {
+        id: formInventory2
+        anchors.fill: parent
+
+        onMenuClicked: {
+            formMenu.state = "visible"
+        }
+
+        onOpacityChanged: {
+            enabled = (opacity === 1) ? true : false
         }
     }
 
@@ -90,7 +120,7 @@ Window {
     StackView {
         id: stack
 
-        initialItem: formInvoice
+        initialItem: formInventory2
         anchors.fill: parent
 
         pushEnter: Transition {
@@ -99,7 +129,7 @@ Window {
                 properties: "opacity"
                 from: 0
                 to: 1
-                duration: 200
+                duration: 400
             }
         }
 
@@ -109,7 +139,7 @@ Window {
                 properties: "opacity"
                 from: 1
                 to: 0
-                duration: 200
+                duration: 400
             }
         }
 
@@ -119,7 +149,7 @@ Window {
                 properties: "opacity"
                 from: 0
                 to: 1
-                duration: 200
+                duration: 400
             }
         }
 
@@ -129,39 +159,31 @@ Window {
                 properties: "opacity"
                 from: 1
                 to: 0
-                duration: 200
+                duration: 400
             }
         }
     }
 
 
-    //=================== Input panel
-//    InputPanel {
-//        id: inputPanel
-//        z: 99
-//        x: 0
-//        y: root.height
-//        width: root.width
+    //================= Menu form
+    MenuForm {
+        id: formMenu
+        anchors.fill: parent
+        state: "invisible"
 
-//        states: State {
-//            name: "visible"
-//            when: inputPanel.active
-//            PropertyChanges {
-//                target: inputPanel
-//                y: root.height - inputPanel.height
-//            }
-//        }
-//        transitions: Transition {
-//            from: ""
-//            to: "visible"
-//            reversible: true
-//            ParallelAnimation {
-//                NumberAnimation {
-//                    properties: "y"
-//                    duration: 250
-//                    easing.type: Easing.InOutQuad
-//                }
-//            }
-//        }
-//    }
+        onExit: {
+            if( index === 0 )
+            {
+                stack.pop()
+                stack.push( formInvoice )
+            }
+            else if( index === 1 )
+            {
+                stack.pop()
+                stack.push( formInventory2 )
+            }
+
+            state = "invisible"
+        }
+    }
 }

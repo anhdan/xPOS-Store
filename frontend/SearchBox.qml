@@ -64,9 +64,7 @@ Rectangle {
         id: txtSearchInput
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: btnSearch.right
-        anchors.leftMargin: 10
         anchors.right: parent.right
-        anchors.rightMargin: 10
 
         background: Rectangle {
             anchors.fill: parent
