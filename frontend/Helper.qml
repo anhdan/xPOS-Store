@@ -110,4 +110,11 @@ QtObject {
         var hours_ = Math.floor( secs / 3600.0 )
         return (Number(hours_).toString().padStart(2, "0") + ":" + Number(mins_).toString().padStart(2, "0") )
     }
+
+    function currencyToNumber( text )
+    {
+        var orgText = text.replace( /,/g, "" )
+        orgText = orgText.replace( "vnd", "" )
+        return parseInt(orgText, 10)
+    }
 }

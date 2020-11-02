@@ -21,12 +21,28 @@ Rectangle {
     property alias payingStr: txtPayingAmount.text
     property alias returnStr: icReturnAmount.infoText
 
+    //=============== Functions
+    function setDefaultDisplay()
+    {
+        searchBox.text = ""
+        boardCustomerInfo.clear()
+        boardCustomerInfo.visible = false
+
+        txtDiscountAmount.text = false
+        btnUsePoint.visible = false
+        radioCash.checked = true
+        txtPayingAmount.text = ""
+        icReturnAmount.infoText = ""
+    }
+
+
     function initialize( latestCost, latesTax, latestDiscount, itemList )
     {
         currPayment = Helper.setDefaultPayment( currPayment )
         currCustomer = Helper.setDefaultCustomer( currCustomer )
         currPayment["total_discount"] = Number(latestDiscount)
         currPayment["total_charging"] = Number(latestCost) + Number(latesTax) - Number(latestDiscount)
+        txtPayingAmount.text = Number(currPayment["total_charging"]).toLocaleString( Qt.locale(), "f", 0 ) + " vnd"
         currItemList = itemList
         xpBackend.initializePayment()
     }
@@ -41,12 +57,33 @@ Rectangle {
     signal customerFound( var customer )
     signal customerNotFound()
 
+    Component.onCompleted: {
+        xpBackend.sigCustomerFound.connect(
+                    function(customer) {
+                        if( enabled )
+                        {
+                            currCustomer = customer
+                            boardCustomerInfo.customerName = customer["name"]
+                            boardCustomerInfo.shoppingCount = customer["shopping_count"]
+                            boardCustomerInfo.customerPoint = customer["point"]
+//                            boardCustomerInfo.totalPayment = add field to display this
+//                            boardCustomerInfo.receivedDiscount = add field to display this
+                            boardCustomerInfo.state = "available"
+                            titCustomerInfo.state = "available"
+                            btnUsePoint.visible = true
+                        }
+                    }
+                    )
+        xpBackend.sigCustomerNotFound.connect( customerNotFound )
+    }
+
 
     //=============== I. Customer info sector
     Label {
         id: titCustomerInfo
         x: 0.0146 * parent.width
         y: 0.1823 * parent.height
+        height: 0.0391 * parent.height
         font {
             pixelSize: UIMaterials.fontsizeS
             weight: Font.Bold
@@ -54,6 +91,26 @@ Rectangle {
         }
         color: UIMaterials.grayPrimary
         text: "Thông tin khách hàng"
+
+        states: State {
+            name: "available"
+//            when: searchBox.c
+            PropertyChanges {
+                target: titCustomerInfo
+                y: 0.0260 * root.height
+            }
+        }
+
+        transitions: Transition {
+            from: "*"
+            to: "available"
+            reversible: true
+            NumberAnimation {
+                properties: "y"
+                duration: 200
+                easing.type: Easing.InOutQuad
+            }
+        }
     }
 
     SearchBox {
@@ -66,6 +123,10 @@ Rectangle {
         backgroundColor: UIMaterials.colorNearWhite
         radius: 10
         placeholderText: "Nhập mã hoặc sđt khách hàng ..."
+
+        onSearchExecuted: {
+            var ret = xpBackend.searchForCustomer( searchStr )
+        }
     }
 
     CustomerInfoBoard {
@@ -73,7 +134,27 @@ Rectangle {
         width: searchBox.width
         anchors.left: titCustomerInfo.left
         y: 0.1953 * parent.height
-        visible: false
+        opacity: 0
+
+        states: State {
+            name: "available"
+//            when:
+            PropertyChanges {
+                target: boardCustomerInfo
+                opacity: 1
+            }
+        }
+
+        transitions: Transition {
+            from: "*"
+            to: "available"
+            reversible: true
+            NumberAnimation {
+                properties: "opacity"
+                duration: 200
+                easing.type: Easing.InOutQuad
+            }
+        }
     }
 
     //======== II. Discount sector
@@ -81,6 +162,7 @@ Rectangle {
         id: titDiscountInfo
         anchors.left: titCustomerInfo.left
         y: 0.3906 * parent.height
+        height: titCustomerInfo.height
         font {
             pixelSize: UIMaterials.fontsizeS
             weight: Font.Bold
@@ -159,6 +241,7 @@ Rectangle {
         id: titPayingInfo
         anchors.left: titCustomerInfo.left
         y: 0.5990 * parent.height
+        height: titCustomerInfo.height
         font {
             pixelSize: UIMaterials.fontsizeS
             weight: Font.Bold
@@ -364,6 +447,17 @@ Rectangle {
 
             onReleased: {
                 rectBtnComplete.opacity = 1
+
+                // Payment backend processing
+                for( var id = 0; id < currItemList.count; id++ )
+                {
+                    var cpItem = Helper.deepCopy( currItemList.get( id ) )
+                    xpBackend.sellProduct( cpItem, cpItem["item_num"] )
+                }
+                xpBackend.completePayment( currCustomer, currPayment )
+
+                payCompleted()
+                colapse()
             }
         }
     }

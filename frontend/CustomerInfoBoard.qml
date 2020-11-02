@@ -16,6 +16,15 @@ Column {
     property alias totalPayment: lblTotalPayment.text
     property alias receivedDiscount: lblTotalDiscount.text
 
+    function clear()
+    {
+        lblCustomerName.text = ""
+        lblShoppingPoint.text = ""
+        lblShoppingTime.text = ""
+        lblTotalPayment.text = ""
+        lblTotalDiscount.text = ""
+    }
+
     //============== Name
     Label {
         id: lblCustomerName

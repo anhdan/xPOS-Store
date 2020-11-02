@@ -175,6 +175,11 @@ Rectangle {
         latestCost = latestDiscount = latestTax = 0
     }
 
+    function getList()
+    {
+        return lvItems.model
+    }
+
     //====================== I. Item Search Box
     // Dropshadow effect
     DropShadow {
