@@ -58,5 +58,6 @@
         <file>frontend/InventoryMgmtForm.qml</file>
         <file>frontend/InventoryUpdate.qml</file>
         <file>frontend/InventoryStatus.qml</file>
+        <file>frontend/KPICard.qml</file>
     </qresource>
 </RCC>

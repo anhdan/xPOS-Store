@@ -28,7 +28,7 @@ Item {
             anchors.top: parent.top
 
             onClicked: {
-                exit()
+                exit( currentIndex )
             }
         }
     }
