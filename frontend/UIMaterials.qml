@@ -88,10 +88,15 @@ QtObject {
         source: "qrc:/resource/fonts/Roboto/Roboto-Light.ttf"
     }
 
+    readonly property FontLoader fontLDCategory: FontLoader {
+        source: "qrc:/resource/fonts/Categories.ttf"
+    }
+
     readonly property string solidFont: fontAwesomeSolid.name
     readonly property string regularFont: fontAwesomeRegular.name
     readonly property string fontOpenSansLight: fontLDOpenSansLight.name
     readonly property string fontRobotoLight: fontLDRobotoLight.name
+    readonly property string fontCategories: fontLDCategory.name
 
     //=========== Icon font
     readonly property string iconSuccess: "\uf058"

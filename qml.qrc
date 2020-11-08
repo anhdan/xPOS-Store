@@ -58,6 +58,29 @@
         <file>frontend/InventoryMgmtForm.qml</file>
         <file>frontend/InventoryUpdate.qml</file>
         <file>frontend/InventoryStatus.qml</file>
+        <file>frontend/InventoryItemList.qml</file>
+        <file>frontend/InventoryStockBoard.qml</file>
+        <file>frontend/DiscountPrgForm.qml</file>
+        <file>frontend/CalendarForm.qml</file>
+        <file>frontend/InconizedButton.qml</file>
+        <file>frontend/CategoryForm.qml</file>
+        <file>resource/svgs/baby.svg</file>
+        <file>resource/svgs/drinks.svg</file>
+        <file>resource/svgs/education.svg</file>
+        <file>resource/svgs/electric_devices.svg</file>
+        <file>resource/svgs/fashion.svg</file>
+        <file>resource/svgs/food.svg</file>
+        <file>resource/svgs/health_care.svg</file>
+        <file>resource/svgs/household_appliance.svg</file>
+        <file>frontend/StockUpdateForm.qml</file>
+        <file>frontend/SwitchButton.qml</file>
         <file>frontend/KPICard.qml</file>
+        <file>frontend/InventoryOOSList.qml</file>
+        <file>frontend/InventoryExpiredList.qml</file>
+        <file>frontend/InventorySlowSellingList.qml</file>
+        <file>resource/fonts/Categories.ttf</file>
+        <file>frontend/AdvanceAnalyticsForm.qml</file>
+        <file>frontend/AnalyticsRetailStatus.qml</file>
+        <file>frontend/TimeDurationPicker.qml</file>
     </qresource>
 </RCC>

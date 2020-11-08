@@ -286,7 +286,7 @@ Rectangle {
                     var tab = tabviewInvoice.getTab( tabviewInvoice.currentIndex )
                     if( tab.item.count > 0 )
                     {
-                        pnPayment.initialize(tab.item.latestCost, tab.item.latestTax, tab.item.latestDiscount, tab.item.model)
+                        pnPayment.initialize(tab.item.latestCost, tab.item.latestTax, tab.item.latestDiscount, tab.item.getList())
 
                         if( pnPayment.state === "deactivated" )
                         {

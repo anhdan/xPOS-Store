@@ -25,19 +25,17 @@ Window {
     Login {
         id: formLogin
         anchors.fill: parent
+        state: "visible"
 
         onApproved: {
             stack.pop()
             stack.push( formInvoice )
+            state = "invisble"
 
             // restart timer
             UIMaterials.currDateTime = Date()
             UIMaterials.currSecs = 0
             timer.restart()
-        }
-
-        onOpacityChanged: {
-            enabled = (opacity === 1) ? true : false
         }
     }
 
@@ -45,7 +43,7 @@ Window {
     InvoiceComposition {
         id: formInvoice
         anchors.fill: parent
-        state: "visible"
+        state: "invisible"
 
         onToInventoryBoard: {
             stack.pop()
@@ -70,6 +68,7 @@ Window {
     InventoryMgmt {
         id: formInventory
         anchors.fill: parent
+        state: "visible"
 
         onToInvoiceBoard: {
             stack.pop()
@@ -89,6 +88,22 @@ Window {
     InventoryMgmtForm {
         id: formInventory2
         anchors.fill: parent
+        state: "invisible"
+
+        onMenuClicked: {
+            formMenu.state = "visible"
+        }
+
+        onOpacityChanged: {
+            enabled = (opacity === 1) ? true : false
+        }
+    }
+
+    //============ Advance analytics form
+    AdvanceAnalyticsForm {
+        id: formAdvanceAnalytics
+        anchors.fill: parent
+        state: "invisible"
 
         onMenuClicked: {
             formMenu.state = "visible"
@@ -120,7 +135,7 @@ Window {
     StackView {
         id: stack
 
-        initialItem: formInventory2
+        initialItem: formAdvanceAnalytics
         anchors.fill: parent
 
         pushEnter: Transition {
@@ -181,6 +196,11 @@ Window {
             {
                 stack.pop()
                 stack.push( formInventory2 )
+            }
+            else if( index === 2 )
+            {
+                stack.pop()
+                stack.push( formAdvanceAnalytics )
             }
 
             state = "invisible"

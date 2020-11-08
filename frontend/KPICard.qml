@@ -6,15 +6,12 @@ import QtQuick.Layouts 1.3
 Rectangle {
     id: root
     color: "white"
-
     property alias nameFontsize: lblKPIName.font.pixelSize
     property alias nameFontColor: lblKPIName.color
     property alias kpiName: lblKPIName.text
-
     property alias valueFontsize: lblKPIValue.font.pixelSize
     property alias valueFontColor: lblKPIValue.color
     property alias kpiValue: lblKPIValue.text
-
     property int kpiTrend: 0
     property alias trendColor: lblKPITrend.color
 
@@ -25,7 +22,6 @@ Rectangle {
         anchors.left: parent.left
         anchors.leftMargin: 5
         anchors.right: parent.right
-
         verticalAlignment: Text.AlignVCenter
         font {
             pixelSize: UIMaterials.fontsizeM
@@ -41,7 +37,6 @@ Rectangle {
         anchors.top: lblKPIName.bottom
         anchors.left: lblKPIName.left
         anchors.right: parent.right
-
         verticalAlignment: Text.AlignVCenter
         font {
             pixelSize: UIMaterials.fontsizeXL
@@ -57,7 +52,6 @@ Rectangle {
         anchors.bottomMargin: 0.0417 * parent.height
         anchors.right: parent.right
         anchors.rightMargin: 0.0185 * parent.width
-
         font {
             pixelSize: UIMaterials.fontsizeL
             weight: Font.Bold
@@ -66,5 +60,4 @@ Rectangle {
         color: "transparent"
         text: (kpiTrend === 0) ? "\uf061" : ((kpiTrend === 1) ? "\uf062" : "\uf063")
     }
-
 }

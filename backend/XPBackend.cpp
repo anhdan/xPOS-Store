@@ -422,6 +422,7 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
     }
 
     // add bill using firebase functions
+    m_bill.toJSONString();
     firebase::functions::HttpsCallableReference fbFunction
             = m_fbFunc->GetHttpsCallable( "addNewBillCall" );
     firebase::Future<firebase::functions::HttpsCallableResult> future

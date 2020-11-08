@@ -1,5 +1,9 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QtWidgets/QApplication>
+#include <QtQuick/QQuickView>
+#include <QtCore/QDir>
+#include <QtQml/QQmlEngine>
 
 #include "backend/database/InventoryDatabase.h"
 #include "backend/database/UserDatabase.h"
@@ -10,7 +14,7 @@
 int main(int argc, char *argv[])
 {
     qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
     //

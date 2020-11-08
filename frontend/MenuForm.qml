@@ -28,7 +28,7 @@ Item {
             anchors.top: parent.top
 
             onClicked: {
-                exit( currentIndex )
+                exit( -1 )
             }
         }
     }
@@ -80,11 +80,18 @@ Item {
                 content: "Tạo hóa đơn"
 
                 onSelected: {
-                    currentItem.state = "deselected"
-                    state = "selected"
-                    currentItem = itInvoice
-                    currentIndex = 0
-                    exit( 0 )
+                    if( currentIndex === 0 )
+                    {
+                        exit( -1 )
+                    }
+                    else
+                    {
+                        currentItem.state = "deselected"
+                        state = "selected"
+                        currentItem = itInvoice
+                        currentIndex = 0
+                        exit( 0 )
+                    }
                 }
             }
 
@@ -96,11 +103,18 @@ Item {
                 content: "Quản lý kho hàng"
 
                 onSelected: {
-                    currentItem.state = "deselected"
-                    state = "selected"
-                    currentItem = itInventory
-                    currentIndex = 1
-                    exit( 1 )
+                    if( currentIndex === 1 )
+                    {
+                        exit( -1 )
+                    }
+                    else
+                    {
+                        currentItem.state = "deselected"
+                        state = "selected"
+                        currentItem = itInventory
+                        currentIndex = 1
+                        exit( 1 )
+                    }
                 }
             }
 
@@ -112,11 +126,18 @@ Item {
                 content: "Báo cáo phân tích"
 
                 onSelected: {
-                    currentItem.state = "deselected"
-                    state = "selected"
-                    currentItem = itAnalytics
-                    currentIndex = 2
-                    exit( 2 )
+                    if( currentIndex === 2 )
+                    {
+                        exit( -1 )
+                    }
+                    else
+                    {
+                        currentItem.state = "deselected"
+                        state = "selected"
+                        currentItem = itAnalytics
+                        currentIndex = 2
+                        exit( 2 )
+                    }
                 }
             }
 
@@ -128,11 +149,18 @@ Item {
                 content: "Chiến lược bán hàng"
 
                 onSelected: {
-                    currentItem.state = "deselected"
-                    state = "selected"
-                    currentItem = itStrategy
-                    currentIndex = 3
-                    exit( 3 )
+                    if( currentIndex === 3 )
+                    {
+                        exit( -1 )
+                    }
+                    else
+                    {
+                        currentItem.state = "deselected"
+                        state = "selected"
+                        currentItem = itStrategy
+                        currentIndex = 3
+                        exit( 3 )
+                    }
                 }
             }
 
@@ -144,11 +172,18 @@ Item {
                 content: "Đặt hàng nhà cung ứng"
 
                 onSelected: {
-                    currentItem.state = "deselected"
-                    state = "selected"
-                    currentItem = itOrder
-                    currentIndex = 4
-                    exit( 4 )
+                    if( currentIndex === 4 )
+                    {
+                        exit( -1 )
+                    }
+                    else
+                    {
+                        currentItem.state = "deselected"
+                        state = "selected"
+                        currentItem = itOrder
+                        currentIndex = 4
+                        exit( 4 )
+                    }
                 }
             }
         }
@@ -177,11 +212,18 @@ Item {
                 content: "Tài khoản"
 
                 onSelected: {
-                    currentItem.state = "deselected"
-                    state = "selected"
-                    currentItem = itAccount
-                    currentIndex = 5
-                    exit( 5 )
+                    if( currentIndex === 5)
+                    {
+                        exit( -1 )
+                    }
+                    else
+                    {
+                        currentItem.state = "deselected"
+                        state = "selected"
+                        currentItem = itAccount
+                        currentIndex = 5
+                        exit( 5 )
+                    }
                 }
             }
 
@@ -193,11 +235,18 @@ Item {
                 content: "Cài đặt"
 
                 onSelected: {
-                    currentItem.state = "deselected"
-                    state = "selected"
-                    currentItem = itSetting
-                    currentIndex = 6
-                    exit( 6 )
+                    if( currentIndex === 6 )
+                    {
+                        exit( -1 )
+                    }
+                    else
+                    {
+                        currentItem.state = "deselected"
+                        state = "selected"
+                        currentItem = itSetting
+                        currentIndex = 6
+                        exit( 6 )
+                    }
                 }
             }
 
@@ -209,11 +258,18 @@ Item {
                 content: "Hướng dẫn sử dụng"
 
                 onSelected: {
-                    currentItem.state = "deselected"
-                    state = "selected"
-                    currentItem = itInstruction
-                    currentIndex = 7
-                    exit( 7 )
+                    if( currentIndex === 1 )
+                    {
+                        exit( -1 )
+                    }
+                    else
+                    {
+                        currentItem.state = "deselected"
+                        state = "selected"
+                        currentItem = itInstruction
+                        currentIndex = 7
+                        exit( 7 )
+                    }
                 }
             }
         }

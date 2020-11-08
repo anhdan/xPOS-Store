@@ -24,8 +24,8 @@ Rectangle {
         // Tab 1: for updating inventory
         Tab {
             id: tab1
-            title: "Cập nhật hàng hóa"
-            source: "InventoryUpdate.qml"
+            title: "Phân tích kinh doanh"
+            source: "AnalyticsRetailStatus.qml"
             onLoaded: {
 
             }
@@ -34,7 +34,7 @@ Rectangle {
         // Tab 2: for reporting on inventory status
         Tab {
             id: tab2
-            title: "Trạng thái kho hàng"
+            title: "Phân tích khách hàng"
             source: "InventoryStatus.qml"
             onLoaded: {
 
@@ -48,7 +48,7 @@ Rectangle {
             tab: Rectangle {
                 id: rectTab
                 color: styleData.selected ? UIMaterials.colorNearWhite : UIMaterials.colorTaskBar
-                implicitWidth: 0.2441 * root.width
+                implicitWidth: 0.2930 * root.width
                 implicitHeight: 0.0781 * root.height
 
                 Rectangle {
@@ -110,34 +110,4 @@ Rectangle {
             }
         }
     }
-
-
-    //========================== VII. States and transition
-    states: [
-        State {
-            name: "visible"
-            PropertyChanges {
-                target: root
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: root
-                enabled: true
-            }
-        },
-
-        State {
-            name: "invisible"
-            PropertyChanges {
-                target: root
-                opacity: 0
-            }
-
-            PropertyChanges {
-                target: root
-                enabled: false
-            }
-        }
-    ]
 }
