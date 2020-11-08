@@ -10,6 +10,7 @@ import QtCharts 2.0
 import "."
 Item {
     id: root
+    clip: true
     //========================= I. KPI panel
     Rectangle {
         id: pnControl
@@ -169,7 +170,7 @@ Item {
     MouseArea {
         id: maDurationPicker
         anchors.fill: parent
-        z: tvInfo.z + 1
+        z: pnDetails.z + 1
 
         TimeDurationPicker {
             id: durationPicker
@@ -205,169 +206,79 @@ Item {
         anchors.left: pnControl.right
         anchors.top: root.top
         color: "white"
+        clip: true
 
-        //----- II.1. Bar chart showing income/profit variation
-        Label {
-            id: titVariationChart
-            height: 0.0565 * parent.height
-            y: 0.0282 * parent.height
-            x: 0.0146 * parent.width
+        RetailStatusRevenue {
+            id: revenuePage
+            width: parent.width
+            height: parent.height
+            x: 0
+            y: 0
 
-            font{
-                pixelSize: UIMaterials.fontsizeM
-                bold: true
-                family: UIMaterials.fontRobotoLight
-            }
-            verticalAlignment: Text.AlignVCenter
-            color: UIMaterials.grayDark
-            text: "Biến động doanh thu"
-        }
-
-        Rectangle {
-            id: pnBarchart
-            width: parent.width - 2 * titVariationChart.x
-            height: 0.4237 * parent.height
-            anchors.left: titVariationChart.left
-            anchors.top: titVariationChart.bottom
-//            anchors.topMargin: 0.0141 * parent.height
-            color: "transparent"
-
-            ChartView {
-//                title: "Bar series"
-                anchors.fill: parent
-                legend.alignment: Qt.AlignBottom
-                antialiasing: true
-
-                BarSeries {
-                    id: mySeries
-                    axisX: BarCategoryAxis { categories: ["2007", "2008", "2009", "2010", "2011", "2012" ] }
-                    BarSet { label: "Bob"; values: [2, 2, 3, 4, 5, 6] }
-                    BarSet { label: "Susan"; values: [5, 1, 2, 4, 1, 7] }
-                    BarSet { label: "James"; values: [3, 5, 8, 13, 5, 8] }
-                }
+            onNextClicked: {
+                stack.pop()
+                stack.push( profitPage )
             }
         }
 
+        RetailStatusProfit {
+            id: profitPage
+            width: parent.width
+            height: parent.height
+            x: parent.width
+            y: 0
 
-        //----- II.2. Pie chart showing profit/income sharing
-        Label {
-            id: titProfitShare
-            height: titVariationChart.height
-            anchors.top: pnBarchart.bottom
-            anchors.topMargin: 0.0242 * parent.height
-            anchors.left: titVariationChart.left
-
-            font{
-                pixelSize: UIMaterials.fontsizeM
-                bold: true
-                family: UIMaterials.fontRobotoLight
+            onPrevClicked: {
+                stack.pop()
+                stack.push( revenuePage )
             }
-            verticalAlignment: Text.AlignVCenter
-            color: UIMaterials.grayDark
-            text: "Tỷ lệ lợi nhuận theo loại mặt hàng"
         }
 
-        Rectangle {
-            id: pnPieChart
-            width: pnBarchart.width
-            height: 0.3955 * parent.height
-            anchors.left: titVariationChart.left
-            anchors.top: titProfitShare.bottom
-            anchors.topMargin: 0.0141 * parent.height
-            color: "transparent"
+        StackView {
+            id: stack
+            initialItem: revenuePage
+            anchors.fill: parent
 
-            ChartView {
-                id: chart
-                anchors.fill: parent
-        //        title: "Production costs"
-                legend.visible: true
-                legend.alignment: Qt.AlignRight
-                legend.font {
-                    pixelSize: UIMaterials.fontsizeM
-                    family: UIMaterials.fontRobotoLight
-                }
-                legend.markerShape: Legend.MarkerShapeCircle
-
-                antialiasing: true
-
-                PieSeries {
-                    id: pieOuter
-                    size: 0.8
-                    holeSize: 0.5
-                    PieSlice {
-                        id: slice;
-                        label: "Thời trang 30%";
-                        labelFont {
-                            pixelSize: UIMaterials.fontsizeM
-                            weight: Font.Bold
-                            family: UIMaterials.fontCategories
-                        }
-                        labelColor: color
-                        value: 19511;
-                        color: "#99CA53"
-
-                        onPressed: {
-                            exploded = true
-                        }
-
-                        onReleased: {
-                            exploded = false
-                        }
-                    }
-
-                    PieSlice {
-                        label: "Thực phẩm 20%";
-                        labelFont {
-                            pixelSize: UIMaterials.fontsizeM
-                            weight: Font.Bold
-                            family: UIMaterials.fontCategories
-                        }
-                        labelColor: color
-                        value: 11105;
-                        color: "#209FDF"
-
-                        onPressed: {
-                            exploded = true
-                        }
-
-                        onReleased: {
-                            exploded = false
-                        }
-                    }
-
-                    PieSlice {
-                        label: "Đồ gia dụng 50%";
-                        labelFont {
-                            pixelSize: UIMaterials.fontsizeM
-                            weight: Font.Bold
-                            family: UIMaterials.fontCategories
-                        }
-                        labelColor: color
-                        value: 9352;
-                        color: "#F6A625"
-
-                        onPressed: {
-                            exploded = true
-                        }
-
-                        onReleased: {
-                            exploded = false
-                        }
-                    }
+            pushEnter: Transition {
+                PropertyAnimation
+                {
+                    properties: "x"
+                    from: pnDetails.width
+                    to: 0
+                    duration: 400
                 }
             }
 
-//            Component.onCompleted: {
-//                // Set the common slice properties dynamically for convenience
-//                for (var i = 0; i < pieOuter.count; i++) {
-//                    pieOuter.at(i).labelPosition = PieSlice.LabelOutside;
-//                    pieOuter.at(i).labelVisible = true;
-//                    pieOuter.at(i).borderWidth = 3;
-//                }
-//            }
+            pushExit: Transition {
+                PropertyAnimation
+                {
+                    properties: "x"
+                    from: 0
+                    to: -pnDetails.width
+                    duration: 400
+                }
+            }
 
+            popEnter: Transition {
+                PropertyAnimation
+                {
+                    properties: "x"
+                    from: -pnDetails.width
+                    to: 0
+                    duration: 400
+                }
+            }
+
+            popExit: Transition {
+                PropertyAnimation
+                {
+                    properties: "x"
+                    from: 0
+                    to: pnDetails.width
+                    duration: 400
+                }
+            }
         }
-
     }
 
 }

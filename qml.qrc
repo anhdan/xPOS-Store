@@ -82,5 +82,7 @@
         <file>frontend/AdvanceAnalyticsForm.qml</file>
         <file>frontend/AnalyticsRetailStatus.qml</file>
         <file>frontend/TimeDurationPicker.qml</file>
+        <file>frontend/RetailStatusRevenue.qml</file>
+        <file>frontend/RetailStatusProfit.qml</file>
     </qresource>
 </RCC>
