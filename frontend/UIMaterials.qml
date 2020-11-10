@@ -4,11 +4,7 @@ import QtQuick 2.0
 
 QtObject {
 
-    // Timer property
-    property var currDateTime
-    property var currSecs: 0
-    property string stopWatchTime: "00:00"
-
+    // Font size properties
     property int fontsizeXS: 20
     property int fontsizeS: 22
     property int fontsizeM: 26

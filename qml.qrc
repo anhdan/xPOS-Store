@@ -2,22 +2,15 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>frontend/Helper.qml</file>
-        <file>frontend/HistoryListview.qml</file>
-        <file>frontend/InventoryMgmt.qml</file>
         <file>frontend/InvoiceComposition.qml</file>
         <file>frontend/ItemsListView.qml</file>
         <file>frontend/Login.qml</file>
         <file>frontend/NotificationPopup.qml</file>
         <file>frontend/NumPad.qml</file>
-        <file>frontend/Payment.qml</file>
-        <file>frontend/ProvidersListview.qml</file>
         <file>frontend/qmldir</file>
         <file>frontend/UIMaterials.qml</file>
         <file>resource/fonts/FontAwesomeRegular-400.otf</file>
         <file>resource/fonts/FontAwesomeSolid-900.otf</file>
-        <file>frontend/IndicatorCard.qml</file>
-        <file>frontend/RealtimeAnalytics.qml</file>
-        <file>frontend/Top5ListView.qml</file>
         <file>resource/imgs/Logo_only_trans.png</file>
         <file>resource/imgs/Logo_withName_tr.png</file>
         <file>resource/fonts/Open_Sans/LICENSE.txt</file>

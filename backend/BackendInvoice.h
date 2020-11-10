@@ -26,9 +26,6 @@
 class BackendInvoice : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QVariant qTodayShift READ qTodayShift WRITE setQTodayShift NOTIFY qTodayShiftChanged)
-    Q_PROPERTY(QVariant qYesterdayShift READ qYesterdayShift WRITE setQYesterdayShift NOTIFY qYesterdayShiftChanged)
-    Q_PROPERTY(QVariantList top5Model READ top5Model NOTIFY top5ModelChanged)
 
 public:
     BackendInvoice( QQmlApplicationEngine *engine, xpos_store::InventoryDatabase *_inventoryDB,
@@ -44,19 +41,6 @@ signals:
 
     void sigCustomerFound( QVariant _customer );
     void sigCustomerNotFound();
-
-    // Properties signal
-    void qTodayShiftChanged(QVariant);
-    void qYesterdayShiftChanged(QVariant);
-    void top5ModelChanged(QVariant);
-
-public:
-    // Properties get set function
-    QVariant qTodayShift();
-    void setQTodayShift(QVariant _qTodayShift );
-    QVariant qYesterdayShift();
-    void setQYesterdayShift( QVariant _qYesterdayShift );
-    QVariantList top5Model();
 
 public slots:
     // Inventory methods
@@ -77,9 +61,6 @@ public slots:
     int getPrivilege();
     int logout();
 
-    // Analytics functions
-    int sortTop5( int _criteria );
-
 public:
     int init();
 private:
@@ -92,13 +73,6 @@ private:
     xpos_store::WorkShift m_currWorkshift;
     xpos_store::Customer m_currCustomer;
     xpos_store::Bill m_bill;
-
-    // For realtime analytics
-    xpos_store::WorkShift m_todayShift;
-    xpos_store::WorkShift m_yesterdayShift;
-    QVariantList m_top5Model;
-    std::list<xpos_store::SellingRecord> m_recordGroups;
-    Top5Criteria m_top5Criteria;
 
     // Firebase objects
     firebase::App *m_fbApp;

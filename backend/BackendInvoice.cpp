@@ -10,9 +10,6 @@ BackendInvoice::BackendInvoice(QQmlApplicationEngine *engine, xpos_store::Invent
     m_fbApp = nullptr;
     m_fbAuth = nullptr;
     m_fbFunc = nullptr;
-    m_top5Model.clear();
-    m_recordGroups.clear();
-    m_top5Criteria = Top5Criteria::NONE;
 }
 
 
@@ -25,8 +22,6 @@ BackendInvoice::~BackendInvoice()
     m_inventoryDB = nullptr;
     m_usersDB = nullptr;
     m_sellingDB = nullptr;
-    m_top5Model.clear();
-    m_recordGroups.clear();
 
     LOG_MSG("[DEB] %s:%d: Shutting down Firebase App.\n", __FUNCTION__, __LINE__ );
     delete m_fbFunc;
@@ -135,58 +130,6 @@ int BackendInvoice::init()
     return xpSuccess;
 }
 
-
-/**
- * @brief BackendInvoice::qTodayShift
- */
-QVariant BackendInvoice::qTodayShift()
-{
-    return m_todayShift.toQVariant();
-}
-
-
-/**
- * @brief BackendInvoice::setQTodayShift
- */
-void BackendInvoice::setQTodayShift(QVariant _qTodayShift)
-{
-    if( m_todayShift.fromQVariant(_qTodayShift) != xpSuccess )
-    {
-        m_todayShift.setDefault();
-        emit qTodayShiftChanged( _qTodayShift );
-    }
-}
-
-
-/**
- * @brief BackendInvoice::qYesterdayShift
- */
-QVariant BackendInvoice::qYesterdayShift()
-{
-    return m_yesterdayShift.toQVariant();
-}
-
-
-/**
- * @brief BackendInvoice::setQYesterdayShift
- */
-void BackendInvoice::setQYesterdayShift(QVariant _qYesterdayShift)
-{
-    if( m_yesterdayShift.fromQVariant(_qYesterdayShift) != xpSuccess )
-    {
-        m_yesterdayShift.setDefault();
-        emit qYesterdayShiftChanged( _qYesterdayShift );
-    }
-}
-
-
-/**
- * @brief BackendInvoice::top5Model
- */
-QVariantList BackendInvoice::top5Model()
-{
-    return m_top5Model;
-}
 
 /**
  * @brief BackendInvoice::searchForProduct
@@ -327,24 +270,6 @@ int BackendInvoice::sellProduct(const QVariant &_qProduct, const int _numSold)
                  xpErr, __FILE__, __LINE__ );
     }
 
-    // Add selling record to today record groups by barcode for top 5 bestsellers display
-    bool exist = false;
-    for( auto it : m_recordGroups )
-    {
-        if( product.getBarcode() == it.getProductBarcode() )
-        {
-            it.setTotalPrice( it.getTotalPrice() + product.getItemNum() * product.getSellingPrice() );
-            it.setTotalProfit( it.getTotalProfit() + product.getItemNum() * (product.getSellingPrice() - product.getInputPrice()) );
-            it.setQuantity( it.getQuantity() + product.getItemNum() );
-            exist = true;
-            break;
-        }
-    }
-    if( !exist )
-    {
-        m_recordGroups.push_back( xpos_store::SellingRecord::fromProduct( product ) );
-    }
-
     return xpErr;
 }
 
@@ -398,8 +323,6 @@ int BackendInvoice::completePayment( const QVariant &_qCustomer, const QVariant 
     m_bill.setPayment( payment );
     // Add payment income to total earning of the current workshift and today shift
     xpErr |= m_currWorkshift.recordBill( m_bill );
-    xpErr |= m_todayShift.recordBill( m_bill );
-    emit qTodayShiftChanged( m_todayShift.toQVariant() );
     if( xpErr != xpSuccess )
     {
         LOG_MSG( "[ERR:%d] %s:%d: Failed to add payment to current workshift income\n",
@@ -506,58 +429,6 @@ int BackendInvoice::login(QString _name, QString _pwd)
         emit sigStaffDisapproved();
     }
 
-    //===== 2. In-day selling summary of until this workshift start
-    time_t currTime = time( NULL );
-    time_t yesterdayStart = ((currTime / SECS_IN_DAY) - 1) * SECS_IN_DAY;
-    time_t todayStart = yesterdayStart + SECS_IN_DAY;
-    std::vector<xpos_store::WorkShift> workshifts;
-
-    // Summarize trading situation on yesterday
-    xpErr |= m_sellingDB->searchWorkShift( workshifts, yesterdayStart, todayStart );
-    m_yesterdayShift.setDefault();
-    xpErr |= m_yesterdayShift.combine( workshifts );
-
-    // Summarize trading situation today until this workshift
-    xpErr |= m_sellingDB->searchWorkShift( workshifts, todayStart, currTime );
-    m_todayShift.setDefault();
-    xpErr |= m_todayShift.combine( workshifts );
-
-    if( xpErr != xpSuccess )
-    {
-        LOG_MSG( "[ERR:%d] %s:%d: Failed to summarize trading situation\n",
-                 xpErr, __FILE__, __LINE__ );
-        return xpErr;
-    }
-    emit qYesterdayShiftChanged( m_yesterdayShift.toQVariant() );
-    emit qTodayShiftChanged( m_todayShift.toQVariant() );
-
-    //===== 3. Summary today selling records by product barcode
-    std::vector<xpos_store::SellingRecord> records;
-    xpErr |= m_sellingDB->groupHistoryRecordByBarcode( records, todayStart, currTime );
-    if( xpErr != xpSuccess )
-    {
-        LOG_MSG( "[ERR:%d] %s:%d: Failed to summarize today selling records by product barcode\n",
-                 xpErr, __FILE__, __LINE__ );
-        return xpErr;
-    }
-
-    m_recordGroups.clear();
-    xpos_store::Product product;
-    for( int i = 0; i < (int)records.size(); i++ )
-    {
-        xpErr |= m_inventoryDB->searchProductByBarcode( records[i].getProductBarcode(), product );
-        records[i].setDescription( product.getName() );
-        m_recordGroups.push_back( records[i] );
-        records[i].printInfo();
-    }
-
-    if( xpErr != xpSuccess )
-    {
-        LOG_MSG( "[ERR:%d] %s:%d: Failed to retrieve product description from selling records\n",
-                 xpErr, __FILE__, __LINE__ );
-        return xpErr;
-    }
-
     return xpErr;
 }
 
@@ -598,50 +469,6 @@ int BackendInvoice::logout()
     }
 
     return xpErr;
-}
-
-
-/**
- * @brief BackendInvoice::sortTop5
- */
-int BackendInvoice::sortTop5(int _criteria)
-{
-    if( _criteria == (int)m_top5Criteria )
-    {
-        return xpSuccess;
-    }
-
-    std::vector<float> sortValues;
-    for( auto it : m_recordGroups )
-    {
-        switch ( _criteria )
-        {
-        case(int)Top5Criteria::REVENUE:
-            sortValues.push_back( it.getTotalPrice() );
-            break;
-        case (int)Top5Criteria::PROFIT:
-            sortValues.push_back( it.getTotalProfit() );
-            break;
-        case (int)Top5Criteria::QUANTITY:
-            sortValues.push_back( (float)it.getQuantity());
-            break;
-        default:
-            LOG_MSG( "[ERR:%d] %s:%d: Invalid sorting criteria\n",
-                     xpErrorInvalidValues, __FILE__, __LINE__ );
-            return xpErrorInvalidValues;
-        }
-    }
-
-    std::vector<size_t> idx = sort_indexes( sortValues, false );
-    m_top5Model.clear();
-    int num = ( idx.size() < 5 ) ? idx.size() : 5;
-    for( int id = 0; id < num; id++ )
-    {
-        m_top5Model.append( std::next(m_recordGroups.begin(), idx[id] )->toQVariant() );
-    }
-    emit top5ModelChanged( m_top5Model );
-
-    return xpSuccess;
 }
 
 

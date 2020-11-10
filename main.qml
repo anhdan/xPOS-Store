@@ -31,11 +31,6 @@ Window {
             stack.pop()
             stack.push( formInvoice )
             state = "invisble"
-
-            // restart timer
-            UIMaterials.currDateTime = Date()
-            UIMaterials.currSecs = 0
-            timer.restart()
         }
     }
 
@@ -65,26 +60,6 @@ Window {
     }
 
     //=========== Inventory Management Form
-    InventoryMgmt {
-        id: formInventory
-        anchors.fill: parent
-        state: "visible"
-
-        onToInvoiceBoard: {
-            stack.pop()
-            stack.push( formInvoice )
-        }
-
-        onToLoginBoard: {
-            stack.pop()
-            stack.push( formLogin )
-        }
-
-        onOpacityChanged: {
-            enabled = (opacity === 1) ? true : false
-        }
-    }
-
     InventoryMgmtForm {
         id: formInventory2
         anchors.fill: parent
@@ -111,19 +86,6 @@ Window {
 
         onOpacityChanged: {
             enabled = (opacity === 1) ? true : false
-        }
-    }
-
-    //============ GLobal timer
-    Timer {
-        id: timer
-        interval: 30000
-        repeat: true
-        running: false
-        onTriggered: {
-            UIMaterials.currDateTime = new Date()
-            UIMaterials.currSecs = UIMaterials.currSecs + 60
-            UIMaterials.stopWatchTime = Helper.secsToStopWatchString( UIMaterials.currSecs )
         }
     }
 
