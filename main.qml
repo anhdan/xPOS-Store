@@ -4,6 +4,10 @@ import QtQuick.Controls 2.2
 import QtQuick.VirtualKeyboard 2.2
 
 import "frontend"
+import "frontend/gadgets"
+import "frontend/invoice"
+import "frontend/inventory"
+import "frontend/analytics"
 
 Window {
     id: root
@@ -24,7 +28,10 @@ Window {
     //=========== Login Form
     Login {
         id: formLogin
-        anchors.fill: parent
+        width: root.width
+        height: root.height
+        x: 0
+        y: 0
         state: "visible"
 
         onApproved: {
@@ -37,7 +44,10 @@ Window {
     //=========== Invoice Composition Form
     InvoiceComposition {
         id: formInvoice
-        anchors.fill: parent
+        width: root.width
+        height: root.height
+        x: 0
+        y: 0
         state: "invisible"
 
         onToInventoryBoard: {
@@ -62,7 +72,10 @@ Window {
     //=========== Inventory Management Form
     InventoryMgmtForm {
         id: formInventory2
-        anchors.fill: parent
+        width: root.width
+        height: root.height
+        x: 0
+        y: 0
         state: "invisible"
 
         onMenuClicked: {
@@ -77,7 +90,10 @@ Window {
     //============ Advance analytics form
     AdvanceAnalyticsForm {
         id: formAdvanceAnalytics
-        anchors.fill: parent
+        width: root.width
+        height: root.height
+        x: 0
+        y: 0
         state: "invisible"
 
         onMenuClicked: {

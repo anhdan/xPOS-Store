@@ -2,11 +2,7 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>frontend/Helper.qml</file>
-        <file>frontend/InvoiceComposition.qml</file>
-        <file>frontend/ItemsListView.qml</file>
         <file>frontend/Login.qml</file>
-        <file>frontend/NotificationPopup.qml</file>
-        <file>frontend/NumPad.qml</file>
         <file>frontend/qmldir</file>
         <file>frontend/UIMaterials.qml</file>
         <file>resource/fonts/FontAwesomeRegular-400.otf</file>
@@ -37,26 +33,9 @@
         <file>resource/fonts/Roboto/Roboto-Regular.ttf</file>
         <file>resource/fonts/Roboto/Roboto-Thin.ttf</file>
         <file>resource/fonts/Roboto/Roboto-ThinItalic.ttf</file>
-        <file>frontend/PriceScreen.qml</file>
-        <file>frontend/SearchBox.qml</file>
-        <file>frontend/ItemsList.qml</file>
-        <file>frontend/PaymentForm.qml</file>
-        <file>frontend/CustomerInfoBoard.qml</file>
-        <file>frontend/InfoCard.qml</file>
         <file>resource/imgs/Logo_withName_tr_24.png</file>
         <file>resource/imgs/Logo_withName_tr_40.png</file>
-        <file>frontend/MenuForm.qml</file>
         <file>resource/imgs/Logo_only_trans_50.png</file>
-        <file>frontend/MenuInstance.qml</file>
-        <file>frontend/InventoryMgmtForm.qml</file>
-        <file>frontend/InventoryUpdate.qml</file>
-        <file>frontend/InventoryStatus.qml</file>
-        <file>frontend/InventoryItemList.qml</file>
-        <file>frontend/InventoryStockBoard.qml</file>
-        <file>frontend/DiscountPrgForm.qml</file>
-        <file>frontend/CalendarForm.qml</file>
-        <file>frontend/InconizedButton.qml</file>
-        <file>frontend/CategoryForm.qml</file>
         <file>resource/svgs/baby.svg</file>
         <file>resource/svgs/drinks.svg</file>
         <file>resource/svgs/education.svg</file>
@@ -65,17 +44,37 @@
         <file>resource/svgs/food.svg</file>
         <file>resource/svgs/health_care.svg</file>
         <file>resource/svgs/household_appliance.svg</file>
-        <file>frontend/StockUpdateForm.qml</file>
-        <file>frontend/SwitchButton.qml</file>
-        <file>frontend/KPICard.qml</file>
-        <file>frontend/InventoryOOSList.qml</file>
-        <file>frontend/InventoryExpiredList.qml</file>
-        <file>frontend/InventorySlowSellingList.qml</file>
         <file>resource/fonts/Categories.ttf</file>
-        <file>frontend/AdvanceAnalyticsForm.qml</file>
-        <file>frontend/AnalyticsRetailStatus.qml</file>
-        <file>frontend/TimeDurationPicker.qml</file>
-        <file>frontend/RetailStatusRevenue.qml</file>
-        <file>frontend/RetailStatusProfit.qml</file>
+        <file>frontend/invoice/InvoiceComposition.qml</file>
+        <file>frontend/invoice/ItemsList.qml</file>
+        <file>frontend/invoice/PaymentForm.qml</file>
+        <file>frontend/invoice/PriceScreen.qml</file>
+        <file>frontend/invoice/CustomerInfoBoard.qml</file>
+        <file>frontend/inventory/CategoryForm.qml</file>
+        <file>frontend/inventory/DiscountPrgForm.qml</file>
+        <file>frontend/inventory/InventoryExpiredList.qml</file>
+        <file>frontend/inventory/InventoryItemList.qml</file>
+        <file>frontend/inventory/InventoryMgmtForm.qml</file>
+        <file>frontend/inventory/InventoryOOSList.qml</file>
+        <file>frontend/inventory/InventorySlowSellingList.qml</file>
+        <file>frontend/inventory/InventoryStatus.qml</file>
+        <file>frontend/inventory/InventoryStockBoard.qml</file>
+        <file>frontend/inventory/InventoryUpdate.qml</file>
+        <file>frontend/inventory/StockUpdateForm.qml</file>
+        <file>frontend/gadgets/CalendarForm.qml</file>
+        <file>frontend/gadgets/InconizedButton.qml</file>
+        <file>frontend/gadgets/InfoCard.qml</file>
+        <file>frontend/gadgets/KPICard.qml</file>
+        <file>frontend/gadgets/NotificationPopup.qml</file>
+        <file>frontend/gadgets/NumPad.qml</file>
+        <file>frontend/gadgets/SearchBox.qml</file>
+        <file>frontend/gadgets/SwitchButton.qml</file>
+        <file>frontend/gadgets/TimeDurationPicker.qml</file>
+        <file>frontend/analytics/AdvanceAnalyticsForm.qml</file>
+        <file>frontend/analytics/AnalyticsRetailStatus.qml</file>
+        <file>frontend/analytics/RetailStatusProfit.qml</file>
+        <file>frontend/analytics/RetailStatusRevenue.qml</file>
+        <file>frontend/gadgets/MenuForm.qml</file>
+        <file>frontend/gadgets/MenuInstance.qml</file>
     </qresource>
 </RCC>
