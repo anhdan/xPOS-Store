@@ -27,7 +27,7 @@ Rectangle {
     signal productNotFound()
 
     Component.onCompleted: {
-        xpBackend.sigProductFound.connect(
+        beInvoice.sigProductFound.connect(
                     function(product) {
                         if( active )
                         {
@@ -204,7 +204,7 @@ Rectangle {
             var ret = searchProductInList( searchStr )
             if( ret === false )
             {
-                xpBackend.searchForProduct( searchStr )
+                beInvoice.searchForProduct( searchStr )
             }
             else
             {

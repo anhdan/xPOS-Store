@@ -8,7 +8,7 @@
 #include "backend/database/InventoryDatabase.h"
 #include "backend/database/UserDatabase.h"
 #include "backend/database/SellingDatabase.h"
-#include "backend/XPBackend.h"
+#include "backend/BackendInvoice.h"
 #include "backend/3rd/key_emitter.h"
 
 int main(int argc, char *argv[])
@@ -57,8 +57,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    XPBackend xpBackend( &engine, &inventoryDB, &usersDB, &sellingDB );
-    xpErr = xpBackend.init();
+    BackendInvoice beInvoice( &engine, &inventoryDB, &usersDB, &sellingDB );
+    xpErr = beInvoice.init();
     if( xpErr != xpSuccess )
     {
         LOG_MSG( "[ERR:%d] :%s:%d: Failed to initialize xPOS backend processor\n",
@@ -67,9 +67,9 @@ int main(int argc, char *argv[])
     }
     KeyEmitter keyEmitter( &engine );
     QQmlContext *ctx = engine.rootContext();
-    ctx->setContextProperty( "xpBackend", &xpBackend );
+    ctx->setContextProperty( "beInvoice", &beInvoice );
     ctx->setContextProperty( "keyEmitter", &keyEmitter );
-//    ctx->setContextProperty( "top5Model", QVariant::fromValue(xpBackend.top5Model()) );
+//    ctx->setContextProperty( "top5Model", QVariant::fromValue(beInvoice.top5Model()) );
 
     //
     //============ II. Load application engine and excute

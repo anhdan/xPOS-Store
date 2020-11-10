@@ -36,7 +36,7 @@ Rectangle {
         currPayment["total_charging"] = Number(latestCost) + Number(latesTax) - Number(latestDiscount)
         currItemList = itemList
         setDefaultDisplay()
-        xpBackend.initializePayment()
+        beInvoice.initializePayment()
     }
 
     //=============== Signals
@@ -51,8 +51,8 @@ Rectangle {
     //============== Signals & Slots connection
     Component.onCompleted:
     {
-        xpBackend.sigCustomerFound.connect( customerFound )
-        xpBackend.sigCustomerNotFound.connect( customerNotFound )
+        beInvoice.sigCustomerFound.connect( customerFound )
+        beInvoice.sigCustomerNotFound.connect( customerNotFound )
     }
 
 
@@ -105,7 +105,7 @@ Rectangle {
         }
 
         onAccepted: {
-            var ret = xpBackend.searchForCustomer( text )
+            var ret = beInvoice.searchForCustomer( text )
             focus = false
         }
     }
@@ -212,7 +212,7 @@ Rectangle {
 
         onReleased: {
             rectBtnUsePoint.color = "transparent"
-            var convertRate = xpBackend.getPoint2MoneyRate()
+            var convertRate = beInvoice.getPoint2MoneyRate()
             if( (currCustomer["point"] * convertRate) > currPayment["total_charging"] )
             {
                 currPayment["used_point"] = ((currPayment["total_charging"] / convertRate) | 0)
@@ -593,9 +593,9 @@ Rectangle {
             for( var id = 0; id < currItemList.count; id++ )
             {
                 var cpItem = Helper.deepCopy( currItemList.get( id ) )
-                xpBackend.sellProduct( cpItem, cpItem["item_num"] )
+                beInvoice.sellProduct( cpItem, cpItem["item_num"] )
             }            
-            xpBackend.completePayment( currCustomer, currPayment )
+            beInvoice.completePayment( currCustomer, currPayment )
 
             payCompleted()
             colapse()

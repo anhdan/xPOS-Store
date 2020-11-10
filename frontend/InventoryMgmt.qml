@@ -65,8 +65,8 @@ Rectangle {
 
     //=================== Signal - Slot connection
     Component.onCompleted: {
-        xpBackend.sigProductFound.connect( root.productFound )
-        xpBackend.sigProductNotFound.connect( root.productNotFound )
+        beInvoice.sigProductFound.connect( root.productFound )
+        beInvoice.sigProductNotFound.connect( root.productNotFound )
     }
 
     onOpacityChanged: {
@@ -182,7 +182,7 @@ Rectangle {
             onAccepted: {
                 inputPanel.active = false
                 console.log( "+++++++++> text = " + text )
-                var ret = xpBackend.searchForProduct( text )
+                var ret = beInvoice.searchForProduct( text )
             }
         }
 
@@ -517,7 +517,7 @@ Rectangle {
             }
 
             onDoubleClicked: {
-                var ret = xpBackend.updateProductFromInventory( updateProduct )
+                var ret = beInvoice.updateProductFromInventory( updateProduct )
                 if( noti.state === "visible" )
                 {
                     noti.state = "invisible"
@@ -667,7 +667,7 @@ Rectangle {
                 text: "Đăng xuất"
                 onTriggered: {
                     toLoginBoard()
-                    xpBackend.logout()
+                    beInvoice.logout()
                 }
             }
 

@@ -44,7 +44,7 @@ Rectangle {
         currPayment["total_charging"] = Number(latestCost) + Number(latesTax) - Number(latestDiscount)
         txtPayingAmount.text = Number(currPayment["total_charging"]).toLocaleString( Qt.locale(), "f", 0 ) + " vnd"
         currItemList = itemList
-        xpBackend.initializePayment()
+        beInvoice.initializePayment()
     }
 
 
@@ -58,7 +58,7 @@ Rectangle {
     signal customerNotFound()
 
     Component.onCompleted: {
-        xpBackend.sigCustomerFound.connect(
+        beInvoice.sigCustomerFound.connect(
                     function(customer) {
                         if( enabled )
                         {
@@ -74,7 +74,7 @@ Rectangle {
                         }
                     }
                     )
-        xpBackend.sigCustomerNotFound.connect( customerNotFound )
+        beInvoice.sigCustomerNotFound.connect( customerNotFound )
     }
 
 
@@ -125,7 +125,7 @@ Rectangle {
         placeholderText: "Nhập mã hoặc sđt khách hàng ..."
 
         onSearchExecuted: {
-            var ret = xpBackend.searchForCustomer( searchStr )
+            var ret = beInvoice.searchForCustomer( searchStr )
         }
     }
 
@@ -452,9 +452,9 @@ Rectangle {
                 for( var id = 0; id < currItemList.count; id++ )
                 {
                     var cpItem = Helper.deepCopy( currItemList.get( id ) )
-                    xpBackend.sellProduct( cpItem, cpItem["item_num"] )
+                    beInvoice.sellProduct( cpItem, cpItem["item_num"] )
                 }
-                xpBackend.completePayment( currCustomer, currPayment )
+                beInvoice.completePayment( currCustomer, currPayment )
 
                 payCompleted()
                 colapse()

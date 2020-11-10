@@ -66,7 +66,8 @@ else()
       backend/containers/Person.cpp
       backend/database/Database.cpp
       backend/database/InventoryDatabase.cpp
-      backend/XPBackend.cpp
+      backend/BackendInvoice.cpp
+      backend/BackendInventory.cpp
       backend/3rd/key_emitter.cpp
       backend/database/UserDatabase.cpp
       backend/database/SellingDatabase.cpp

@@ -1,9 +1,9 @@
-#include "XPBackend.h"
+#include "BackendInvoice.h"
 
 /**
- * @brief XPBackend::XPBackend
+ * @brief BackendInvoice::BackendInvoice
  */
-XPBackend::XPBackend(QQmlApplicationEngine *engine, xpos_store::InventoryDatabase *_inventoryDB,
+BackendInvoice::BackendInvoice(QQmlApplicationEngine *engine, xpos_store::InventoryDatabase *_inventoryDB,
                      xpos_store::UserDatabase *_usersDB, xpos_store::SellingDatabase *_sellingDB )
     : m_engine(engine), m_inventoryDB( _inventoryDB ), m_usersDB(_usersDB), m_sellingDB(_sellingDB)
 {
@@ -17,9 +17,9 @@ XPBackend::XPBackend(QQmlApplicationEngine *engine, xpos_store::InventoryDatabas
 
 
 /**
- * @brief XPBackend::~XPBackend
+ * @brief BackendInvoice::~BackendInvoice
  */
-XPBackend::~XPBackend()
+BackendInvoice::~BackendInvoice()
 {
     m_engine = nullptr;
     m_inventoryDB = nullptr;
@@ -39,10 +39,10 @@ XPBackend::~XPBackend()
 
 
 /**
- * @brief XPBackend::init
+ * @brief BackendInvoice::init
  * @return
  */
-int XPBackend::init()
+int BackendInvoice::init()
 {
 
     //===== 2. Initialize firebase
@@ -137,18 +137,18 @@ int XPBackend::init()
 
 
 /**
- * @brief XPBackend::qTodayShift
+ * @brief BackendInvoice::qTodayShift
  */
-QVariant XPBackend::qTodayShift()
+QVariant BackendInvoice::qTodayShift()
 {
     return m_todayShift.toQVariant();
 }
 
 
 /**
- * @brief XPBackend::setQTodayShift
+ * @brief BackendInvoice::setQTodayShift
  */
-void XPBackend::setQTodayShift(QVariant _qTodayShift)
+void BackendInvoice::setQTodayShift(QVariant _qTodayShift)
 {
     if( m_todayShift.fromQVariant(_qTodayShift) != xpSuccess )
     {
@@ -159,18 +159,18 @@ void XPBackend::setQTodayShift(QVariant _qTodayShift)
 
 
 /**
- * @brief XPBackend::qYesterdayShift
+ * @brief BackendInvoice::qYesterdayShift
  */
-QVariant XPBackend::qYesterdayShift()
+QVariant BackendInvoice::qYesterdayShift()
 {
     return m_yesterdayShift.toQVariant();
 }
 
 
 /**
- * @brief XPBackend::setQYesterdayShift
+ * @brief BackendInvoice::setQYesterdayShift
  */
-void XPBackend::setQYesterdayShift(QVariant _qYesterdayShift)
+void BackendInvoice::setQYesterdayShift(QVariant _qYesterdayShift)
 {
     if( m_yesterdayShift.fromQVariant(_qYesterdayShift) != xpSuccess )
     {
@@ -181,17 +181,17 @@ void XPBackend::setQYesterdayShift(QVariant _qYesterdayShift)
 
 
 /**
- * @brief XPBackend::top5Model
+ * @brief BackendInvoice::top5Model
  */
-QVariantList XPBackend::top5Model()
+QVariantList BackendInvoice::top5Model()
 {
     return m_top5Model;
 }
 
 /**
- * @brief XPBackend::searchForProduct
+ * @brief BackendInvoice::searchForProduct
  */
-int XPBackend::searchForProduct(QString _code)
+int BackendInvoice::searchForProduct(QString _code)
 {
     xpError_t xpErr = xpSuccess;
     if( !m_inventoryDB->isOpen() )
@@ -230,9 +230,9 @@ int XPBackend::searchForProduct(QString _code)
 
 
 /**
- * @brief XPBackend::updateProductFromInventory
+ * @brief BackendInvoice::updateProductFromInventory
  */
-int XPBackend::updateProductFromInventory( const QVariant &_product)
+int BackendInvoice::updateProductFromInventory( const QVariant &_product)
 {
     xpos_store::Product beProduct;
     xpError_t xpErr = beProduct.fromQVariant( _product );
@@ -270,9 +270,9 @@ int XPBackend::updateProductFromInventory( const QVariant &_product)
 
 
 /**
- * @brief XPBackend::initializePayment
+ * @brief BackendInvoice::initializePayment
  */
-int XPBackend::initializePayment()
+int BackendInvoice::initializePayment()
 {
     m_currCustomer.setDefault();
     m_bill.setDefault();
@@ -285,9 +285,9 @@ int XPBackend::initializePayment()
 
 
 /**
- * @brief XPBackend::sellProduct
+ * @brief BackendInvoice::sellProduct
  */
-int XPBackend::sellProduct(const QVariant &_qProduct, const int _numSold)
+int BackendInvoice::sellProduct(const QVariant &_qProduct, const int _numSold)
 {
     xpos_store::Product product;
     xpError_t xpErr = product.fromQVariant( _qProduct );
@@ -350,9 +350,9 @@ int XPBackend::sellProduct(const QVariant &_qProduct, const int _numSold)
 
 
 /**
- * @brief XPBackend::completePayment
+ * @brief BackendInvoice::completePayment
  */
-int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPayment )
+int BackendInvoice::completePayment( const QVariant &_qCustomer, const QVariant &_qPayment )
 {
     xpError_t xpErr = xpSuccess;
 
@@ -479,9 +479,9 @@ int XPBackend::completePayment( const QVariant &_qCustomer, const QVariant &_qPa
 
 
 /**
- * @brief XPBackend::login
+ * @brief BackendInvoice::login
  */
-int XPBackend::login(QString _name, QString _pwd)
+int BackendInvoice::login(QString _name, QString _pwd)
 {
     //===== 1. Authenticate staff
     bool authenticated = false;
@@ -563,18 +563,18 @@ int XPBackend::login(QString _name, QString _pwd)
 
 
 /**
- * @brief XPBackend::getPrivilege
+ * @brief BackendInvoice::getPrivilege
  */
-int XPBackend::getPrivilege()
+int BackendInvoice::getPrivilege()
 {
     return (int)m_currStaff.getPrivilege();
 }
 
 
 /**
- * @brief XPBackend::logout
+ * @brief BackendInvoice::logout
  */
-int XPBackend::logout()
+int BackendInvoice::logout()
 {
     // End workshift and store to database
     xpError_t xpErr = xpSuccess;
@@ -602,9 +602,9 @@ int XPBackend::logout()
 
 
 /**
- * @brief XPBackend::sortTop5
+ * @brief BackendInvoice::sortTop5
  */
-int XPBackend::sortTop5(int _criteria)
+int BackendInvoice::sortTop5(int _criteria)
 {
     if( _criteria == (int)m_top5Criteria )
     {
@@ -646,9 +646,9 @@ int XPBackend::sortTop5(int _criteria)
 
 
 /**
- * @brief XPBackend::searchForCustomer
+ * @brief BackendInvoice::searchForCustomer
  */
-int XPBackend::searchForCustomer(QString _id)
+int BackendInvoice::searchForCustomer(QString _id)
 {    
     //===== Check the existence of this customer in local database
     xpError_t xpErr = xpSuccess;
@@ -780,9 +780,9 @@ int XPBackend::searchForCustomer(QString _id)
 }
 
 /**
- * @brief XPBackend::getPoint2MoneyRate
+ * @brief BackendInvoice::getPoint2MoneyRate
  */
-double XPBackend::getPoint2MoneyRate()
+double BackendInvoice::getPoint2MoneyRate()
 {
     //! TODO:
     //! Use a CURRENCY table to store conversion rate of many currency

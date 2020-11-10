@@ -11,8 +11,8 @@ import "."
 Rectangle {
     id: root
 
-    property var todayShift: xpBackend.qTodayShift
-    property var yesterdayShift: xpBackend.qYesterdayShift
+    property var todayShift: beInvoice.qTodayShift
+    property var yesterdayShift: beInvoice.qYesterdayShift
     property alias categoryText: lvTop5.categoryText
 
     Label {
@@ -128,20 +128,20 @@ Rectangle {
             anchors.top: titTop5.bottom
             anchors.topMargin: 15
             anchors.horizontalCenter: parent.horizontalCenter
-            model: xpBackend.top5Model
+            model: beInvoice.top5Model
 
             onCategoryTextChanged: {
                 if( categoryText === "Doanh thu(đ)" )
                 {
-                    xpBackend.sortTop5( 1 )
+                    beInvoice.sortTop5( 1 )
                 }
                 else if( categoryText === "Lợi nhuận(đ)" )
                 {
-                    xpBackend.sortTop5( 2 )
+                    beInvoice.sortTop5( 2 )
                 }
                 else
                 {
-                    xpBackend.sortTop5( 3 )
+                    beInvoice.sortTop5( 3 )
                 }
             }
         }

@@ -125,7 +125,7 @@ ListView {
 
         if( ret === false )
         {
-            xpBackend.searchForProduct( code )
+            beInvoice.searchForProduct( code )
         }
         else
         {

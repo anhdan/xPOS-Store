@@ -40,7 +40,7 @@ Rectangle {
     }
 
     Component.onCompleted: {
-        xpBackend.sigProductNotFound.connect( showNotFoundNoti )
+        beInvoice.sigProductNotFound.connect( showNotFoundNoti )
     }
 
     onOpacityChanged: {
@@ -48,12 +48,12 @@ Rectangle {
         if( opacity === 1 )
         {
             enabled = true
-            xpBackend.sigProductNotFound.connect( showNotFoundNoti )
+            beInvoice.sigProductNotFound.connect( showNotFoundNoti )
         }
         else
         {
             enabled = false
-            xpBackend.sigProductNotFound.disconnect( showNotFoundNoti )
+            beInvoice.sigProductNotFound.disconnect( showNotFoundNoti )
         }
     }
 
@@ -572,15 +572,15 @@ Rectangle {
             {
                 if( categoryText === "Doanh thu(đ)" )
                 {
-                    xpBackend.sortTop5( 1 )
+                    beInvoice.sortTop5( 1 )
                 }
                 else if( categoryText === "Lợi nhuận(đ)" )
                 {
-                    xpBackend.sortTop5( 2 )
+                    beInvoice.sortTop5( 2 )
                 }
                 else
                 {
-                    xpBackend.sortTop5( 3 )
+                    beInvoice.sortTop5( 3 )
                 }
             }
         }

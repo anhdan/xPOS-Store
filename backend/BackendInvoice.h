@@ -23,7 +23,7 @@
 #include "backend/database/UserDatabase.h"
 #include "backend/database/SellingDatabase.h"
 
-class XPBackend : public QObject
+class BackendInvoice : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QVariant qTodayShift READ qTodayShift WRITE setQTodayShift NOTIFY qTodayShiftChanged)
@@ -31,9 +31,9 @@ class XPBackend : public QObject
     Q_PROPERTY(QVariantList top5Model READ top5Model NOTIFY top5ModelChanged)
 
 public:
-    XPBackend( QQmlApplicationEngine *engine, xpos_store::InventoryDatabase *_inventoryDB,
+    BackendInvoice( QQmlApplicationEngine *engine, xpos_store::InventoryDatabase *_inventoryDB,
                xpos_store::UserDatabase *_usersDB, xpos_store::SellingDatabase *_sellingDB );
-    ~XPBackend();    
+    ~BackendInvoice();    
 
 signals:
     void sigProductFound( QVariant _product );

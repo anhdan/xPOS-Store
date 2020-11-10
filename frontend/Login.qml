@@ -19,8 +19,8 @@ Rectangle {
 
     //====================== Signal & slot connections
     Component.onCompleted: {
-        xpBackend.sigStaffApproved.connect( root.approved )
-        xpBackend.sigStaffDisapproved.connect( root.disapproved )
+        beInvoice.sigStaffApproved.connect( root.approved )
+        beInvoice.sigStaffDisapproved.connect( root.disapproved )
     }
 
     //=================== Input panel
@@ -209,7 +209,7 @@ Rectangle {
 
         onReleased: {
             rectBtnLogin.color = UIMaterials.appBgrColorLight
-            var ret = xpBackend.login( txtId.text, txtPwd.text )
+            var ret = beInvoice.login( txtId.text, txtPwd.text )
         }
     }
 
