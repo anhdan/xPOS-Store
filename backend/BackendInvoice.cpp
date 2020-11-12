@@ -173,46 +173,6 @@ int BackendInvoice::searchForProduct(QString _code)
 
 
 /**
- * @brief BackendInvoice::updateProductFromInventory
- */
-int BackendInvoice::updateProductFromInventory( const QVariant &_product)
-{
-    xpos_store::Product beProduct;
-    xpError_t xpErr = beProduct.fromQVariant( _product );
-    if( xpErr != xpSuccess )
-    {
-        LOG_MSG( "[ERR:%d] %s:%d: Failed to convert Qvariant parameter to backend object\n",
-                 xpErr, __FILE__, __LINE__ );
-        return xpErr;
-    }
-
-    if( !m_inventoryDB->isOpen() )
-    {
-        m_inventoryDB->open();
-    }
-
-    if( m_currProduct.getBarcode() == "" ) // Product is not in database
-    {
-        xpErr = m_inventoryDB->insertProduct( beProduct );
-    }
-    else if( !beProduct.isIdenticalTo(m_currProduct) )
-    {
-        // Update info to already exist product
-        xpErr = m_inventoryDB->updateProduct( beProduct, false );
-    }
-
-    if( xpErr != xpSuccess )
-    {
-        LOG_MSG( "[ERR:%d] %s:%d: Failed to update product info to database\n",
-                 xpErr, __FILE__, __LINE__ );
-        return xpErr;
-    }
-
-    return xpSuccess;
-}
-
-
-/**
  * @brief BackendInvoice::initializePayment
  */
 int BackendInvoice::initializePayment()

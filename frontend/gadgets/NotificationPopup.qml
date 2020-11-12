@@ -33,12 +33,12 @@ Rectangle {
     // Notification sign
     Text {
         id: txtSign
-        anchors.verticalCenter: txtNoti.verticalCenter
-        anchors.right: txtNoti.left
-        anchors.rightMargin: 5
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        anchors.leftMargin: 10
         text: UIMaterials.iconError
         font {
-            pixelSize: 30
+            pixelSize: UIMaterials.fontsizeL
             weight: Font.Bold
             family: UIMaterials.solidFont
         }
@@ -50,9 +50,14 @@ Rectangle {
     Text {
         id: txtNoti
         text: "This is for testing"
-        anchors.centerIn: parent
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: txtSign.right
+        anchors.leftMargin: font.pixelSize
         width: Math.min(root.width*2/3, root.width-txtSign.width-50)
-        font.pixelSize: UIMaterials.fontSizeSmall
+        font {
+            pixelSize: UIMaterials.fontsizeM
+            family: UIMaterials.fontRobotoLight
+        }
         color: "white"
         wrapMode: Text.Wrap
     }
@@ -75,7 +80,7 @@ Rectangle {
             text: "\uf060"
             anchors.centerIn: parent
             color: UIMaterials.grayLight
-            font.pixelSize: 30
+            font.pixelSize: UIMaterials.fontsizeL
             font.weight: Font.Bold
             font.family: UIMaterials.regularFont
             horizontalAlignment: Text.AlignHCenter

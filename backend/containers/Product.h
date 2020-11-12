@@ -70,6 +70,9 @@ private:
     std::string m_description;
     std::string m_unit;
     Category    m_category;
+    std::string m_shortenName;
+    int m_sku;
+
 
     double m_inputPrice;
     double m_unitPrice;

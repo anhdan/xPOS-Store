@@ -12,7 +12,7 @@ Rectangle {
     id: root
 
     //====================== I. Signal
-    signal categorySelected( var major, var minor )
+    signal categorySelected( var major, var minor, var name )
     signal changesCanceled()
 
     property var nameArray: ["Thực phẩm", "Đồ uống", "Gia dụng", "Thời trang",
@@ -28,6 +28,11 @@ Rectangle {
 
     function clear()
     {
+    }
+
+    function getCategoryString( _majorIdx, _minorIdx )
+    {
+        return ( "Need implementation" )
     }
 
 

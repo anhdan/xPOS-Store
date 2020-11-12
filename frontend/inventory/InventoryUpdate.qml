@@ -13,6 +13,65 @@ import "../gadgets"
 Item {
     id: root
 
+    property var currItem
+
+    //========================= Signals and slots
+    //----- Signals
+    Component.onCompleted: {
+        beInventory.sigProductFound.connect(
+                    function( product ) {
+                        currItem = Helper.deepCopy( product )
+                        currItem[qsTr("completed")] = false
+                        currItem[qsTr("exp_date")] = new Date
+                        lvItems.append( currItem )
+                        showProductInfo( product )
+                    }
+                    )
+
+        beInventory.sigProductNotFound.connect(
+                    function( code ) {
+                        currItem = Helper.createDefaultProduct()
+                        currItem["barcode"] = code
+                        currItem[qsTr("completed")] = false
+                        currItem[qsTr("exp_date")] = new Date
+                        lvItems.append( currItem )
+                        noti.showNoti( "Sản phẩm chưa tồn tại", UIMaterials.iconError )
+                        noti.state = "visible"
+                        showProductInfo( currItem )
+                    }
+                    )
+    }
+
+    //----- Slots
+    function showProductInfo( product )
+    {
+        icBarcode.infoText = product["barcode"]
+        icClass.infoText = formCategory.getCategoryString( product["category"] )
+        icName.infoText = product["name"]
+        icUnitLabel.infoText = product["unit"]
+        icShortenName.infoText = product["shorten_name"]
+        icSKU.infoText = product["sku"]
+
+        icInputPrice.infoText = product["input_price"]
+        icUnitPrice.infoText = product["unit_price"]
+        if( (product["discount_price"] > 0) && (product["discount_price"] < product["unit_price"]) )
+        {
+            icDiscountPrice.infoText = product["discount_price"]
+            icDiscountStart.infoText = Helper.dateToString(product["discount_start"])
+            icDiscountEnd.infoText = Helper.dateToString(product["discount_end"])
+            btnDiscountPrg.state = "running"
+            rowDiscountPrg.visible = true
+        }
+        else
+        {
+            rowDiscountPrg.visible = false
+            btnDiscountPrg.state = ""
+        }
+
+        boardStockInfo.instock = product["num_instock"]
+        boardStockInfo.sold = product["num_sold"]
+        boardStockInfo.disqualifiedRate = Number(product["num_disqualified"] / (product["num_instock"] + product["num_sold"] + product["num_disqualified"]) * 100).toFixed(2) + "%"
+    }
 
     //========================= I. Control panel
     Rectangle {
@@ -33,6 +92,18 @@ Item {
             backgroundColor: "white"
             textColor: UIMaterials.colorTaskBar
             placeholderText: "Mã vạch/Tên viết tắt ..."
+
+            onSearchExecuted: {
+                var idx = lvItems.find( searchStr )
+                if( idx === -1 )
+                {
+                    beInventory.searchForProduct( searchStr )
+                }
+                else
+                {
+                    lvItems.select( idx )
+                }
+            }
         }
 
         //----- I.2. Processed item list view
@@ -43,6 +114,11 @@ Item {
             anchors.left: parent.left
             width: parent.width
             height: 0.6893 * parent.height
+
+            onSelected: {
+                //! TODO
+                //  Show info of selected item
+            }
         }
 
         //----- I.3. Control button
@@ -204,7 +280,30 @@ Item {
                 }
 
                 onReleased: {
+                    currItem["completed"] = 1
                     rectBtnSave.opacity = 1
+                    lvItems.set( lvItems.currentIndex, currItem )
+
+                    var ret = beInventory.updateProduct( currItem )
+                    if( noti.state === "visible" )
+                    {
+                        noti.state = "invisible"
+                    }
+
+                    if( ret === 0 )
+                    {
+                        noti.showNoti( "Lưu thông tin sản phẩm thành công", "success" )
+                    }
+                    else
+                    {
+                        noti.showNoti( "Gặp lỗi lưu thông tin sản phẩm", "error" )
+                    }
+                    noti.state = "visible"
+
+                    if( lvItems.currentIndex < lvItems.count )
+                    {
+                        lvItems.select( lvItems.currentIndex + 1 )
+                    }
                 }
             }
         }
@@ -252,6 +351,10 @@ Item {
             titleText: "Mã vạch"
             placeholderText: "..."
             underline: true
+
+            onEditFinished: {
+                currItem["barcode"] = infoText
+            }
         }
 
         InfoCard {
@@ -297,6 +400,10 @@ Item {
             titleText: "Tên sản phẩm"
             placeholderText: "..."
             underline: true
+
+            onEditFinished: {
+                currItem["name"] = infoText
+            }
         }
 
         InfoCard {
@@ -315,6 +422,10 @@ Item {
             titleText: "Đơn vị"
             placeholderText: "..."
             underline: true
+
+            onEditFinished: {
+                currItem["unit"] = infoText
+            }
         }
 
         InfoCard {
@@ -375,6 +486,7 @@ Item {
             width: 0.5 * icBarcode.width
             titleHeight: icBarcode.titleHeight
             infoHeight: icBarcode.infoHeight
+            isCurrency: true
 
             titleFontSize: UIMaterials.fontsizeXS
             titleColor: UIMaterials.grayDark
@@ -384,6 +496,10 @@ Item {
             titleText: "Đơn giá nhập"
             placeholderText: "..."
             underline: true
+
+            onEditFinished: {
+                currItem["input_price"] = Helper.currencyToNumber( infoText )
+            }
         }
 
         InfoCard {
@@ -394,18 +510,24 @@ Item {
             width: 0.5 * icBarcode.width
             titleHeight: icBarcode.titleHeight
             infoHeight: icBarcode.infoHeight
+            isCurrency: true
 
             titleFontSize: UIMaterials.fontsizeXS
             titleColor: icInputPrice.titleColor
             infoColor: "black"
             editable: true
 
-            titleText: "Đơn giá nhập"
+            titleText: "Đơn giá bán"
             placeholderText: "..."
             underline: true
+
+            onEditFinished: {
+                currItem["unit_price"] = Helper.currencyToNumber( infoText )
+            }
         }
 
         Row {
+            id: rowDiscountPrg
             anchors.top: icInputPrice.bottom
             anchors.topMargin: 0.0282 * parent.height
             anchors.left: icInputPrice.left
@@ -642,6 +764,13 @@ Item {
                     enabled = false
                 }
             }
+
+            onActivated: {
+                currItem["discount_price"] = discountPrice
+                currItem["discount_start"] = startDate
+                currItem["discount_end"] = endDate
+                showProductInfo( currItem )
+            }
         }
 
         //----- II.5. Category selection form
@@ -681,6 +810,11 @@ Item {
                 {
                     enabled = false
                 }
+            }
+
+            onCategorySelected: {
+                currItem["category"] = major
+                icClass.infoText = name
             }
         }
 
@@ -722,6 +856,21 @@ Item {
                     enabled = false
                 }
             }
+
+            onUpdated: {
+                if( isImport )
+                {
+                    currItem["num_instock"] += quantity
+                    currItem["exp_date"] = expDate
+                }
+                else
+                {
+                    currItem["num_instock"] -= quantity
+                    currItem["num_disqualified"] += quantity
+                }
+                boardStockInfo.instock = currItem["num_instock"]
+                boardStockInfo.disqualifiedRate = Number(currItem["num_disqualified"] / (currItem["num_instock"] + currItem["num_sold"] + currItem["num_disqualified"]) * 100).toFixed(2) + "%"
+            }
         }
 
         //----- II.6. Input panel
@@ -751,6 +900,65 @@ Item {
                     duration: 250
                     easing.type: Easing.InOutQuad
                 }
+            }
+        }
+    }
+
+    //======================= III. Notification Popup
+    NotificationPopup {
+        id: noti
+        width: 1.2 * pnControl.width
+        height: 0.1412 * root.height
+        x: 5
+        z: 100
+        anchors.bottom: root.bottom
+        anchors.bottomMargin: 5
+        state: "invisible"
+
+        states: [
+            State {
+                name: "visible"
+                PropertyChanges {
+                    target: noti
+                    x: 5
+                }
+            },
+
+            State {
+                name: "invisible"
+                PropertyChanges {
+                    target: noti
+                    x: -noti.width
+                }
+            }
+        ]
+
+        transitions: Transition {
+            from: "invisible"
+            to: "visible"
+            reversible: true
+            NumberAnimation {
+                properties: "x"
+                duration: 400
+                easing.type: Easing.InOutQuad
+            }
+        }
+
+        onColapse: {
+            state = "invisible"
+        }
+
+        onStateChanged: {
+            if( state === "visible" )
+            {
+                focus = true
+            }
+        }
+
+        onFocusChanged: {
+            if( focus === false )
+            {
+                state = "invisible"
             }
         }
     }

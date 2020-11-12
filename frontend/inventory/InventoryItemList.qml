@@ -13,12 +13,26 @@ ListView {
     cacheBuffer: 100
 
     property int unsavedItemsNum: 0
+    property alias count: itemModel.count
 
     //====================== I. Signals
     signal selected( var item )
 
 
     //====================== II. Slots
+    function find( _barcode )
+    {
+        for( var i = 0; i < itemModel.count; i++ )
+        {
+            var item = itemModel.get( i )
+            if( item["barcode"] === _barcode )
+            {
+                return i
+            }
+        }
+        return -1
+    }
+
     function updateCurrItem( item )
     {
         var currItem = itemModel.get( currentIndex )
@@ -28,28 +42,38 @@ ListView {
         }
     }
 
-    ListModel {
-        id: itemModel
-
-        ListElement {
-            barcode: 21980180087
-            name: "ele1"
-            completed: false
-        }
-
-        ListElement {
-            barcode: 21980180564
-            name: "ele2"
-            completed: true
+    function select( _index )
+    {
+        if( _index !== root.currentIndex )
+        {
+            root.currentIndex = _index
+            selected( itemModel.get(_index) )   /// ? Need deep copy ?
         }
     }
 
+    function append( _item )
+    {
+        itemModel.append( Helper.deepCopy( _item ) )
+    }
+
+    function set( _index, _item )
+    {
+        if( _index < itemModel.count )
+        {
+            itemModel.set( _index, _item )
+        }
+    }
+
+
+    ListModel {
+        id: itemModel
+    }
 
     delegate: Rectangle {
         id: itemDelegate
         width: parent.width
         height: 0.1042 * UIMaterials.windowHeight
-        color: "transparent"
+        color: (index === root.currentIndex) ? "white" : "transparent"
 
         // Completion indicator LED
         Rectangle {
@@ -116,8 +140,6 @@ ListView {
             onPressed: {
                 if( index != currentIndex )
                 {
-                    currentItem.color = "transparent"
-                    itemDelegate.color = "white"
                     currentIndex = index
                     selected( itemModel.get(index) )   /// ? Need deep copy ?
                 }

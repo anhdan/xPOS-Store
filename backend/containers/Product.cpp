@@ -13,6 +13,8 @@ void Product::setDefault()
     m_description = "";
     m_unit = "";
     m_category = Category::NONE;
+    m_shortenName = "";
+    m_sku = 0;
 
     m_inputPrice = m_unitPrice = m_discountPrice = 0.0;
     m_discountStart = m_discountEnd = 0;
@@ -34,6 +36,8 @@ void Product::copyTo(Item *_item)
         _prod->m_description = m_description;
         _prod->m_unit = m_unit;
         _prod->m_category = m_category;
+        _prod->m_shortenName = m_shortenName;
+        _prod->m_sku = m_sku;
         _prod->m_inputPrice = m_inputPrice;
         _prod->m_unitPrice = m_unitPrice;
         _prod->m_discountPrice = m_discountPrice;
@@ -57,7 +61,9 @@ void Product::printInfo()
     LOG_MSG( ". NAME:           %s\n", m_name.c_str() );
     LOG_MSG( ". DESCRIPTION:    %s\n", m_description.c_str() );
     LOG_MSG( ". UNIT:           %s\n", m_unit.c_str() );
-    LOG_MSG( ". CATEGORY:       %s\n", CATEGORIES_NAME[(int)m_category].c_str());
+    LOG_MSG( ". CATEGORY:       %s\n", CATEGORIES_MAJOR_NAME[(int)m_category].c_str());
+    LOG_MSG( ". SHORTEN NAME:   %s\n", m_shortenName.c_str() );
+    LOG_MSG( ". SKU:            %s\n", m_sku );
     LOG_MSG( ". INPUT PRICE:    %f\n", m_inputPrice );
     LOG_MSG( ". UNIT PRICE:     %f\n", m_unitPrice );
     LOG_MSG( ". DISCOUNT PRICE: %f\n", m_discountPrice );
@@ -81,6 +87,8 @@ QVariant Product::toQVariant( )
     map["name"] = QString::fromStdString( getName() );
     map["desc"] = QString::fromStdString( getDescription() );
     map["unit"] = QString::fromStdString( getUnit() );
+    map["shorten_name"] = QString::fromStdString( m_shortenName );
+    map["sku"] = m_sku;
     map["input_price"] = getInputPrice();
     map["unit_price"] = getUnitPrice();
     map["item_num"] = getItemNum();
@@ -90,15 +98,15 @@ QVariant Product::toQVariant( )
         map["discount_price"] = m_discountPrice;
         QDateTime qTime;
         qTime.setTime_t( (uint)m_discountStart );
-        map["discount_start"] = qTime.toString( "dd/MM/yyyy" );
+        map["discount_start"] = qTime; // qTime.toString( "dd/MM/yyyy" );
         qTime.setTime_t( (uint)m_discountEnd );
-        map["discount_end"] = qTime.toString( "dd/MM/yyyy" );
+        map["discount_end"] = qTime; //qTime.toString( "dd/MM/yyyy" );
     }
     else
     {
         map["discount_price"] = 0;
-        map["discount_start"] = "";
-        map["discount_end"] = "";
+        map["discount_start"] = QDateTime();
+        map["discount_end"] = QDateTime();
     }
     map["selling_price"] = getSellingPrice();
 
@@ -122,6 +130,9 @@ xpError_t Product::fromQVariant( const QVariant &_item )
         QVariantMap map = _item.toMap();
         m_barcode = map["barcode"].toString().toStdString();
         m_name = map["name"].toString().toStdString();
+        m_shortenName = map["shorten_name"].toString().toStdString();
+        m_sku = map["sku"].toInt( &ret );
+        finalRet &= ret;
         m_description = map["desc"].toString().toStdString();
         m_unit = map["unit"].toString().toStdString();
         m_inputPrice = map["input_price"].toDouble(&ret);
@@ -384,7 +395,7 @@ Category Product::getCategory()
  */
 std::string Product::getCategoryName()
 {
-    return CATEGORIES_NAME[(int)m_category];
+    return CATEGORIES_MAJOR_NAME[(int)m_category];
 }
 
 

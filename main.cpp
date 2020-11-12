@@ -9,6 +9,7 @@
 #include "backend/database/UserDatabase.h"
 #include "backend/database/SellingDatabase.h"
 #include "backend/BackendInvoice.h"
+#include "backend/BackendInventory.h"
 #include "backend/3rd/key_emitter.h"
 
 int main(int argc, char *argv[])
@@ -58,6 +59,7 @@ int main(int argc, char *argv[])
     }
 
     BackendInvoice beInvoice( &engine, &inventoryDB, &usersDB, &sellingDB );
+    BackendInventory beInventory( &engine, &inventoryDB );
     xpErr = beInvoice.init();
     if( xpErr != xpSuccess )
     {
@@ -68,6 +70,7 @@ int main(int argc, char *argv[])
     KeyEmitter keyEmitter( &engine );
     QQmlContext *ctx = engine.rootContext();
     ctx->setContextProperty( "beInvoice", &beInvoice );
+    ctx->setContextProperty( "beInventory", &beInventory );
     ctx->setContextProperty( "keyEmitter", &keyEmitter );
 
     //

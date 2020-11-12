@@ -3,6 +3,23 @@ import QtQuick 2.0
 
 QtObject {
 
+    function copy( src, dst )
+    {
+        if( dst === undefined )
+        {
+            dst = deepCopy( src )
+        }
+
+        for (var i in p) {
+            if (typeof p[i] === 'object') {
+                c[i] = (p[i].constructor === Array) ? [] : {};
+                deepCopy(p[i], c[i]);
+            } else {
+                c[i] = p[i];
+            }
+        }
+    }
+
     function deepCopy(p) {
         var c = {};
         for (var i in p) {
@@ -23,13 +40,17 @@ QtObject {
         ret["name"] = ""
         ret["desc"] = ""
         ret["unit"] = ""
+        ret["input_price"] = 0.0
         ret["unit_price"] = 0.0
         ret["discount_price"] = 0.0
-        ret["discount_start"] = "01/01/1970"
-        ret["discount_end"] = "01/01/1970"
+        ret["discount_start"] = new Date
+        ret["discount_end"] = new Date
         ret["num_instock"] = 0
         ret["num_sold"] = 0
         ret["num_disqualified"] = 0
+        ret["exp_date"] = new Date
+        ret["shorten_name"] = ""
+        ret["sku"] = ""
 
         return ret
     }
@@ -48,8 +69,8 @@ QtObject {
         product["unit"] = ""
         product["unit_price"] = 0.0
         product["discount_price"] = 0.0
-        product["discount_start"] = "01/01/1970"
-        product["discount_end"] = "01/01/1970"
+        product["discount_start"] = new Date
+        product["discount_end"] = new Date
         product["num_instock"] = 0
         product["num_sold"] = 0
         product["num_disqualified"] = 0
@@ -116,5 +137,10 @@ QtObject {
         var orgText = text.replace( /,/g, "" )
         orgText = orgText.replace( "vnd", "" )
         return parseInt(orgText, 10)
+    }
+
+    function dateToString( date )
+    {
+        return date.toLocaleDateString(Qt.locale(), "dd/MM/yyyy")
     }
 }

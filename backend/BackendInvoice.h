@@ -45,7 +45,6 @@ signals:
 public slots:
     // Inventory methods
     int searchForProduct( QString _code );
-    int updateProductFromInventory( const QVariant &_product );
 
     // Invoice methods
     int initializePayment();

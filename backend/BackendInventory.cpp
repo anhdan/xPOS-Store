@@ -1,6 +1,119 @@
 #include "BackendInventory.h"
 
+/**
+ * @brief BackendInventory::BackendInventory
+ */
 BackendInventory::BackendInventory(QObject *parent) : QObject(parent)
 {
 
+}
+
+
+/**
+ * @brief BackendInventory::BackendInventory
+ */
+BackendInventory::BackendInventory(QQmlApplicationEngine *engine, xpos_store::InventoryDatabase *_inventoryDB)
+    : m_engine(engine), m_inventoryDB(_inventoryDB)
+{
+    LOG_MSG( "An Inventory backend has been created\n" );
+}
+
+
+/**
+ * @brief BackendInventory::~BackendInventory
+ */
+BackendInventory::~BackendInventory()
+{
+    m_engine = nullptr;
+    m_inventoryDB = nullptr;
+}
+
+
+
+/**
+ * @brief BackendInventory::init
+ */
+int BackendInventory::init()
+{
+    return xpSuccess;
+}
+
+/**
+ * @brief BackendInvoice::searchForProduct
+ */
+int BackendInventory::searchForProduct(QString _code)
+{
+    xpError_t xpErr = xpSuccess;
+    if( !m_inventoryDB->isOpen() )
+    {
+        m_inventoryDB->open();
+    }
+
+    m_currProduct.setDefault();
+    xpErr = m_inventoryDB->searchProductByBarcode( _code.toStdString(), m_currProduct );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to search for product\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    if( m_currProduct.isValid())
+    {
+        m_currProduct.printInfo();
+        if( m_currProduct.isDiscountExpired() )
+        {
+            m_currProduct.cancelDiscount();
+            xpErr |= m_inventoryDB->updateProduct( m_currProduct, false );
+        }
+        emit sigProductFound( m_currProduct.toQVariant() );
+    }
+    else
+    {
+        LOG_MSG( "[WAR] %s:%d: Product not found\n",
+                 __FILE__, __LINE__ );
+        emit sigProductNotFound( _code );
+    }
+
+    return xpErr;
+}
+
+
+/**
+ * @brief BackendInvoice::updateProduct
+ */
+int BackendInventory::updateProduct( const QVariant &_product)
+{
+    xpos_store::Product beProduct;
+    xpError_t xpErr = beProduct.fromQVariant( _product );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to convert Qvariant parameter to backend object\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    if( !m_inventoryDB->isOpen() )
+    {
+        m_inventoryDB->open();
+    }
+
+    if( m_currProduct.getBarcode() == "" ) // Product is not in database
+    {
+        xpErr = m_inventoryDB->insertProduct( beProduct );
+    }
+    else if( !beProduct.isIdenticalTo(m_currProduct) )
+    {
+        // Update info to already exist product
+        xpErr = m_inventoryDB->updateProduct( beProduct, false );
+    }
+
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to update product info to database\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    return xpSuccess;
 }

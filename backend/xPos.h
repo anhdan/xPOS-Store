@@ -84,8 +84,14 @@ enum class Category : int
     BABY
 };
 
-const std::string CATEGORIES_NAME[9] = {"None", "Thực phẩm", "Đồ uống", "Đồ dùng gia đình", "Thời trang",
-                                       "Điện tử", "Giáo dục - Văn phòng", "Sức khỏe", "Trẻ em" };
+const std::string CATEGORIES_MAJOR_NAME[9] = {"None", "Thực phẩm", "Đồ uống", "Đồ dùng gia đình", "Thời trang",
+                                              "Điện tử", "Giáo dục - Văn phòng", "Sức khỏe", "Trẻ em" };
+
+
+typedef struct _ProductCategory_ {
+    int major;
+    int minor;
+} ProductCategory;
 
 
 /**
