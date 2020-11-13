@@ -112,8 +112,10 @@ int BackendInventory::updateProduct( const QVariant &_product)
     {
         LOG_MSG( "[ERR:%d] %s:%d: Failed to update product info to database\n",
                  xpErr, __FILE__, __LINE__ );
+        emit sigUpdateFailed();
         return xpErr;
     }
 
+    emit sigUpdateSucceeded();
     return xpSuccess;
 }

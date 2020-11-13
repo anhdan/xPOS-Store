@@ -60,7 +60,7 @@ ListView {
     {
         if( _index < itemModel.count )
         {
-            itemModel.set( _index, _item )
+            itemModel.set( _index, Helper.deepCopy( _item ) )
         }
     }
 

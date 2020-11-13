@@ -13,12 +13,37 @@ Rectangle {
     clip: true
     color: "transparent"
 
+    property int currStock: 0
+    property int stockChange: 0
+    property var currDate
+    property var exprDate
+    property bool validQuantity: false
+    property bool validExprDate: true
+
     //====================== I. Signal
-    signal updated( var quantity, var isImport, var expDate )
+    signal updated( var quantityChange, var expDate )
     signal changesCanceled()
+    signal invalidInput( var msg )
 
     function clear()
     {
+        swUpdateType.position = 1
+        icUpdateQuantity.infoText = ""
+        icExprDate.infoText = ""
+    }
+
+    function init( _currStock, _currDate )
+    {
+        currStock = _currStock
+        currDate = _currDate
+        validQuantity = false
+        validExprDate = true
+        clear()
+    }
+
+    function getDateString()
+    {
+        return (txtDayInMonth.text + "/" + txtMonthInYear.text + "/" + txtYear.text )
     }
 
 
@@ -99,220 +124,84 @@ Rectangle {
         }
 
         onEditFinished: {
-            if( txtDayInMonth.text === "" )
+            if( (Number(infoText) > currStock) && (swUpdateType.position === 2) )
             {
-                txtDayInMonth.focus = true
+                validQuantity = false
+                invalidInput( "Lượng xả hàng vượt quá số lượng trong kho" )
             }
-            else {
+            else
+            {
+                stockChange = (swUpdateType.position === 1) ? Number(infoText) : -Number(infoText)
+                validQuantity = true
                 inputPanel.active = false
             }
         }
     }
 
-    //----- Expiration date
-    Label {
-        id: titExprDate
-        width: icUpdateQuantity.width
-        height: icUpdateQuantity.titleHeight
-        anchors.left: icUpdateQuantity.left
+    InfoCard {
+        id: icExprDate
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: icUpdateQuantity.bottom
         anchors.topMargin: icUpdateQuantity.anchors.topMargin
-        visible: (swUpdateType.position === 1)
-        font {
-            pixelSize: icUpdateQuantity.titleFontSize
-            family: UIMaterials.fontRobotoLight
-        }
-        color: icUpdateQuantity.titleColor
-        opacity: 0.6
-        text: "Hạn sử dụng"
-    }
+        width: icUpdateQuantity.width
 
-    Row {
-        property bool inputing: (txtDayInMonth.focus | txtMonthInYear.focus | txtYear.focus)
+        titleHeight: icUpdateQuantity.titleHeight
+        titleFontSize: UIMaterials.fontsizeM
+        titleColor: UIMaterials.grayDark
 
-        id: rowExprDate
-        spacing: 0
-        anchors.top: titExprDate.bottom
-        anchors.topMargin: 0.0141 * parent.height
-        anchors.left: titExprDate.left
-        visible: (swUpdateType.position === 1)
+        infoHeight: icUpdateQuantity.infoHeight
+        infoFontsize: UIMaterials.fontsizeXL
+        infoColor: "black"
+        editable: true
+        isCalendar: true
 
-        TextField {
-            id: txtDayInMonth
-            width: 0.28 * titExprDate.width
-            height: icUpdateQuantity.infoHeight
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-            placeholderText: "Ngày"
-//            placeholderTextColor: UIMaterials.colorTrueGray
-            background: Rectangle {
-                anchors.fill: parent
-                color: UIMaterials.colorNearWhite
+        titleText: "Hạn sử dụng"
+        placeholderText: "..."
+        underline: true
+
+        onEditStarted: {
+            if( inputPanel.active )
+            {
+                inputPanel.active = false
             }
 
-            font {
-                pixelSize: UIMaterials.fontsizeXL
-                family: UIMaterials.fontRobotoLight
-            }
-            inputMethodHints: Qt.ImhDialableCharactersOnly
-
-            onAccepted: {
-                focus = false
-            }
-
-            onFocusChanged: {
-                if( focus === true )
+            var calendar = Qt.createQmlObject( "import QtQuick.Controls 1.4; \
+                                                    Calendar {\
+                                                        id: calendar; \
+                                                        locale: Qt.locale(); \
+                                                        width: root.width / 2; \
+                                                        height: root.height / 2; \
+                                                        maximumDate: new Date(2050, 0, 1); \
+                                                        minimumDate: new Date(2020, 0, 1); \
+                                                        anchors.horizontalCenter: root.horizontalCenter; \
+                                                        anchors.verticalCenter: icExprDate.verticalCenter; \
+                                                        z: 20\
+                                                    }",
+                                              root, "calendarErr" )
+            calendar.clicked.connect(function( date ) {
+                if( date < currDate )
                 {
-                    if( inputPanel.active === false )
-                    {
-                        inputPanel.active = true
-                    }
+                    validExprDate = false
+                    invalidInput( "Hạn sử dụng không hợp lệ" )
                 }
                 else
                 {
-                    if( txtMonthInYear.text === "" )
-                    {
-                        txtMonthInYear.focus = true
-                    }
-                    else if( txtYear.text === "" )
-                    {
-                        txtYear.focus = true
-                    }
-                    else
-                    {
-                        inputPanel.active = false
-                    }
-                    txtDayInMonth.focus = false
+                    validExprDate = true
+                    exprDate = date
+                    infoText = date.toLocaleDateString(Qt.locale(), "dd/MM/yyyy")
+                    calendar.destroy()
+                    focus = false
+                    icExprDate.editFinished()
                 }
-            }
-        }
-
-        Label {
-            width: 0.08 * titExprDate.width
-            height: txtDayInMonth.height
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-
-            font {
-                pixelSize: UIMaterials.fontsizeXL
-                family: UIMaterials.fontRobotoLight
-            }
-            text: "-"
-            color: UIMaterials.grayDark
-        }
-
-        TextField {
-            id: txtMonthInYear
-            width: txtDayInMonth.width
-            height: txtDayInMonth.height
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-            placeholderText: "Tháng"
-//            placeholderTextColor: UIMaterials.colorTrueGray
-            background: Rectangle {
-                anchors.fill: parent
-                color: UIMaterials.colorNearWhite
-            }
-
-            font {
-                pixelSize: UIMaterials.fontsizeXL
-                family: UIMaterials.fontRobotoLight
-            }
-            inputMethodHints: Qt.ImhDialableCharactersOnly
-
-            onAccepted: {
-                focus = false
-            }
-
-            onFocusChanged: {
-                if( focus === true )
+            })
+            calendar.focusChanged.connect(function() {
+                if( calendar.focus === false )
                 {
-                    if( inputPanel.active === false )
-                    {
-                        inputPanel.active = true
-                    }
+                    icExprDate.editFinished()
+                    calendar.destroy()
                 }
-                else
-                {
-                    if( txtYear.text === "" )
-                    {
-                        txtYear.focus = true
-                    }
-                    else if( txtDayInMonth.text === "" )
-                    {
-                        txtDayInMonth.focus = true
-                    }
-                    else
-                    {
-                        inputPanel.active = false
-                    }
-                    txtDayInMonth.focus = false
-                }
-            }
-        }
-
-        Label {
-            width: 0.08 * titExprDate.width
-            height: txtDayInMonth.height
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-
-            font {
-                pixelSize: UIMaterials.fontsizeXL
-                family: UIMaterials.fontRobotoLight
-            }
-            text: "-"
-            color: UIMaterials.grayDark
-        }
-
-        TextField {
-            id: txtYear
-            width: txtDayInMonth.width
-            height: txtDayInMonth.height
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-            placeholderText: "Năm"
-//            placeholderTextColor: UIMaterials.colorTrueGray
-            background: Rectangle {
-                anchors.fill: parent
-                color: UIMaterials.colorNearWhite
-            }
-
-            font {
-                pixelSize: UIMaterials.fontsizeXL
-                family: UIMaterials.fontRobotoLight
-            }
-            inputMethodHints: Qt.ImhDialableCharactersOnly
-
-            onAccepted: {
-                focus = false
-            }
-
-            onFocusChanged: {
-                if( focus === true )
-                {
-                    if( inputPanel.active === false )
-                    {
-                        inputPanel.active = true
-                    }
-                }
-                else
-                {
-                    if( txtDayInMonth.text === "" )
-                    {
-                        txtDayInMonth.focus = true
-                    }
-                    else if( txtMonthInYear.text === "" )
-                    {
-                        txtMonthInYear.focus = true
-                    }
-                    else
-                    {
-                        inputPanel.active = false
-                    }
-                    txtDayInMonth.focus = false
-                }
-            }
+            })
+            calendar.focus = true
         }
     }
 
@@ -325,11 +214,12 @@ Rectangle {
         y: 0.8969 * parent.height
         anchors.right: parent.horizontalCenter
         anchors.rightMargin: 20
+        visible: (validQuantity & validExprDate)
 
         background: Rectangle {
             id: rectBtnConfirm
             anchors.fill: parent
-            color: UIMaterials.colorTrueBlue
+            color: UIMaterials.colorTaskBar
             radius: 10
         }
 
@@ -349,6 +239,8 @@ Rectangle {
 
         onReleased: {
             rectBtnConfirm.opacity = 1
+            console.log( "stock change: " + stockChange )
+            updated( stockChange, exprDate )
         }
     }
 

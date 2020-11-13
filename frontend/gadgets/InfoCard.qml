@@ -107,6 +107,7 @@ Column {
             else
             {
                 lblTitle.font.bold = false
+                editFinished()
             }
         }
     }

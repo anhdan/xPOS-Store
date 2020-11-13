@@ -11,6 +11,9 @@ import "../gadgets"
 Rectangle {
     id: root
 
+    property int currentIndex: -1
+    property var currButton: btnCat00
+
     //====================== I. Signal
     signal categorySelected( var major, var minor, var name )
     signal changesCanceled()
@@ -32,7 +35,7 @@ Rectangle {
 
     function getCategoryString( _majorIdx, _minorIdx )
     {
-        return ( "Need implementation" )
+        return nameArray[_majorIdx]
     }
 
 
@@ -60,51 +63,87 @@ Rectangle {
             spacing: btnCat00.width / 3
 
             InconizedButton {
+                readonly property int index: 0
+
                 id: btnCat00
                 width: 0.1754 * root.width
                 height: 0.1695 * root.height
-                fgrColor: UIMaterials.grayDark
-                bgrColor: UIMaterials.colorNearWhite
+                fgrColor: (index === currentIndex) ? "white" : UIMaterials.grayDark
+                bgrColor: (index === currentIndex) ? UIMaterials.colorTrueBlue : UIMaterials.colorNearWhite
                 iconSource: iconSourceArray[0]
                 name: nameArray[0]
                 radius: 10
                 visible: (name !== "")
+
+                onPressed: {
+                    if( currentIndex !== index )
+                    {
+                        currentIndex = index
+                    }
+                }
             }
 
             InconizedButton {
+                readonly property int index: 1
+
                 id: btnCat01
                 width: btnCat00.width
                 height: btnCat00.height
-                fgrColor: UIMaterials.grayDark
-                bgrColor: UIMaterials.colorNearWhite
+                fgrColor: (index === currentIndex) ? "white" : UIMaterials.grayDark
+                bgrColor: (index === currentIndex) ? UIMaterials.colorTrueBlue : UIMaterials.colorNearWhite
                 iconSource: iconSourceArray[1]
                 name: nameArray[1]
                 visible: (name !== "")
                 radius: 10
+
+                onPressed: {
+                    if( currentIndex !== index )
+                    {
+                        currentIndex = index
+                    }
+                }
             }
 
             InconizedButton {
+                readonly property int index: 2
+
                 id: btnCat02
                 width: btnCat00.width
                 height: btnCat00.height
-                fgrColor: UIMaterials.grayDark
-                bgrColor: UIMaterials.colorNearWhite
+                fgrColor: (index === currentIndex) ? "white" : UIMaterials.grayDark
+                bgrColor: (index === currentIndex) ? UIMaterials.colorTrueBlue : UIMaterials.colorNearWhite
                 iconSource: iconSourceArray[2]
                 name: nameArray[2]
                 visible: (name !== "")
                 radius: 10
+
+                onPressed: {
+                    if( currentIndex !== index )
+                    {
+                        currentIndex = index
+                    }
+                }
             }
 
             InconizedButton {
+                readonly property int index: 3
+
                 id: btnCat03
                 width: btnCat00.width
                 height: btnCat00.height
-                fgrColor: UIMaterials.grayDark
-                bgrColor: UIMaterials.colorNearWhite
+                fgrColor: (index === currentIndex) ? "white" : UIMaterials.grayDark
+                bgrColor: (index === currentIndex) ? UIMaterials.colorTrueBlue : UIMaterials.colorNearWhite
                 iconSource: iconSourceArray[3]
                 name: nameArray[3]
                 visible: (name !== "")
                 radius: 10
+
+                onPressed: {
+                    if( currentIndex !== index )
+                    {
+                        currentIndex = index
+                    }
+                }
             }
         }
 
@@ -113,51 +152,87 @@ Rectangle {
             spacing: btnCat00.width / 3
 
             InconizedButton {
+                readonly property int index: 4
+
                 id: btnCat10
                 width: btnCat00.width
                 height: btnCat00.height
-                fgrColor: UIMaterials.grayDark
-                bgrColor: UIMaterials.colorNearWhite
+                fgrColor: (index === currentIndex) ? "white" : UIMaterials.grayDark
+                bgrColor: (index === currentIndex) ? UIMaterials.colorTrueBlue : UIMaterials.colorNearWhite
                 iconSource: iconSourceArray[4]
                 name: nameArray[4]
                 visible: (name !== "")
                 radius: 10
+
+                onPressed: {
+                    if( currentIndex !== index )
+                    {
+                        currentIndex = index
+                    }
+                }
             }
 
             InconizedButton {
+                readonly property int index: 5
+
                 id: btnCat11
                 width: btnCat00.width
                 height: btnCat00.height
-                fgrColor: UIMaterials.grayDark
-                bgrColor: UIMaterials.colorNearWhite
+                fgrColor: (index === currentIndex) ? "white" : UIMaterials.grayDark
+                bgrColor: (index === currentIndex) ? UIMaterials.colorTrueBlue : UIMaterials.colorNearWhite
                 iconSource: iconSourceArray[5]
                 name: nameArray[5]
                 visible: (name !== "")
                 radius: 10
+
+                onPressed: {
+                    if( currentIndex !== index )
+                    {
+                        currentIndex = index
+                    }
+                }
             }
 
             InconizedButton {
+                readonly property int index: 6
+
                 id: btnCat12
                 width: btnCat00.width
                 height: btnCat00.height
-                fgrColor: UIMaterials.grayDark
-                bgrColor: UIMaterials.colorNearWhite
+                fgrColor: (index === currentIndex) ? "white" : UIMaterials.grayDark
+                bgrColor: (index === currentIndex) ? UIMaterials.colorTrueBlue : UIMaterials.colorNearWhite
                 iconSource: iconSourceArray[6]
                 name: nameArray[6]
                 visible: (name !== "")
                 radius: 10
+
+                onPressed: {
+                    if( currentIndex !== index )
+                    {
+                        currentIndex = index
+                    }
+                }
             }
 
             InconizedButton {
+                readonly property int index: 7
+
                 id: btnCat13
                 width: btnCat00.width
                 height: btnCat00.height
-                fgrColor: UIMaterials.grayDark
-                bgrColor: UIMaterials.colorNearWhite
+                fgrColor: (index === currentIndex) ? "white" : UIMaterials.grayDark
+                bgrColor: (index === currentIndex) ? UIMaterials.colorTrueBlue : UIMaterials.colorNearWhite
                 iconSource: iconSourceArray[7]
                 name: nameArray[7]
                 visible: (name !== "")
                 radius: 10
+
+                onPressed: {
+                    if( currentIndex !== index )
+                    {
+                        currentIndex = index
+                    }
+                }
             }
         }
     }
@@ -172,11 +247,12 @@ Rectangle {
         anchors.right: parent.horizontalCenter
         anchors.rightMargin: 20
         focusPolicy: Qt.NoFocus
+        visible: (currentIndex !== -1)
 
         background: Rectangle {
             id: rectBtnConfirm
             anchors.fill: parent
-            color: UIMaterials.colorTrueBlue
+            color: UIMaterials.colorTaskBar
             radius: 10
         }
 
@@ -196,6 +272,7 @@ Rectangle {
 
         onReleased: {
             rectBtnConfirm.opacity = 1
+            categorySelected( currentIndex, -1, nameArray[currentIndex] )
         }
     }
 

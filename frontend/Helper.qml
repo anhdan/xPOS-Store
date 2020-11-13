@@ -40,17 +40,19 @@ QtObject {
         ret["name"] = ""
         ret["desc"] = ""
         ret["unit"] = ""
+        ret["category"] = -1
         ret["input_price"] = 0.0
         ret["unit_price"] = 0.0
         ret["discount_price"] = 0.0
-        ret["discount_start"] = new Date
-        ret["discount_end"] = new Date
+        ret["discount_start"] = Date.fromLocaleString(Qt.locale(), "01/01/1970", "dd/mm/yyyy") //new Date()
+        ret["discount_end"] = Date.fromLocaleString(Qt.locale(), "01/01/1970", "dd/mm/yyyy")
+        ret["item_num"] = 0
         ret["num_instock"] = 0
         ret["num_sold"] = 0
         ret["num_disqualified"] = 0
-        ret["exp_date"] = new Date
+        ret["exp_date"] = Date.fromLocaleString(Qt.locale(), "01/01/1970", "dd/mm/yyyy")
         ret["shorten_name"] = ""
-        ret["sku"] = ""
+        ret["sku"] = 0
 
         return ret
     }
@@ -67,10 +69,12 @@ QtObject {
         product["name"] = ""
         product["desc"] = ""
         product["unit"] = ""
+        product["category"] = -1
         product["unit_price"] = 0.0
         product["discount_price"] = 0.0
-        product["discount_start"] = new Date
-        product["discount_end"] = new Date
+        product["discount_start"] = new Date(0)
+        product["discount_end"] = new Date(0)
+        product["item_num"] = 0
         product["num_instock"] = 0
         product["num_sold"] = 0
         product["num_disqualified"] = 0

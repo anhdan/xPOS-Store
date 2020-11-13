@@ -63,7 +63,7 @@ void Product::printInfo()
     LOG_MSG( ". UNIT:           %s\n", m_unit.c_str() );
     LOG_MSG( ". CATEGORY:       %s\n", CATEGORIES_MAJOR_NAME[(int)m_category].c_str());
     LOG_MSG( ". SHORTEN NAME:   %s\n", m_shortenName.c_str() );
-    LOG_MSG( ". SKU:            %s\n", m_sku );
+    LOG_MSG( ". SKU:            %d\n", m_sku );
     LOG_MSG( ". INPUT PRICE:    %f\n", m_inputPrice );
     LOG_MSG( ". UNIT PRICE:     %f\n", m_unitPrice );
     LOG_MSG( ". DISCOUNT PRICE: %f\n", m_discountPrice );
@@ -87,6 +87,7 @@ QVariant Product::toQVariant( )
     map["name"] = QString::fromStdString( getName() );
     map["desc"] = QString::fromStdString( getDescription() );
     map["unit"] = QString::fromStdString( getUnit() );
+    map["category"] = (int)m_category;
     map["shorten_name"] = QString::fromStdString( m_shortenName );
     map["sku"] = m_sku;
     map["input_price"] = getInputPrice();
@@ -105,8 +106,8 @@ QVariant Product::toQVariant( )
     else
     {
         map["discount_price"] = 0;
-        map["discount_start"] = QDateTime();
-        map["discount_end"] = QDateTime();
+        map["discount_start"] = 0;
+        map["discount_end"] = 0;
     }
     map["selling_price"] = getSellingPrice();
 
@@ -134,6 +135,8 @@ xpError_t Product::fromQVariant( const QVariant &_item )
         m_sku = map["sku"].toInt( &ret );
         finalRet &= ret;
         m_description = map["desc"].toString().toStdString();
+        m_category = (Category)map["category"].toInt( &ret );
+        finalRet &= ret;
         m_unit = map["unit"].toString().toStdString();
         m_inputPrice = map["input_price"].toDouble(&ret);
         finalRet &= ret;
@@ -142,8 +145,15 @@ xpError_t Product::fromQVariant( const QVariant &_item )
 
         m_discountPrice = map["discount_price"].toDouble(&ret);
         finalRet &= ret;
-        m_discountStart = (time_t)QDateTime::fromString( map["discount_start"].toString(), "dd/MM/yyyy" ).toTime_t();
-        m_discountEnd = (time_t)QDateTime::fromString( map["discount_end"].toString(), "dd/MM/yyyy" ).toTime_t();
+        if( m_discountPrice > 0 )
+        {
+            m_discountStart = (time_t)QDateTime( map["discount_start"].toDate() ).toTime_t();
+            m_discountEnd = (time_t)QDateTime( map["discount_end"].toDate() ).toTime_t();
+        }
+        else
+        {
+            m_discountStart = m_discountEnd = 0;
+        }
 
         m_itemNum = map["item_num"].toInt( &ret );
         finalRet &= ret;

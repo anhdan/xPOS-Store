@@ -129,7 +129,9 @@ xpError_t InventoryDatabase::insertProduct(Product &_product)
         return xpErrorNotPermited;
     }
 
-    std::string cmdFormat = "INSERT INTO PRODUCT (BARCODE, NAME, DESC, UNIT, CATEGORY, INPUT_PRICE, UNIT_PRICE, DISCOUNT_PRICE, DISCOUNT_START, DISCOUNT_END, NUM_INSTOCK, NUM_SOLD, NUM_DISQUALIFIED) " \
+    std::string cmdFormat = "INSERT INTO PRODUCT (BARCODE, NAME, DESC, UNIT, CATEGORY, " \
+                                                "INPUT_PRICE, UNIT_PRICE, DISCOUNT_PRICE, DISCOUNT_START, "\
+                                                "DISCOUNT_END, NUM_INSTOCK, NUM_SOLD, NUM_DISQUALIFIED) " \
                             "VALUES('%s', '%s', '%s', '%s', %d, %f, %f, %f, %ld, %ld, %d, %d, %d);";
     char sqliteCmd[1000];
     double discountPrice = 0;

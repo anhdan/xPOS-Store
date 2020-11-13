@@ -32,7 +32,7 @@ Window {
         height: root.height
         x: 0
         y: 0
-        state: "visible"
+//        state: "visible"
 
         onApproved: {
             stack.pop()
@@ -48,7 +48,7 @@ Window {
         height: root.height
         x: 0
         y: 0
-        state: "invisible"
+//        state: "invisible"
 
         onToInventoryBoard: {
             stack.pop()
@@ -76,7 +76,7 @@ Window {
         height: root.height
         x: 0
         y: 0
-        state: "invisible"
+//        state: "invisible"
 
         onMenuClicked: {
             formMenu.state = "visible"
@@ -113,7 +113,7 @@ Window {
     StackView {
         id: stack
 
-        initialItem: formAdvanceAnalytics
+        initialItem: formInventory2
         anchors.fill: parent
 
         pushEnter: Transition {

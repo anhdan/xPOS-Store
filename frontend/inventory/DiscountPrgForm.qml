@@ -12,19 +12,32 @@ Rectangle {
     id: root
     color: "transparent"
 
+    property real unitPrice: 0
     property real discountPrice: 0
-    property date startDate
+    property date startDate: new Date()
     property date endDate
 
+    property bool priceValid: false
+    property bool durationValid: false
+
     //====================== I. Signal
+    signal inputInvalid( var msg )
     signal activated( var discountPrice, var startDate, var endDate )
     signal changesCanceled()
 
     function clear()
     {
         icDiscountPrice.infoText = ""
-        icDiscountStart.infoText = ""
         icDiscountEnd.infoText = ""
+        priceValid = false
+        durationValid = false
+        startDate = new Date()
+    }
+
+    function init( _unitPrice )
+    {
+        unitPrice = _unitPrice
+        clear()
     }
 
 
@@ -65,9 +78,22 @@ Rectangle {
 
         onEditFinished: {
             discountPrice = Helper.currencyToNumber( infoText )
-            inputPanel.active = false
-            focus = false
-            icDiscountStart.editStarted()
+            if( isNaN(discountPrice) || discountPrice <= 0
+                    || discountPrice >= unitPrice )
+            {
+                infoText = ""
+                discountPrice = 0
+                priceValid = false
+                inputInvalid( "Giá khuyến mãi không hợp lệ" )
+            }
+            else
+            {
+                priceValid = true
+                inputPanel.active = false
+                focus = false
+                icDiscountStart.editStarted()
+            }
+
         }
 
         onEditStarted: {
@@ -117,7 +143,7 @@ Rectangle {
                                               root, "calendarErr" )
             calendar.clicked.connect(function( date ) {
                 startDate = date
-                infoText = date.toLocaleDateString(Qt.locale(), "dd/MM/yyyy")
+                infoText = startDate.toLocaleDateString(Qt.locale(), "dd/MM/yyyy")
                 calendar.destroy()
                 focus = false
                 icDiscountStart.editFinished()
@@ -178,11 +204,20 @@ Rectangle {
                                                     }",
                                               root, "calendarErr" )
             calendar.clicked.connect(function( date ) {
-                endDate = date
-                infoText = date.toLocaleDateString(Qt.locale(), "dd/MM/yyyy")
-                calendar.destroy()
-                focus = false
-                icDiscountEnd.editFinished()
+                if( date < startDate || date < new Date() )
+                {
+                    durationValid = false
+                    inputInvalid( "Thời gian khuyến mãi không hợp lệ" )
+                }
+                else
+                {
+                    durationValid = true
+                    endDate = date
+                    infoText = date.toLocaleDateString(Qt.locale(), "dd/MM/yyyy")
+                    calendar.destroy()
+                    focus = false
+                    icDiscountEnd.editFinished()
+                }
             })
             calendar.focusChanged.connect(function() {
                 if( calendar.focus === false )
@@ -203,11 +238,12 @@ Rectangle {
         y: 0.8969 * parent.height
         anchors.right: parent.horizontalCenter
         anchors.rightMargin: 20
+        visible: (priceValid & durationValid)
 
         background: Rectangle {
             id: rectBtnConfirm
             anchors.fill: parent
-            color: UIMaterials.colorTrueBlue
+            color: UIMaterials.colorTaskBar
             radius: 10
         }
 
@@ -227,6 +263,7 @@ Rectangle {
 
         onReleased: {
             rectBtnConfirm.opacity = 1
+            activated( discountPrice, startDate, endDate )
         }
     }
 

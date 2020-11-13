@@ -20,6 +20,8 @@ public:
 signals:
     void sigProductFound( QVariant _product );
     void sigProductNotFound( QString _code );
+    void sigUpdateSucceeded();
+    void sigUpdateFailed();
 
 public slots:
     int searchForProduct( QString _code );

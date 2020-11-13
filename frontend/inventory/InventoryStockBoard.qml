@@ -10,8 +10,8 @@ Column {
     id: root
     spacing: 0
 
-    property alias instock: lblInstock.text
-    property alias sold: lblSold.text
+    property int instock: 0
+    property int sold: 0
     property real disqualifiedRate: 0
 
     function clear()
@@ -47,7 +47,7 @@ Column {
                 family: UIMaterials.fontRobotoLight
             }
             color: UIMaterials.colorTrueBlue
-            text: "0"
+            text: instock.toString()
             verticalAlignment: Text.AlignVCenter
         }
     }
@@ -77,7 +77,7 @@ Column {
                 family: UIMaterials.fontRobotoLight
             }
             color: "black"
-            text: "0"
+            text: sold.toString()
             verticalAlignment: Text.AlignVCenter
         }
     }
@@ -107,7 +107,7 @@ Column {
                 family: UIMaterials.fontRobotoLight
             }
             color: "black"
-            text: (disqualifiedRate * 100).toString() + " %"
+            text: (disqualifiedRate * 100).toFixed(2) + " %"
             verticalAlignment: Text.AlignVCenter
         }
     }

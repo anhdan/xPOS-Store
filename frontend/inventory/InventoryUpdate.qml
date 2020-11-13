@@ -22,7 +22,7 @@ Item {
                     function( product ) {
                         currItem = Helper.deepCopy( product )
                         currItem[qsTr("completed")] = false
-                        currItem[qsTr("exp_date")] = new Date
+                        currItem[qsTr("exp_date")] = new Date()
                         lvItems.append( currItem )
                         showProductInfo( product )
                     }
@@ -31,14 +31,22 @@ Item {
         beInventory.sigProductNotFound.connect(
                     function( code ) {
                         currItem = Helper.createDefaultProduct()
+                        console.log( "=====> category: " + currItem["category"] )
                         currItem["barcode"] = code
-                        currItem[qsTr("completed")] = false
-                        currItem[qsTr("exp_date")] = new Date
+                        currItem["completed"] = false
+                        currItem["exp_date"] = new Date()
                         lvItems.append( currItem )
                         noti.showNoti( "Sản phẩm chưa tồn tại", UIMaterials.iconError )
                         noti.state = "visible"
                         showProductInfo( currItem )
                     }
+                    )
+
+        beInventory.sigUpdateSucceeded.connect(
+                    function() {
+
+                    }
+
                     )
     }
 
@@ -46,7 +54,7 @@ Item {
     function showProductInfo( product )
     {
         icBarcode.infoText = product["barcode"]
-        icClass.infoText = formCategory.getCategoryString( product["category"] )
+        icClass.infoText = (product["category"] !== -1) ? formCategory.getCategoryString( product["category"] ) : ""
         icName.infoText = product["name"]
         icUnitLabel.infoText = product["unit"]
         icShortenName.infoText = product["shorten_name"]
@@ -70,7 +78,8 @@ Item {
 
         boardStockInfo.instock = product["num_instock"]
         boardStockInfo.sold = product["num_sold"]
-        boardStockInfo.disqualifiedRate = Number(product["num_disqualified"] / (product["num_instock"] + product["num_sold"] + product["num_disqualified"]) * 100).toFixed(2) + "%"
+        var totalQuantity = (product["num_instock"] + product["num_sold"] + product["num_disqualified"])
+        boardStockInfo.disqualifiedRate = (totalQuantity > 0) ? product["num_disqualified"] / totalQuantity : 0
     }
 
     //========================= I. Control panel
@@ -116,8 +125,8 @@ Item {
             height: 0.6893 * parent.height
 
             onSelected: {
-                //! TODO
-                //  Show info of selected item
+                currItem = Helper.deepCopy( item )
+                showProductInfo( currItem )
             }
         }
 
@@ -132,7 +141,6 @@ Item {
                 id: btnDelete
                 width: 0.3226 * parent.width
                 height: 0.1042 * UIMaterials.windowHeight
-                focusPolicy: Qt.NoFocus
 
                 background: Rectangle {
                     id: rectBtnDelete
@@ -184,7 +192,6 @@ Item {
                 id: btnUndo
                 width: btnDelete.width
                 height: btnDelete.height
-                focusPolicy: Qt.NoFocus
 
                 background: Rectangle {
                     id: rectBtnUndo
@@ -236,7 +243,6 @@ Item {
                 id: btnSave
                 width: btnDelete.width
                 height: btnDelete.height
-                focusPolicy: Qt.NoFocus
 
                 background: Rectangle {
                     id: rectBtnSave
@@ -280,18 +286,16 @@ Item {
                 }
 
                 onReleased: {
-                    currItem["completed"] = 1
                     rectBtnSave.opacity = 1
-                    lvItems.set( lvItems.currentIndex, currItem )
-
                     var ret = beInventory.updateProduct( currItem )
                     if( noti.state === "visible" )
                     {
                         noti.state = "invisible"
                     }
-
                     if( ret === 0 )
                     {
+                        currItem["completed"] = true
+                        lvItems.set( lvItems.currentIndex, currItem )
                         noti.showNoti( "Lưu thông tin sản phẩm thành công", "success" )
                     }
                     else
@@ -378,6 +382,7 @@ Item {
             onEditStarted: {
                 if( formCategory.enabled === false )
                 {
+                    formCategory.currentIndex = currItem["category"]
                     formCategory.enabled = true
                 }
             }
@@ -403,6 +408,20 @@ Item {
 
             onEditFinished: {
                 currItem["name"] = infoText
+                if( infoText[0] !== " " )
+                {
+                    var shortenName = infoText[0].toUpperCase()
+                }
+
+                for( var i = 1; i < infoText.length-1; i++ )
+                {
+                    if( infoText[i] === " " && infoText[i+1] !== " " )
+                    {
+                        shortenName += infoText[i+1].toUpperCase()
+                    }
+                }
+                currItem["shorten_name"] = shortenName
+                icShortenName.infoText = shortenName
             }
         }
 
@@ -626,7 +645,7 @@ Item {
                 rectBtnDiscountPrg.opacity = 1
                 if( formDiscountPrg.enabled === false )
                 {
-                    formDiscountPrg.clear()
+                    formDiscountPrg.init( currItem["unit_price"] )
                     formDiscountPrg.enabled = true
                 }
             }
@@ -688,6 +707,7 @@ Item {
                 rectBtnUpdate.opacity = 1
                 if( formStockUpdate.enabled === false )
                 {
+                    formStockUpdate.init(boardStockInfo.instock, new Date() )
                     formStockUpdate.enabled = true
                 }
             }
@@ -770,6 +790,17 @@ Item {
                 currItem["discount_start"] = startDate
                 currItem["discount_end"] = endDate
                 showProductInfo( currItem )
+                enabled = false
+            }
+
+            onInputInvalid: {
+                if( noti.state === "visible" )
+                {
+                    noti.state = "invisible"
+                }
+
+                noti.showNoti( msg, UIMaterials.iconError )
+                noti.state = "visible"
             }
         }
 
@@ -813,8 +844,9 @@ Item {
             }
 
             onCategorySelected: {
-                currItem["category"] = major
+                root.currItem["category"] = major
                 icClass.infoText = name
+                enabled = false
             }
         }
 
@@ -858,18 +890,25 @@ Item {
             }
 
             onUpdated: {
-                if( isImport )
+                currItem["num_instock"] += quantityChange
+                if( quantityChange < 0 )
                 {
-                    currItem["num_instock"] += quantity
-                    currItem["exp_date"] = expDate
+                    currItem["num_disqualified"] -= quantityChange
                 }
-                else
+
+                currItem["exp_date"] = expDate
+                showProductInfo( currItem )
+                enabled = false
+            }
+
+            onInvalidInput: {
+                if( noti.state === "visible" )
                 {
-                    currItem["num_instock"] -= quantity
-                    currItem["num_disqualified"] += quantity
+                    noti.state = "invisible"
                 }
-                boardStockInfo.instock = currItem["num_instock"]
-                boardStockInfo.disqualifiedRate = Number(currItem["num_disqualified"] / (currItem["num_instock"] + currItem["num_sold"] + currItem["num_disqualified"]) * 100).toFixed(2) + "%"
+
+                noti.showNoti( msg, UIMaterials.iconError )
+                noti.state = "visible"
             }
         }
 
