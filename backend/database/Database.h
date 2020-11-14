@@ -1,6 +1,7 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
+#include <iostream>
 #include <sqlite3.h>
 #include "backend/xPos.h"
 #include "backend/containers/Item.h"
@@ -24,6 +25,7 @@ public:
     bool isOpen();
 
     void printInfo();
+    int count( const std::string &_tableName );
 
 protected:
     sqlite3 *m_dbPtr;

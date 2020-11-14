@@ -2,6 +2,13 @@
 
 namespace xpos_store {
 
+static int callback(void *count, int argc, char **argv, char **azColName) {
+    int *c = (int*)count;
+    *c = atoi(argv[0]);
+    return 0;
+}
+
+
 /**
  * @brief Database::Database
  */
@@ -46,6 +53,37 @@ void Database::printInfo()
     //! TODO
     //! 1. print tables' name
     LOG_MSG( "----------------------------\n" );
+}
+
+
+/**
+ * @brief Database::count
+ */
+int Database::count( const std::string &_tableName )
+{
+    xpError_t sqliteErr = xpSuccess;
+    if( !m_isOpen )
+    {
+        sqliteErr = open();
+        if( sqliteErr != xpSuccess )
+        {
+            return -1;
+        }
+    }
+
+    int count = -1;
+    char *sqliteMsg;
+    std::string sqliteCmd = "SELECT COUNT(*) FROM " + _tableName + ";";
+    sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd.c_str(), callback, &count, &sqliteMsg );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        return -1;
+    }
+
+    return count;
 }
 
 

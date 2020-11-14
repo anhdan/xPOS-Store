@@ -29,7 +29,7 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: 0.0565 * parent.height
             kpiName: "Tổng số mặt hàng"
-            kpiValue: "0"
+            kpiValue: beInventory.kpi["types_num"].toString()
         }
 
         KPICard {

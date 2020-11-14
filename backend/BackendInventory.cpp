@@ -35,6 +35,28 @@ BackendInventory::~BackendInventory()
  */
 int BackendInventory::init()
 {
+    //! TODO: Compute inventory status
+    //!
+    //===== I. Compute KPIs of the inventory
+    xpError_t xpErr = m_inventoryDB->summaryInventory( m_kpi );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to summary inventory database\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    LOG_MSG( "TOTAL TYPES = %d\nTOTAL_VALUE = %f\nTOTAL_PROFIT=%f\n",
+             m_kpi.typesNum, m_kpi.totalValue, m_kpi.totalProfit );
+    for( int i = 0; i < m_kpi.categories.size(); i++ )
+    {
+        printf( "\tcategory = %d  - value = %10f  -  profit = %10f\n",
+                m_kpi.categories[i], m_kpi.values[i], m_kpi.profits[i] );
+    }
+
+
+
+
     return xpSuccess;
 }
 
@@ -118,4 +140,19 @@ int BackendInventory::updateProduct( const QVariant &_product)
 
     emit sigUpdateSucceeded();
     return xpSuccess;
+}
+
+
+/**
+ * @brief BackendInventory::kpi
+ */
+QVariant BackendInventory::kpi()
+{
+    QVariantMap map;
+    map["types_num"] = m_kpi.typesNum;
+    map["total_values"] = m_kpi.totalValue;
+    map["total_profit"] = m_kpi.totalProfit;
+    map["total_lost"] = 0.0;
+
+    return QVariant::fromValue(map);
 }

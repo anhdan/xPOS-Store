@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
     BackendInvoice beInvoice( &engine, &inventoryDB, &usersDB, &sellingDB );
     BackendInventory beInventory( &engine, &inventoryDB );
     xpErr = beInvoice.init();
+    xpErr |= beInventory.init();
     if( xpErr != xpSuccess )
     {
         LOG_MSG( "[ERR:%d] :%s:%d: Failed to initialize xPOS backend processor\n",

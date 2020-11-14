@@ -7,6 +7,36 @@
 
 namespace xpos_store {
 
+/**
+ * @brief The InventoryKPI class
+ */
+class InventoryKPI {
+public:
+    int typesNum = 0;
+    double totalValue = 0;
+    double totalProfit = 0;
+    double totalLost = 0;
+
+    std::vector<double> values;
+    std::vector<double> profits;
+    std::vector<int> categories;
+
+    void setDefault()
+    {
+        typesNum = 0;
+        totalValue = 0;
+        totalProfit = 0;
+        totalLost = 0;
+        values.clear();
+        profits.clear();
+        categories.clear();
+    }
+};
+
+
+/**
+ * @brief The InventoryDatabase class
+ */
 class InventoryDatabase : public Database
 {
 public:
@@ -21,6 +51,8 @@ public:
     xpError_t insertProduct( Product &_product );
     xpError_t deleteProductByBarcode( const std::string &_barcode );
     xpError_t updateProduct( Product &_productInfo, bool _isQuantityOnly=true );
+
+    xpError_t summaryInventory( InventoryKPI &kpi );
 };
 
 }

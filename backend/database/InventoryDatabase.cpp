@@ -3,6 +3,49 @@
 namespace xpos_store
 {
 
+/**************************************************************
+ *      callback functions
+ **************************************************************/
+static int kpiCallback( void *data, int fieldsNum, char **fieldVal, char **fieldName )
+{
+    if( data )
+    {
+        InventoryKPI* kpi = (InventoryKPI*)data;
+
+        int category = -1;
+        double input_cost = 0;
+        double revenue = 0;
+        for( int fieldId = 0; fieldId < fieldsNum; fieldId++ )
+        {
+            if( !strcmp(fieldName[fieldId], "CATEGORY") )
+            {
+                category = fieldVal[fieldId] ? atoi(fieldVal[fieldId]) : -1;
+            }
+            else if( !strcmp(fieldName[fieldId], "SUM(INPUT_PRICE*NUM_INSTOCK)") )
+            {
+                input_cost = fieldVal[fieldId] ? atof(fieldVal[fieldId]) : 0.0;
+            }
+            else if( !strcmp(fieldName[fieldId], "SUM(UNIT_PRICE*NUM_INSTOCK)") )
+            {
+                revenue = fieldVal[fieldId] ? atof(fieldVal[fieldId]) : 0.0;
+            }
+            else
+            {
+                LOG_MSG( "[ERR:%d] %s:%d: Invalid field name\n", xpErrorProcessFailure, __FILE__, __LINE__ );
+                return xpErrorProcessFailure;
+            }
+        }
+
+        kpi->totalValue += input_cost;
+        kpi->totalProfit += revenue - input_cost;
+        kpi->categories.push_back(category);
+        kpi->values.push_back( input_cost );
+        kpi->profits.push_back( revenue - input_cost );
+    }
+
+    return xpSuccess;
+}
+
 
 /**
  * @brief InventoryDatabase::InventoryDatabase
@@ -244,6 +287,41 @@ xpError_t InventoryDatabase::updateProduct( Product &_productInfo , bool _isQuan
 
     char *sqliteMsg;
     xpError_t sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd, nullptr, nullptr, &sqliteMsg );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        return xpErrorProcessFailure;
+    }
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief InventoryDatabase::summaryInventory
+ */
+xpError_t InventoryDatabase::summaryInventory(InventoryKPI &kpi)
+{
+    kpi.setDefault();
+    // Number of product types in inventory
+    kpi.typesNum = count( "PRODUCT" );
+    if( kpi.typesNum == -1 )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to get number of product types\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__ );
+        return xpErrorProcessFailure;
+    }
+
+    // Sum of value and profit by category
+    std::string sqliteCmd =   "SELECT CATEGORY, SUM(INPUT_PRICE*NUM_INSTOCK), SUM(UNIT_PRICE*NUM_INSTOCK)\n" \
+                              "FROM PRODUCT\n" \
+                              "GROUP BY CATEGORY\n" \
+                              "ORDER BY SUM(INPUT_PRICE*NUM_INSTOCK) DESC;";
+
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd.c_str(), kpiCallback, (void*)&kpi, &sqliteMsg );
     if( sqliteErr != SQLITE_OK )
     {
         LOG_MSG( "[ERR:%d] %s:%d: %s\n",
