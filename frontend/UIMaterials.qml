@@ -5,6 +5,7 @@ import QtQuick 2.0
 QtObject {
 
     // Font size properties
+    property int fontsizeXXS: 18
     property int fontsizeXS: 20
     property int fontsizeS: 22
     property int fontsizeM: 26
@@ -97,5 +98,23 @@ QtObject {
     //=========== Icon font
     readonly property string iconSuccess: "\uf058"
     readonly property string iconError: "\uf071"
+
+    readonly property var iconCategories: [ "\ue904", // food
+                                            "\ue900", // drinks
+                                            "\ue906", // household appliances
+                                            "\ue903", // fashion
+                                            "\ue902", // electronics
+                                            "\ue901", // eucation
+                                            "\ue905", // heathcare
+                                            "\ue907" // baby
+                                          ]
+    readonly property var categoryNames: [  "Thực phẩm",
+                                            "Đồ uống",
+                                            "Gia dụng",
+                                            "Thời trang",
+                                            "Điện tử",
+                                            "Văn phòng",
+                                            "Sức khỏe",
+                                            "Trẻ em"]
 
 }

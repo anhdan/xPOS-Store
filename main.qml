@@ -15,6 +15,7 @@ Window {
     width: UIMaterials.windowWidth
     height: UIMaterials.windowHeight
     title: qsTr("Ant Thu Ngân")
+    color: "white"
 
     onWidthChanged: {
         UIMaterials.fontsizeXS = Math.round(0.0195 * width)

@@ -154,5 +154,25 @@ QVariant BackendInventory::kpi()
     map["total_profit"] = m_kpi.totalProfit;
     map["total_lost"] = 0.0;
 
+    QVariantList categories, values, profits, categoryNames;
+    for( int i = 0; i < (int)m_kpi.values.size(); i++ )
+    {
+        categories << m_kpi.categories[i];
+        values << m_kpi.values[i];
+        profits << m_kpi.profits[i];
+        if(  m_kpi.categories[i] != -1 )
+        {
+            categoryNames << QString::fromStdString(CATEGORIES_MAJOR_NAME[m_kpi.categories[i]]);
+        }
+        else
+        {
+            categoryNames << QString::fromStdString("None");
+        }
+    }
+    map["categories"] = QVariant::fromValue(categories);
+    map["category_names"] = QVariant::fromValue(categoryNames);
+    map["values"] = QVariant::fromValue(values);
+    map["profits"] = QVariant::fromValue(profits);
+
     return QVariant::fromValue(map);
 }

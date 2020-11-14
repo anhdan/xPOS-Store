@@ -1,10 +1,11 @@
-import QtQuick 2.0
+import QtQuick 2.4
 import QtQml 2.2
 import QtQuick.Controls 1.4
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.0
 import QtQuick.Controls.Styles 1.4
 import QtQuick.VirtualKeyboard 2.2
+import QtCharts 2.0
 
 import "."
 import ".."
@@ -12,6 +13,56 @@ import "../gadgets"
 
 Item {
     id: root
+    clip: true
+
+    function updatePiechart()
+    {
+        // Clear legend content
+        lvLabel.model.clear()
+
+        if( beInventory.kpi["total_values"] === 0 )
+            return
+
+        var categories = beInventory.kpi["categories"]
+        var categoryNames = beInventory.kpi["category_names"]
+        var values = beInventory.kpi["values"]
+        var profit = beInventory.kpi["profit"]
+
+        var accValue = 0.0
+        var othersValue = 0.0
+        for( var i = 0; i < categories.length; i++ )
+        {
+            if( accValue / beInventory.kpi["total_values"] > 0.9 )
+            {
+                othersValue = beInventory.kpi["total_values"] - accValue
+                break
+            }
+
+            if( categories[i] !== -1 )
+            {
+                accValue += values[i]
+                var share = values[i] / beInventory.kpi["total_values"] * 100
+                pieOuter.append( UIMaterials.iconCategories[categories[i]], values[i] )
+                legendModel.append({"legend_sign": UIMaterials.iconCategories[categories[i]],
+                                    "legend_color": "black",
+                                    "legend_name": share.toFixed(2) + " %  " + UIMaterials.categoryNames[categories[i]]
+                                   })
+            }
+            else {
+                othersValue += values[i]
+            }
+        }
+
+        if( othersValue > 0 )
+        {
+            pieOuter.append( "...", othersValue )
+            legendModel.append({"legend_sign": "...",
+                                "legend_color": "black",
+                                "legend_name": (othersValue * 100 / beInventory.kpi["total_values"]).toFixed(2) + " %  Các mặt hàng khác"
+                               })
+        }
+    }
+
     //========================= I. KPI panel
     Rectangle {
         id: pnControl
@@ -40,7 +91,7 @@ Item {
             anchors.top: kpiKindsNum.bottom
             anchors.topMargin: kpiKindsNum.anchors.topMargin
             kpiName: "Tổng giá trị hàng hóa"
-            kpiValue: "0 vnd"
+            kpiValue: Number(beInventory.kpi["total_values"]).toLocaleString( Qt.locale(), "f", 0 )
         }
 
         KPICard {
@@ -51,7 +102,7 @@ Item {
             anchors.top: kpiTotalValue.bottom
             anchors.topMargin: kpiKindsNum.anchors.topMargin
             kpiName: "Lợi nhuận ước tính"
-            kpiValue: "0 vnd"
+            kpiValue: Number(beInventory.kpi["total_profit"]).toLocaleString( Qt.locale(), "f", 0 )
         }
 
         KPICard {
@@ -63,9 +114,127 @@ Item {
             anchors.topMargin: kpiKindsNum.anchors.topMargin
             kpiName: "Tổng giá trị thất thoát"
             valueFontColor: UIMaterials.colorTrueRed
-            kpiValue: "0 vnd"
+            kpiValue: Number(beInventory.kpi["total_lost"]).toLocaleString( Qt.locale(), "f", 0 )
         }
     }
+
+    //========================= Pie chart showing the share value of product categpries
+    Rectangle {
+        id: pieChart
+        width: 0.668 * parent.width
+        height: parent.height / 3
+        anchors.top: parent.top
+        anchors.left: pnControl.right
+        color: "white"
+
+        Label {
+            id: titPieChart
+            y: 0.0282 * parent.height
+            x: 0.0146 * parent.width
+
+            font{
+                pixelSize: UIMaterials.fontsizeM
+                bold: true
+                family: UIMaterials.fontRobotoLight
+            }
+            verticalAlignment: Text.AlignVCenter
+            color: UIMaterials.grayDark
+            text: "Tỷ lệ giá trị các loại mặt hàng"
+        }
+
+        ChartView {
+            id: chart
+            height: parent.height - titPieChart.y - titPieChart.height
+            width: parent.width / 2
+            anchors.left: parent.left
+            anchors.top: titPieChart.bottom
+            legend.visible: false
+            antialiasing: true
+
+            PieSeries {
+                id: pieOuter
+                size: 0.9
+                holeSize: 0.5
+
+                onSliceAdded: {
+                    slice.labelFont.pixelSize = UIMaterials.fontsizeXS
+                    slice.labelFont.weight = Font.Bold
+                    slice.labelFont.family = UIMaterials.fontCategories
+                    slice.labelPosition = PieSlice.LabelInsideHorizontal;
+                    slice.labelColor = UIMaterials.colorNearWhite
+                    slice.labelVisible = true;
+                }
+            }
+        }
+
+        Component.onCompleted: {
+            updatePiechart()
+            beInventory.kpiChanged.connect( root.updatePiechart )
+        }
+
+//        Rectangle {
+//            anchors.top: chart.top
+//            anchors.left: chart.right
+//            width: parent.width/2
+//            height: chart.height
+//            color: "white"
+
+            ListView {
+                id: lvLabel
+                anchors.top: chart.top
+                anchors.topMargin: 60
+                anchors.left: chart.right
+                width: parent.width / 2
+                implicitHeight: chart.height
+                model: legendModel
+
+                ListModel {
+                    id: legendModel
+                }
+
+                delegate: Row {
+                    spacing: 10
+                    Label {
+                        id: lblCategorySign
+                        width: UIMaterials.fontsizeXL
+                        height: UIMaterials.fontsizeXL
+                        font {
+                            pixelSize: UIMaterials.fontsizeS
+                            weight: Font.Bold
+                            family: UIMaterials.fontCategories
+                        }
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        color: pieOuter.at(index).color
+                        text: legend_sign
+                    }
+
+                    Label {
+                        id: lblCategoryName
+                        height: lblCategorySign.height
+                        font {
+                            pixelSize: UIMaterials.fontsizeS
+                            family: UIMaterials.fontRobotoLight
+                        }
+                        horizontalAlignment: Text.AlignLeft
+                        verticalAlignment: Text.AlignVCenter
+                        color: "black"
+                        text: legend_name
+                    }
+                }
+
+            }
+//        }
+    }
+
+//    Component.onCompleted: {
+//        // Set the common slice properties dynamically for convenience
+//        for (var i = 0; i < pieOuter.count; i++) {
+//            pieOuter.at(i).labelPosition = PieSlice.LabelOutside;
+//            pieOuter.at(i).labelVisible = true;
+//            pieOuter.at(i).borderWidth = 3;
+//        }
+//    }
 
     //========================= II. In-depth info panel
     TabView {
@@ -73,7 +242,7 @@ Item {
         width: 0.668 * parent.width
         height: parent.height
         x: pnControl.width
-        y: 0
+        y: pieChart.height
 
         property int numSoonOOS: 0
         property int numSoonExpired: 0
