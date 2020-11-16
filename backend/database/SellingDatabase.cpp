@@ -29,6 +29,10 @@ xpError_t SellingDatabase::createBillTable()
                             "   CUSTOMER_ID         TEXT        ,\n" \
                             "   STAFF_ID            TEXT        NOT NULL,\n" \
                             "   CREATION_TIME       INTEGER     NOT NULL,\n" \
+                            "   YEAR                INTEGER     NOT NULL,\n" \
+                            "   MONTH               INTEGER     NOT NULL,\n" \
+                            "   DAY                 INTEGER     NOT NULL,\n" \
+                            "   HOUR                INTEGER     NOT NULL,\n" \
                             "   TOTAL_CHARGING      REAL        NOT NULL,\n" \
                             "   TOTAL_DISCOUNT      REAL        NOT NULL,\n" \
                             "   CUSTOMER_PAYMENT    REAL        NOT NULL,\n" \
@@ -196,13 +200,20 @@ xpError_t SellingDatabase::insertBill( Bill &_bill)
         return xpErrorNotPermited;
     }
 
-    std::string cmdFormat = "INSERT INTO BILL (ID, CUSTOMER_ID, STAFF_ID, CREATION_TIME, TOTAL_CHARGING, TOTAL_DISCOUNT, CUSTOMER_PAYMENT, PROFIT, USED_POINT, REWARDED_POINT) " \
-                            "VALUES('%s', '%s', '%s', %ld, %f, %f, %f, %f, %d, %d);";
+    // Get time in year/month/date/hour
+    time_t billTime = _bill.getCreationTime();
+    struct tm *ltm = localtime( &billTime );
+
+
+    std::string cmdFormat = "INSERT INTO BILL (ID, CUSTOMER_ID, STAFF_ID, CREATION_TIME, YEAR, MONTH, DAY, HOUR, " \
+                                              "TOTAL_CHARGING, TOTAL_DISCOUNT, CUSTOMER_PAYMENT, PROFIT, USED_POINT, REWARDED_POINT) " \
+                            "VALUES('%s', '%s', '%s', %ld, %d, %d, %d, %d, %f, %f, %f, %f, %d, %d);";
     char sqliteCmd[1000];
     Payment payment;
     _bill.getPayment( payment );
     sprintf( sqliteCmd, cmdFormat.c_str(), _bill.getId().c_str(),
              _bill.getCustomerId().c_str(), _bill.getStaffId().c_str(), _bill.getCreationTime(),
+             ltm->tm_year + 1900, ltm->tm_mon + 1, ltm->tm_mday, ltm->tm_hour,
              payment.getTotalCharging(), payment.getTotalDiscount(), payment.getCustomerPayment(),
              _bill.getProfit(), payment.getUsedPoint(), payment.getRewardedPoint() );
     printf( "====> insert bill cmd: %s\n", sqliteCmd );

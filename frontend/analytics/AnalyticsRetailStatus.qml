@@ -181,6 +181,10 @@ Item {
             height: 0.4520 * root.height
             x: rowDuration.x
             y: rowDuration.y
+
+            onCurrPeriodIndexChanged: {
+
+            }
         }
         enabled: false
         visible: false

@@ -17,6 +17,7 @@
 #include <string.h>
 #include <float.h>
 #include <time.h>
+#include <ctime>
 #include <vector>
 #include <list>
 #include <numeric>
