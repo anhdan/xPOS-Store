@@ -27,7 +27,7 @@ class BackendAnalytics : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(RangeType rangeType READ rangeType WRITE setRangeType NOTIFY rangeTypeChanged)
+    Q_PROPERTY(QVariant kpi READ kpi NOTIFY kpiChanged)
 
 public:
     BackendAnalytics( QQmlApplicationEngine *engine, xpos_store::InventoryDatabase *_inventoryDB,
@@ -35,25 +35,18 @@ public:
     ~BackendAnalytics();
 
 signals:
-    void rangeTypeChanged();
+    void retailStatusComputed( QVariant _barSeries );
+    void barSeriesChanged( QVariant );
+    void pieSeriesChanged( QVariant );
+    void kpiChanged( QVariant );
 
 public slots:
-
+    int getRetailStatus( const QDate &_startDate, const QDate &_endDate );
+    QVariant kpi();
 
 public:
-    enum class RangeType : int {
-        Day,
-        Week,
-        Month,
-        Quater,
-        Year
-    };
-    Q_ENUM(RangeType)
-
-    RangeType rangeType();
-    void setRangeType( RangeType _rangeType );
-
     int init();
+
 private:
     QQmlApplicationEngine *m_engine;
     xpos_store::InventoryDatabase *m_inventoryDB;
@@ -61,9 +54,9 @@ private:
     xpos_store::SellingDatabase *m_sellingDB;
 
     // Analytics time range
-    RangeType m_rangeType;
-    QDateTime m_startTime;
-    QDateTime m_endTime;
+    QVariantMap m_kpi;
+    std::list<RetailStatusRecord> m_retailStatusRecords;
+    std::list<xpos_store::SellingRecord> m_sellingRecords;
 };
 
 #endif // BACKENDANALYTICS_H

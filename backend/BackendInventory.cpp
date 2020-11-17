@@ -48,7 +48,7 @@ int BackendInventory::init()
 
     LOG_MSG( "TOTAL TYPES = %d\nTOTAL_VALUE = %f\nTOTAL_PROFIT=%f\n",
              m_kpi.typesNum, m_kpi.totalValue, m_kpi.totalProfit );
-    for( int i = 0; i < m_kpi.categories.size(); i++ )
+    for( int i = 0; i < (int)m_kpi.categories.size(); i++ )
     {
         printf( "\tcategory = %d  - value = %10f  -  profit = %10f\n",
                 m_kpi.categories[i], m_kpi.values[i], m_kpi.profits[i] );

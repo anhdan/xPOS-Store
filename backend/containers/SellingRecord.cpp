@@ -141,6 +141,32 @@ std::string SellingRecord::getBillId()
 
 
 /**
+ * @brief SellingRecord::setCategory
+ */
+void SellingRecord::setCategory(const Category &_category)
+{
+    m_category = _category;
+}
+
+
+/**
+ * @brief SellingRecord::getCategory
+ */
+Category SellingRecord::getCategory()
+{
+    return m_category;
+}
+
+/**
+ * @brief SellingRecord::getCategoryName
+ */
+std::string SellingRecord::getCategoryName()
+{
+    return CATEGORIES_MAJOR_NAME[(int)m_category];
+}
+
+
+/**
  * @brief SellingRecord::setProductBarcode
  */
 void SellingRecord::setProductBarcode( const std::string &_barcode )
@@ -362,13 +388,17 @@ xpError_t SellingRecord::searchCallBackGroup(void *data, int fieldsNum, char **f
 {
     if( data )
     {
-        std::vector<SellingRecord> *records = (std::vector<SellingRecord>*)data;
+        std::list<SellingRecord> *records = (std::list<SellingRecord>*)data;
         SellingRecord record;
         for( int fieldId = 0; fieldId < fieldsNum; fieldId++ )
         {
             if( !strcmp(fieldName[fieldId], "PRODUCT_BARCODE") )
             {
                 record.m_productBarcode = fieldVal[fieldId] ? fieldVal[fieldId] : "";
+            }
+            else if( !strcmp(fieldName[fieldId], "CATEGORY") )
+            {
+                record.m_category = fieldVal[fieldId] ? (Category)atoi(fieldVal[fieldId]) : Category::NONE;
             }
             else if( !strcmp(fieldName[fieldId], "SUM(QUANTITY)") )
             {

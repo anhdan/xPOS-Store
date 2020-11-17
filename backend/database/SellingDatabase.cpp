@@ -4,6 +4,64 @@
 namespace xpos_store {
 
 /**
+ * @brief groupBillCallBack
+ */
+static int groupBillCallBack(void *data, int fieldsNum, char **fieldVal, char **fieldName)
+{
+    if( data )
+    {
+        std::list<RetailStatusRecord> *records = (std::list<RetailStatusRecord>*)data;
+        RetailStatusRecord record;
+        for( int fieldId = 0; fieldId < fieldsNum; fieldId++ )
+        {
+            if( !strcmp(fieldName[fieldId], "YEAR") )
+            {
+                record.year = fieldVal[fieldId] ? atoi(fieldVal[fieldId]) : 0;
+            }
+            else if( !strcmp(fieldName[fieldId], "MONTH") )
+            {
+                record.month = fieldVal[fieldId] ? atoi(fieldVal[fieldId]) : 0;
+            }
+            else if( !strcmp(fieldName[fieldId], "WEEK") )
+            {
+                record.week = fieldVal[fieldId] ? atoi(fieldVal[fieldId]) : 0;
+            }
+            else if( !strcmp(fieldName[fieldId], "WDAY") )
+            {
+                record.wday = fieldVal[fieldId] ? atoi(fieldVal[fieldId]) : 0;
+            }
+            else if( !strcmp(fieldName[fieldId], "HOUR") )
+            {
+                record.hour = fieldVal[fieldId] ? atoi(fieldVal[fieldId]) : 0;
+            }
+            else if( !strcmp(fieldName[fieldId], "SUM(TOTAL_CHARGING)") )
+            {
+                record.revenue = fieldVal[fieldId] ? atof(fieldVal[fieldId]) : 0.0;
+            }
+            else if( !strcmp(fieldName[fieldId], "SUM(TOTAL_DISCOUNT)") )
+            {
+                record.disount = fieldVal[fieldId] ? atof(fieldVal[fieldId]) : 0.0;
+            }
+            else if( !strcmp(fieldName[fieldId], "SUM(PROFIT)") )
+            {
+                record.profit = fieldVal[fieldId] ? atof(fieldVal[fieldId]) : 0.0;
+            }
+            else
+            {
+                LOG_MSG( "[ERR:%d] %s:%d: Invalid field name\n", xpErrorProcessFailure, __FILE__, __LINE__ );
+                return xpErrorProcessFailure;
+            }
+        }
+
+        records->push_back( record );
+    }
+
+    return xpSuccess;
+}
+
+
+
+/**
  * @brief SellingDatabase::SellingDatabase
  */
 SellingDatabase::SellingDatabase(const SellingDatabase &_db) : Database(_db)
@@ -31,7 +89,8 @@ xpError_t SellingDatabase::createBillTable()
                             "   CREATION_TIME       INTEGER     NOT NULL,\n" \
                             "   YEAR                INTEGER     NOT NULL,\n" \
                             "   MONTH               INTEGER     NOT NULL,\n" \
-                            "   DAY                 INTEGER     NOT NULL,\n" \
+                            "   WEEK                INTEGER     NOT NULL,\n" \
+                            "   WDAY                INTEGER     NOT NULL,\n" \
                             "   HOUR                INTEGER     NOT NULL,\n" \
                             "   TOTAL_CHARGING      REAL        NOT NULL,\n" \
                             "   TOTAL_DISCOUNT      REAL        NOT NULL,\n" \
@@ -71,6 +130,7 @@ xpError_t SellingDatabase::createSellingRecordTable()
     std::string sqliteCmd = "CREATE TABLE IF NOT EXISTS SELLING_RECORD (\n" \
                             "   BILL_ID             TEXT        NOT NULL,\n" \
                             "   PRODUCT_BARCODE     TEXT        NOT NULL,\n" \
+                            "   CATEGORY            INTEGER     NOT NULL,\n" \
                             "   CREATION_TIME       INTEGER     NOT NULL,\n" \
                             "   QUANTITY            INTEGER     NOT NULL,\n" \
                             "   TOTAL_PRICE         REAL        NOT NULL,\n" \
@@ -205,15 +265,15 @@ xpError_t SellingDatabase::insertBill( Bill &_bill)
     struct tm *ltm = localtime( &billTime );
 
 
-    std::string cmdFormat = "INSERT INTO BILL (ID, CUSTOMER_ID, STAFF_ID, CREATION_TIME, YEAR, MONTH, DAY, HOUR, " \
+    std::string cmdFormat = "INSERT INTO BILL (ID, CUSTOMER_ID, STAFF_ID, CREATION_TIME, YEAR, MONTH, WEEK, WDAY, HOUR, " \
                                               "TOTAL_CHARGING, TOTAL_DISCOUNT, CUSTOMER_PAYMENT, PROFIT, USED_POINT, REWARDED_POINT) " \
-                            "VALUES('%s', '%s', '%s', %ld, %d, %d, %d, %d, %f, %f, %f, %f, %d, %d);";
+                            "VALUES('%s', '%s', '%s', %ld, %d, %d, %d, %d, %d, %f, %f, %f, %f, %d, %d);";
     char sqliteCmd[1000];
     Payment payment;
     _bill.getPayment( payment );
     sprintf( sqliteCmd, cmdFormat.c_str(), _bill.getId().c_str(),
              _bill.getCustomerId().c_str(), _bill.getStaffId().c_str(), _bill.getCreationTime(),
-             ltm->tm_year + 1900, ltm->tm_mon + 1, ltm->tm_mday, ltm->tm_hour,
+             ltm->tm_year + 1900, ltm->tm_mon + 1, (ltm->tm_mday - 1) / 7, ltm->tm_wday , ltm->tm_hour,
              payment.getTotalCharging(), payment.getTotalDiscount(), payment.getCustomerPayment(),
              _bill.getProfit(), payment.getUsedPoint(), payment.getRewardedPoint() );
     printf( "====> insert bill cmd: %s\n", sqliteCmd );
@@ -273,12 +333,12 @@ xpError_t SellingDatabase::insertSellingRecord( SellingRecord &_record)
         return xpErrorNotPermited;
     }
 
-    std::string cmdFormat = "INSERT INTO SELLING_RECORD (BILL_ID, PRODUCT_BARCODE, CREATION_TIME, QUANTITY, TOTAL_PRICE, DISCOUNT_PERCENT, TOTAL_PROFIT) " \
-                            "VALUES('%s', '%s', %ld, %d, %f, %f, %f);";
+    std::string cmdFormat = "INSERT INTO SELLING_RECORD (BILL_ID, PRODUCT_BARCODE, CATEGORY, CREATION_TIME, QUANTITY, TOTAL_PRICE, DISCOUNT_PERCENT, TOTAL_PROFIT) " \
+                            "VALUES('%s', '%s', %d, %ld, %d, %f, %f, %f);";
     char sqliteCmd[1000];
     sprintf( sqliteCmd, cmdFormat.c_str(),
              _record.getBillId().c_str(), _record.getProductBarcode().c_str(),
-             _record.getCreationTime(), _record.getQuantity(),
+             (int)_record.getCategory(), _record.getCreationTime(), _record.getQuantity(),
              _record.getTotalPrice(), _record.getDiscountPercent(),
              _record.getTotalProfit() );
     printf( "====> insert selling record cmd: %s\n", sqliteCmd );
@@ -318,11 +378,11 @@ xpError_t SellingDatabase::insertSellingRecord(Product &_product, const std::str
 
 
     double discountPercent = (_product.getUnitPrice() - _product.getSellingPrice()) / _product.getUnitPrice() * 100;
-    std::string cmdFormat = "INSERT INTO SELLING_RECORD (BILL_ID, PRODUCT_BARCODE, CREATION_TIME, QUANTITY, TOTAL_PRICE, DISCOUNT_PERCENT, TOTAL_PROFIT) " \
-                            "VALUES('%s', '%s', %ld, %d, %f, %f, %f);";
+    std::string cmdFormat = "INSERT INTO SELLING_RECORD (BILL_ID, PRODUCT_BARCODE, CATEGORY, CREATION_TIME, QUANTITY, TOTAL_PRICE, DISCOUNT_PERCENT, TOTAL_PROFIT) " \
+                            "VALUES('%s', '%s', %d, %ld, %d, %f, %f, %f);";
     char sqliteCmd[1000];
     sprintf( sqliteCmd, cmdFormat.c_str(),
-             _billId.c_str(), _product.getBarcode().c_str(), _creationTime, _product.getItemNum(),
+             _billId.c_str(), _product.getBarcode().c_str(), (int)_product.getCategory(), _creationTime, _product.getItemNum(),
              _product.getSellingPrice() * _product.getItemNum(), discountPercent,
              (_product.getSellingPrice()-_product.getInputPrice())*_product.getItemNum() );
     printf( "====> insert selling record cmd: %s\n", sqliteCmd );
@@ -571,6 +631,227 @@ xpError_t SellingDatabase::searchWorkShift(std::vector<WorkShift> &_workshifts, 
                  xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
         sqlite3_free( sqliteMsg );
         _workshifts.clear();
+        return xpErrorProcessFailure;
+    }
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief SellingDatabase::groupBillsByDayHours
+ */
+xpError_t SellingDatabase::groupBillsByDayHours(const uint64_t &_startTime, const uint64_t &_endTime, std::list<RetailStatusRecord> &_retailRecords)
+{
+    if( !m_isOpen )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: The database has not been opened\n",
+                 xpErrorNotPermited, __FILE__, __LINE__ );
+        return xpErrorNotPermited;
+    }
+
+    std::string sqliteCmdFormat =   "SELECT HOUR, SUM(TOTAL_CHARGING), SUM(TOTAL_DISCOUNT), SUM(PROFIT)\n" \
+                                    "FROM BILL\n" \
+                                    "WHERE CREATION_TIME > %ld AND CREATION_TIME <%ld\n" \
+                                    "GROUP BY HOUR\n" \
+                                    "ORDER BY CREATION_TIME ASC;";
+    char sqliteCmd[1000];
+    sprintf( sqliteCmd, sqliteCmdFormat.c_str(), _startTime, _endTime );
+    LOG_MSG( "[DEB] %s:%d: ===> groupBillsByDayHour cmd:\n\t%s\n",
+             __FUNCTION__, __LINE__, sqliteCmd );
+
+    _retailRecords.clear();
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd, groupBillCallBack, (void*)&_retailRecords, &sqliteMsg );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        _retailRecords.clear();
+        return xpErrorProcessFailure;
+    }
+
+    std::list<RetailStatusRecord>::iterator it = _retailRecords.begin();
+    for( int id = 0; id < (int)_retailRecords.size(); id++ )
+    {
+        it->timeStr = std::to_string( it->hour ) + ":00";
+        std::advance( it, 1 );
+    }
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief SellingDatabase::groupBillsByWeekDays
+ */
+xpError_t SellingDatabase::groupBillsByWeekDays( const uint64_t &_startTime, const uint64_t &_endTime, std::list<RetailStatusRecord> &_retailRecords )
+{
+    if( !m_isOpen )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: The database has not been opened\n",
+                 xpErrorNotPermited, __FILE__, __LINE__ );
+        return xpErrorNotPermited;
+    }
+
+    std::string sqliteCmdFormat =   "SELECT MONTH, WEEK, WDAY, SUM(TOTAL_CHARGING), SUM(TOTAL_DISCOUNT), SUM(PROFIT)\n" \
+                                    "FROM BILL\n" \
+                                    "WHERE CREATION_TIME > %ld AND CREATION_TIME <%ld\n" \
+                                    "GROUP BY WEEK, WDAY\n" \
+                                    "ORDER BY CREATION_TIME ASC;";
+    char sqliteCmd[1000];
+    sprintf( sqliteCmd, sqliteCmdFormat.c_str(), _startTime, _endTime );
+    LOG_MSG( "[DEB] %s:%d: ===> groupBillsByWeekDay cmd:\n\t%s\n",
+             __FUNCTION__, __LINE__, sqliteCmd );
+
+    _retailRecords.clear();
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd, groupBillCallBack, (void*)&_retailRecords, &sqliteMsg );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        _retailRecords.clear();
+        return xpErrorProcessFailure;
+    }
+
+    std::list<RetailStatusRecord>::iterator it = _retailRecords.begin();
+    for( int id = 0; id < (int)_retailRecords.size(); id++ )
+    {
+        it->timeStr = DATE[it->wday] + ", " + std::to_string(it->week*7 + it->wday) + "/" + std::to_string(it->month);
+        std::advance( it, 1 );
+    }
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief SellingDatabase::groupBillsByMonthWeeks
+ */
+xpError_t SellingDatabase::groupBillsByMonthWeeks(const uint64_t &_startTime, const uint64_t &_endTime, std::list<RetailStatusRecord> &_retailRecords)
+{
+    if( !m_isOpen )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: The database has not been opened\n",
+                 xpErrorNotPermited, __FILE__, __LINE__ );
+        return xpErrorNotPermited;
+    }
+
+    std::string sqliteCmdFormat =   "SELECT YEAR, MONTH, WEEK, SUM(TOTAL_CHARGING), SUM(TOTAL_DISCOUNT), SUM(PROFIT)\n" \
+                                    "FROM BILL\n" \
+                                    "WHERE CREATION_TIME > %ld AND CREATION_TIME <%ld\n" \
+                                    "GROUP BY MONTH, WEEK\n" \
+                                    "ORDER BY CREATION_TIME ASC;";
+    char sqliteCmd[1000];
+    sprintf( sqliteCmd, sqliteCmdFormat.c_str(), _startTime, _endTime );
+    LOG_MSG( "[DEB] %s:%d: ===> groupBillsByMonthWeeks cmd:\n\t%s\n",
+             __FUNCTION__, __LINE__, sqliteCmd );
+
+    _retailRecords.clear();
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd, groupBillCallBack, (void*)&_retailRecords, &sqliteMsg );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        _retailRecords.clear();
+        return xpErrorProcessFailure;
+    }
+
+    std::list<RetailStatusRecord>::iterator it = _retailRecords.begin();
+    for( int id = 0; id < (int)_retailRecords.size(); id++ )
+    {
+        QDate startDate( it->year, it->month, it->week );
+        QDate endDate( it->year, it->month, it->week * 7 + 6 );
+        it->timeStr = std::to_string( startDate.day() ) + "/" + std::to_string( startDate.month()+1 ) + " - "
+                + std::to_string( endDate.day() ) + "/" + std::to_string( endDate.month()+1 );
+        std::advance( it, 1 );
+    }
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief SellingDatabase::groupBillsByMonths
+ */
+xpError_t SellingDatabase::groupBillsByMonths(const uint64_t &_startTime, const uint64_t &_endTime, std::list<RetailStatusRecord> &_retailRecords)
+{
+    if( !m_isOpen )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: The database has not been opened\n",
+                 xpErrorNotPermited, __FILE__, __LINE__ );
+        return xpErrorNotPermited;
+    }
+
+    std::string sqliteCmdFormat =   "SELECT YEAR, MONTH, SUM(TOTAL_CHARGING), SUM(TOTAL_DISCOUNT), SUM(PROFIT)\n" \
+                                    "FROM BILL\n" \
+                                    "WHERE CREATION_TIME > %ld AND CREATION_TIME <%ld\n" \
+                                    "GROUP BY YEAR, MONTH\n" \
+                                    "ORDER BY CREATION_TIME ASC;";
+    char sqliteCmd[1000];
+    sprintf( sqliteCmd, sqliteCmdFormat.c_str(), _startTime, _endTime );
+    LOG_MSG( "[DEB] %s:%d: ===> groupBillsByMonths cmd:\n\t%s\n",
+             __FUNCTION__, __LINE__, sqliteCmd );
+
+    _retailRecords.clear();
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd, groupBillCallBack, (void*)&_retailRecords, &sqliteMsg );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        _retailRecords.clear();
+        return xpErrorProcessFailure;
+    }
+
+    std::list<RetailStatusRecord>::iterator it = _retailRecords.begin();
+    for( int id = 0; id < (int)_retailRecords.size(); id++ )
+    {
+        it->timeStr = "Th " + std::to_string( it->month ) + "/" + std::to_string( it->year );
+        std::advance( it, 1 );
+    }
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief SellingDatabase::groupSellingRecordsByCategory
+ */
+xpError_t SellingDatabase::groupSellingRecordsByCategory(const uint64_t &_startTime, const uint64_t &_endTime, std::list<SellingRecord> &_sellingRecords)
+{
+    if( !m_isOpen )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: The database has not been opened\n",
+                 xpErrorNotPermited, __FILE__, __LINE__ );
+        return xpErrorNotPermited;
+    }
+
+    std::string sqliteCmdFormat =   "SELECT CATEGORY, SUM(TOTAL_PRICE), SUM(TOTAL_PROFIT)\n" \
+                                    "FROM SELLING_RECORD\n" \
+                                    "WHERE CREATION_TIME>=%ld AND CREATION_TIME<%ld\n" \
+                                    "GROUP BY CATEGORY\n" \
+                                    "ORDER BY SUM(TOTAL_PRICE) DESC;";
+    char sqliteCmd[1000];
+    sprintf( sqliteCmd, sqliteCmdFormat.c_str(), _startTime, _endTime );
+    LOG_MSG( "[DEB] %s:%d: ===> groupHistoryRecordByBarcode cmd:\n\t%s\n",
+             __FUNCTION__, __LINE__, sqliteCmd );
+
+    _sellingRecords.clear();
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd, SellingRecord::searchCallBackGroup, (void*)&_sellingRecords, &sqliteMsg );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        _sellingRecords.clear();
         return xpErrorProcessFailure;
     }
 

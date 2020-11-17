@@ -12,9 +12,67 @@ Rectangle {
     opacity: 0.95
     radius: 10
 
-    property int currPeriodIndex: 0
-    property alias startDate: calendarStart.selectedDate
-    property alias endDate: calendarEnd.selectedDate
+    property int currPeriodIndex: -1
+    property string periodString: ""
+    property var startDate: new Date()
+    property var endDate: new Date()
+    property bool startSelected: false
+    property bool endSelected: false
+
+    function next()
+    {
+        if( endDate <= new Date() )
+        {
+            var days = Math.ceil( (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24) );
+            startDate = new Date(endDate)
+            endDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + days )
+            periodString = startDate.toLocaleDateString("dd/mm") + " - " + endDate.toLocaleDateString("dd/mm")
+            picked( startDate, endDate )
+        }
+    }
+
+    function back()
+    {
+        var days = Math.ceil( (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24) );
+        endDate = new Date(startDate)
+        startDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - days )
+        if( currPeriodIndex !== -1 )
+            currPeriodIndex = -1
+
+        if( currPeriodIndex === btnToday.index )
+        {
+            periodString = "Hôm qua"
+        }
+        else if(currPeriodIndex === btnThisWeek.index )
+        {
+            periodString = "Tuần trước"
+        }
+        else if(currPeriodIndex === btnThisMonth.index )
+        {
+            periodString = "Tháng trước"
+        }
+        else if(currPeriodIndex === btnThisQuater.index )
+        {
+            periodString = "Quý trước"
+        }
+        else if(currPeriodIndex === btnThisYear.index )
+        {
+            periodString = "Năm trước"
+        }
+        else
+        {
+            periodString = startDate.toLocaleDateString("dd/mm") + " - " + endDate.toLocaleDateString("dd/mm")
+        }
+
+        picked( startDate, endDate )
+    }
+
+    Component.onCompleted: {
+        btnToday.clicked()
+    }
+
+    //================ Signals
+    signal picked( var _startDate, var _endDate )
 
     //================ I. Quick time picker
     Column {
@@ -39,6 +97,7 @@ Rectangle {
             }
 
             Text {
+                id: txtBtnToday
                 anchors.left: parent.left
                 anchors.leftMargin: 0.0133 * parent.width
                 anchors.verticalCenter: parent.verticalCenter
@@ -52,6 +111,11 @@ Rectangle {
 
             onClicked: {
                 root.currPeriodIndex = btnToday.index
+                periodString = txtBtnToday.text
+                endDate = new Date()
+                startDate = new Date()
+                endDate.setDate( startDate.getDate() + 1 )
+                picked( startDate, endDate )
             }
         }
 
@@ -68,6 +132,7 @@ Rectangle {
             }
 
             Text {
+                id: txtBtnThisWeek
                 anchors.left: parent.left
                 anchors.leftMargin: 0.0133 * parent.width
                 anchors.verticalCenter: parent.verticalCenter
@@ -81,6 +146,15 @@ Rectangle {
 
             onClicked: {
                 root.currPeriodIndex = btnThisWeek.index
+                periodString = txtBtnThisWeek.text
+
+                var today = new Date()
+                startDate = new Date()
+                endDate = new Date()
+                var day = today.getDay()
+                startDate.setDate( today.getDate() + 1 - day )
+                endDate.setDate( today.getDate() + 8 - day )
+                picked( startDate, endDate )
             }
         }
 
@@ -97,6 +171,7 @@ Rectangle {
             }
 
             Text {
+                id: txtBtnThisMonth
                 anchors.left: parent.left
                 anchors.leftMargin: 0.0133 * parent.width
                 anchors.verticalCenter: parent.verticalCenter
@@ -110,6 +185,12 @@ Rectangle {
 
             onClicked: {
                 root.currPeriodIndex = btnThisMonth.index
+                periodString = txtBtnThisMonth.text
+
+                var today = new Date()
+                startDate = new Date( today.getFullYear(), today.getMonth(), 1 )
+                endDate = new Date( today.getFullYear(), today.getMonth() + 1, 1 )
+                picked( startDate, endDate )
             }
         }
 
@@ -126,6 +207,7 @@ Rectangle {
             }
 
             Text {
+                id: txtBtnThisQuater
                 anchors.left: parent.left
                 anchors.leftMargin: 0.0133 * parent.width
                 anchors.verticalCenter: parent.verticalCenter
@@ -139,6 +221,13 @@ Rectangle {
 
             onClicked: {
                 root.currPeriodIndex = btnThisQuater.index
+                periodString = txtBtnThisQuater.text
+
+                var today = new Date()
+                var quater = Math.floor( today.getMonth() / 3 )
+                startDate = new Date( today.getFullYear(), quater * 3, 1 )
+                endDate = new Date( today.getFullYear(), (quater+1) * 3, 1 )
+                picked( startDate, endDate )
             }
         }
 
@@ -155,6 +244,7 @@ Rectangle {
             }
 
             Text {
+                id: txtBtnThisYear
                 anchors.left: parent.left
                 anchors.leftMargin: 0.0133 * parent.width
                 anchors.verticalCenter: parent.verticalCenter
@@ -168,6 +258,13 @@ Rectangle {
 
             onClicked: {
                 root.currPeriodIndex = btnThisYear.index
+                periodString = txtBtnThisYear.text
+
+                var today = new Date()
+                var quater = Math.floor( today.getMonth() / 3 )
+                startDate = new Date( today.getFullYear(), 0, 1 )
+                endDate = new Date( today.getFullYear() + 1, 0, 1 )
+                picked( startDate, endDate )
             }
         }
     }
@@ -242,6 +339,20 @@ Rectangle {
 
         maximumDate: new Date(2050, 0, 1)
         minimumDate: new Date(2020, 0, 1)
+        selectedDate: startDate
+
+        onClicked: {
+            startDate = selectedDate
+            if( endSelected )
+            {
+                startSelected = endSelected = false
+                picked( startDate, endDate )
+            }
+            else
+            {
+                startSelected = true
+            }
+        }
     }
 
     //=============== II. End Date picker by calendar
@@ -313,5 +424,18 @@ Rectangle {
 
         maximumDate: new Date(2050, 0, 1)
         minimumDate: new Date(2020, 0, 1)
+
+        onClicked: {
+            endDate = selectedDate
+            if( startSelected )
+            {
+                startSelected = endSelected = false
+                picked( startDate, endDate )
+            }
+            else
+            {
+                endSelected = true
+            }
+        }
     }
 }

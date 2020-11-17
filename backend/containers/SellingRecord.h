@@ -29,6 +29,10 @@ public:
     void setBillId( const std::string &_billId );
     std::string getBillId();
 
+    void setCategory( const Category &_category );
+    Category getCategory();
+    std::string getCategoryName();
+
     void setProductBarcode( const std::string &_barcode );
     std::string getProductBarcode();
 
@@ -61,6 +65,7 @@ private:
     std::string m_productBarcode;
     std::string m_desc;
     time_t m_creationTime;
+    Category m_category;
     int m_quantity;
     double m_totalProfit;
     double m_totalPrice;

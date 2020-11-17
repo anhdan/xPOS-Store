@@ -24,6 +24,7 @@ Item {
             return
 
         var categories = beInventory.kpi["categories"]
+        console.log( "-------> categories: ", categories )
         var categoryNames = beInventory.kpi["category_names"]
         var values = beInventory.kpi["values"]
         var profit = beInventory.kpi["profit"]

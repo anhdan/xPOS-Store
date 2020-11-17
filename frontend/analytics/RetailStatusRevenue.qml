@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import QtQml 2.2
 import QtQuick.Controls 2.2
-import QtCharts 2.0
+import QtCharts 2.3
 
 import ".."
 
@@ -9,6 +9,50 @@ Item {
     id: root
 
     signal nextClicked()
+
+    property var barsRevenue
+    property var piesRevenue
+
+    Component.onCompleted: {
+        beAnalytics.barSeriesChanged.connect( root.updateBarChart )
+        beAnalytics.pieSeriesChanged.connect( root.updatePieChart )
+    }
+
+    function updateBarChart( _barSeries ) {
+        barsRevenue = _barSeries
+        barsets.clear();
+        xAxis.clear()
+        var labels = []
+        var values = []
+        yAxis.max = 0
+        for( var i = 0; i < _barSeries.length; i++ )
+        {
+            var bar = _barSeries[i];
+            labels[i] = bar["label"]
+            values[i] =  bar["revenue"]
+            if( values[i] > yAxis.max )
+            {
+                yAxis.max = values[i]
+            }
+        }
+        xAxis.categories = labels
+        yAxis.max = Math.round(yAxis.max * 1.2 / 100000) * 100000
+        barsets.append( "revenue", values )
+    }
+
+
+    function updatePieChart( _pieSeries )
+    {
+        piesRevenue = _pieSeries
+        pieOuter.clear();
+        console.log( "---> _pieSeries.length = ",  _pieSeries.length )
+        for( var i = 0; i < _pieSeries.length; i++ )
+        {
+            var pie = _pieSeries[i]
+            console.log( "label = ", pie["label"], "  |  revenue = ", pie["revenue"])
+            pieOuter.append( pie["label"], pie["revenue"] )
+        }
+    }
 
     //============ I. Bar chart showing income/profit variation
     Label {
@@ -33,21 +77,27 @@ Item {
         height: 0.4237 * parent.height
         anchors.left: titVariationChart.left
         anchors.top: titVariationChart.bottom
-//            anchors.topMargin: 0.0141 * parent.height
         color: "transparent"
 
         ChartView {
 //                title: "Bar series"
             anchors.fill: parent
             legend.alignment: Qt.AlignBottom
+            legend.visible: false
             antialiasing: true
 
             BarSeries {
-                id: mySeries
-                axisX: BarCategoryAxis { categories: ["2007", "2008", "2009", "2010", "2011", "2012" ] }
-                BarSet { label: "Bob"; values: [2, 2, 3, 4, 5, 6] }
-                BarSet { label: "Susan"; values: [5, 1, 2, 4, 1, 7] }
-                BarSet { label: "James"; values: [3, 5, 8, 13, 5, 8] }
+                id: barsets
+                axisX: BarCategoryAxis {
+                    id: xAxis
+                }
+
+                axisY: ValueAxis {
+                    id: yAxis
+                    min: 0
+                    max: 500000
+                    tickInterval: 100000
+                }
             }
         }
     }
@@ -95,68 +145,28 @@ Item {
             antialiasing: true
 
             PieSeries {
+                property var previousSlice
+                property string previousLabel
+
                 id: pieOuter
                 size: 0.8
                 holeSize: 0.5
-                PieSlice {
-                    id: slice;
-                    label: "Thời trang 30%";
-                    labelFont {
-                        pixelSize: UIMaterials.fontsizeM
-                        weight: Font.Bold
-                        family: UIMaterials.fontCategories
-                    }
-                    labelColor: color
-                    value: 19511;
-                    color: "#99CA53"
 
-                    onPressed: {
-                        exploded = true
+                onClicked: {
+                    if( previousSlice !== undefined )
+                    {
+                        previousSlice.exploded = false
+                        previousSlice.labelVisible = false
+                        previousSlice.label = previousLabel
                     }
 
-                    onReleased: {
-                        exploded = false
-                    }
-                }
+                    previousLabel = slice.label
+                    previousSlice = slice
+                    slice.label = Number(slice.percentage * 100).toFixed(2) + "%" + slice.label
+                    slice.labelVisible = true
+                    slice.labelPosition = PieSlice.LabelOutside
+                    slice.exploded = true
 
-                PieSlice {
-                    label: "Thực phẩm 20%";
-                    labelFont {
-                        pixelSize: UIMaterials.fontsizeM
-                        weight: Font.Bold
-                        family: UIMaterials.fontCategories
-                    }
-                    labelColor: color
-                    value: 11105;
-                    color: "#209FDF"
-
-                    onPressed: {
-                        exploded = true
-                    }
-
-                    onReleased: {
-                        exploded = false
-                    }
-                }
-
-                PieSlice {
-                    label: "Đồ gia dụng 50%";
-                    labelFont {
-                        pixelSize: UIMaterials.fontsizeM
-                        weight: Font.Bold
-                        family: UIMaterials.fontCategories
-                    }
-                    labelColor: color
-                    value: 9352;
-                    color: "#F6A625"
-
-                    onPressed: {
-                        exploded = true
-                    }
-
-                    onReleased: {
-                        exploded = false
-                    }
                 }
             }
         }

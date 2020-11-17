@@ -60,6 +60,7 @@ Item {
 
                 onReleased: {
                     txtBtnBackward.opacity = 1
+                    durationPicker.back()
                 }
             }
 
@@ -74,7 +75,7 @@ Item {
                     family: UIMaterials.fontRobotoLight
                 }
                 color: UIMaterials.colorTaskBar
-                text: "Tháng này"
+                text: durationPicker.periodString
 
                 MouseArea {
                     id: maLblCalendar
@@ -85,7 +86,7 @@ Item {
                         {
                             maDurationPicker.state = "visible"
                             pnControl.enabled = false
-                            tvInfo.enabled = false
+                            pnDetails.enabled = false
                         }
                     }
                 }
@@ -120,6 +121,7 @@ Item {
 
                 onReleased: {
                     txtBtnForward.opacity = 1
+                    durationPicker.next()
                 }
             }
         }
@@ -132,7 +134,7 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: 0.1271 * parent.height
             kpiName: "Tổng doanh thu"
-            kpiValue: "0"
+            kpiValue: Number(beAnalytics.kpi["revenue"]).toLocaleString( Qt.locale(), "f", 0 )
         }
 
         KPICard {
@@ -143,7 +145,7 @@ Item {
             anchors.top: kpiKindsNum.bottom
             anchors.topMargin: 0.0565 * parent.height
             kpiName: "Tổng lợi nhuận ròng"
-            kpiValue: "0 vnd"
+            kpiValue: Number(beAnalytics.kpi["profit"]).toLocaleString( Qt.locale(), "f", 0 )
         }
 
         KPICard {
@@ -154,7 +156,7 @@ Item {
             anchors.top: kpiTotalValue.bottom
             anchors.topMargin: kpiTotalValue.anchors.topMargin
             kpiName: "Tổng chiết khấu/KM"
-            kpiValue: "0 vnd"
+            kpiValue: Number(beAnalytics.kpi["discount"]).toLocaleString( Qt.locale(), "f", 0 )
         }
 
         KPICard {
@@ -166,7 +168,7 @@ Item {
             anchors.topMargin: kpiTotalValue.anchors.topMargin
             kpiName: "Tổng giá trị thất thoát"
             valueFontColor: UIMaterials.colorTrueRed
-            kpiValue: "0 vnd"
+            kpiValue: Number(beAnalytics.kpi["lost"]).toLocaleString( Qt.locale(), "f", 0 )
         }
     }
 
@@ -182,8 +184,14 @@ Item {
             x: rowDuration.x
             y: rowDuration.y
 
-            onCurrPeriodIndexChanged: {
-
+            onPicked: {
+                console.log( "====> startDate = ", startDate.toLocaleDateString( "dd/mm/yyyy" ))
+                console.log( "====> endDate = ", endDate.toLocaleDateString( "dd/mm/yyyy" ))
+                maDurationPicker.state = ""
+//                lblCalendar.text = periodString
+                pnControl.enabled = true
+                pnDetails.enabled = true
+                beAnalytics.getRetailStatus( startDate, endDate )
             }
         }
         enabled: false
@@ -201,7 +209,7 @@ Item {
         onClicked: {
             state = ""
             pnControl.enabled = true
-            tvInfo.enabled = true
+            pnDetails.enabled = true
         }
     }
 

@@ -9,6 +9,7 @@
 
 namespace xpos_store {
 
+
 class SellingDatabase : public Database
 {
 public:
@@ -37,6 +38,13 @@ public:
     xpError_t insertWorkShift( WorkShift &_workshift );
     xpError_t searchWorkShift( std::vector<WorkShift> &_workshifts, const time_t _start,
                                const time_t _stop, const std::string &_staffId="" );
+
+    xpError_t groupBillsByDayHours( const uint64_t &_startTime, const uint64_t &_endTime, std::list<RetailStatusRecord> &_retailRecords );
+    xpError_t groupBillsByWeekDays( const uint64_t &_startTime, const uint64_t &_endTime, std::list<RetailStatusRecord> &_retailRecords );
+    xpError_t groupBillsByMonthWeeks( const uint64_t &_startTime, const uint64_t &_endTime, std::list<RetailStatusRecord> &_retailRecords );
+    xpError_t groupBillsByMonths( const uint64_t &_startTime, const uint64_t &_endTime, std::list<RetailStatusRecord> &_retailRecords );
+
+    xpError_t groupSellingRecordsByCategory( const uint64_t &_startTime, const uint64_t &_endTime, std::list<SellingRecord> &_sellingRecords );
 };
 
 }

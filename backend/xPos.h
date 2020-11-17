@@ -94,6 +94,31 @@ typedef struct _ProductCategory_ {
     int minor;
 } ProductCategory;
 
+const std::string DATE[7] = { "CN", "T2", "T3", "T4", "T5", "T6", "T7" };
+
+
+typedef struct _xpDateTime_ {
+    int year = 0;
+    int month = 0;
+    int week = 0;
+    int wDay = 0;
+    int hour = 0;
+} xpDateTime;
+
+
+typedef struct _RetailStatusRecord_ {
+    int year = 0;
+    int month = 0;
+    int week = 0;
+    int wday = 0;
+    int hour = 0;
+    std::string timeStr = "";
+    double revenue = 0;
+    double profit = 0;
+    double disount = 0;
+    double lost = 0;
+} RetailStatusRecord;
+
 
 /**
  * @brief Enumurate class of gender types
