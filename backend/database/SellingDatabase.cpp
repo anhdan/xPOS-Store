@@ -859,4 +859,42 @@ xpError_t SellingDatabase::groupSellingRecordsByCategory(const uint64_t &_startT
 }
 
 
+/**
+ * @brief SellingDatabase::groupSellingRecordsByBarcode
+ */
+xpError_t SellingDatabase::groupSellingRecordsByBarcode(const uint64_t &_startTime, const uint64_t &_endTime, std::list<SellingRecord> &_sellingRecords)
+{
+    if( !m_isOpen )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: The database has not been opened\n",
+                 xpErrorNotPermited, __FILE__, __LINE__ );
+        return xpErrorNotPermited;
+    }
+
+    std::string sqliteCmdFormat =   "SELECT PRODUCT_BARCODE, SUM(QUANTITY), SUM(TOTAL_PRICE), SUM(TOTAL_PROFIT)\n" \
+                                    "FROM SELLING_RECORD\n" \
+                                    "WHERE CREATION_TIME>=%ld AND CREATION_TIME<%ld\n" \
+                                    "GROUP BY PRODUCT_BARCODE\n" \
+                                    "ORDER BY SUM(TOTAL_PRICE) DESC;";
+    char sqliteCmd[1000];
+    sprintf( sqliteCmd, sqliteCmdFormat.c_str(), _startTime, _endTime );
+    LOG_MSG( "[DEB] %s:%d: ===> groupHistoryRecordByBarcode cmd:\n\t%s\n",
+             __FUNCTION__, __LINE__, sqliteCmd );
+
+    _sellingRecords.clear();
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd, SellingRecord::searchCallBackGroup, (void*)&_sellingRecords, &sqliteMsg );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        _sellingRecords.clear();
+        return xpErrorProcessFailure;
+    }
+
+    return xpSuccess;
+}
+
+
 }

@@ -12,8 +12,8 @@ Rectangle {
     opacity: 0.95
     radius: 10
 
-    property int currPeriodIndex: -1
-    property string periodString: ""
+    property int currPeriodIndex: btnToday.index
+    property string periodString: txtBtnToday.text
     property var startDate: new Date()
     property var endDate: new Date()
     property bool startSelected: false
@@ -23,7 +23,7 @@ Rectangle {
     {
         if( endDate <= new Date() )
         {
-            var days = Math.ceil( (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24) );
+            var days = Math.floor( (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24) );
             startDate = new Date(endDate)
             endDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + days )
             periodString = startDate.toLocaleDateString("dd/mm") + " - " + endDate.toLocaleDateString("dd/mm")
@@ -33,11 +33,9 @@ Rectangle {
 
     function back()
     {
-        var days = Math.ceil( (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24) );
+        var days = Math.floor( (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24) );
         endDate = new Date(startDate)
         startDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - days )
-        if( currPeriodIndex !== -1 )
-            currPeriodIndex = -1
 
         if( currPeriodIndex === btnToday.index )
         {
@@ -63,6 +61,9 @@ Rectangle {
         {
             periodString = startDate.toLocaleDateString("dd/mm") + " - " + endDate.toLocaleDateString("dd/mm")
         }
+
+        if( currPeriodIndex !== -1 )
+            currPeriodIndex = -1
 
         picked( startDate, endDate )
     }

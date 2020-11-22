@@ -41,7 +41,6 @@ int BackendAnalytics::getRetailStatus( const QDate &_startDate, const QDate &_en
 {
     //===== Compute data for bar chart
     long days = _startDate.daysTo( _endDate );
-    std::cout << "======> days = " << days << std::endl;
     xpError_t xpErr = xpSuccess;
     if( days == 1 )
     {
@@ -126,8 +125,46 @@ int BackendAnalytics::getRetailStatus( const QDate &_startDate, const QDate &_en
                 it1->getTotalPrice(), it1->getTotalProfit() );
         std::advance( it1, 1 );
     }
-    std::cout << "C++ length = " << pieSeries.length() << std::endl;
     emit pieSeriesChanged( QVariant::fromValue(pieSeries) );
+
+    //===== Compute data for top N bestsellers
+    xpErr |= m_sellingDB->groupSellingRecordsByBarcode( QDateTime(_startDate).toSecsSinceEpoch(),
+                                                        QDateTime(_endDate).toSecsSinceEpoch(), m_topNList );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to create top N bestsellers data\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    QVariantList topNList;
+    std::list<xpos_store::SellingRecord>::iterator it2 = m_topNList.begin();
+    for( int id = 0; id < (int)m_sellingRecords.size(); id++ )
+    {
+        xpos_store::Product product;
+        xpErr |= m_inventoryDB->searchProductByBarcode( it2->getProductBarcode(), product );
+        if( xpErr != xpSuccess )
+        {
+            LOG_MSG( "[ERR:%d] %s:%d: Failed to search for product name\n",
+                     xpErr, __FILE__, __LINE__ );
+            return xpErr;
+        }
+
+        QVariantMap map;
+        map["barcode"] = QString::fromStdString( it2->getProductBarcode() );
+        map["name"] = QString::fromStdString( product.getName() );
+        map["quantity"] = it2->getQuantity();
+        map["revenue"] = it2->getTotalPrice();
+        map["profit"] = it2->getTotalProfit();
+        topNList << QVariant::fromValue( map );
+
+        LOG_MSG( "barcode = %s |  name = %s  | quantity = %d  |  revenue = %.3f | profit = %.3f\n",
+                 map["barcode"].toString().toStdString().c_str(), map["name"].toString().toStdString().c_str(),
+                it2->getQuantity(), it2->getTotalPrice(), it2->getTotalProfit() );
+        std::advance( it2, 1 );
+    }
+    std::cout << "====> length " << topNList.length() << std::endl;
+    emit topNBestSellersChanged( QVariant::fromValue(topNList) );
 
     return xpSuccess;
 }

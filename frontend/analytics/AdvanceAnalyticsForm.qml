@@ -34,14 +34,14 @@ Rectangle {
         }
 
         // Tab 2: for reporting on inventory status
-        Tab {
-            id: tab2
-            title: "Phân tích khách hàng"
-            source: "InventoryStatus.qml"
-            onLoaded: {
+//        Tab {
+//            id: tab2
+//            title: "Phân tích khách hàng"
+//            source: "InventoryStatus.qml"
+//            onLoaded: {
 
-            }
-        }
+//            }
+//        }
 
 
         // Tab Delegate definition
@@ -50,7 +50,7 @@ Rectangle {
             tab: Rectangle {
                 id: rectTab
                 color: styleData.selected ? UIMaterials.colorNearWhite : UIMaterials.colorTaskBar
-                implicitWidth: 0.2930 * root.width
+                implicitWidth: 0.3320 * root.width
                 implicitHeight: 0.0781 * root.height
 
                 Rectangle {

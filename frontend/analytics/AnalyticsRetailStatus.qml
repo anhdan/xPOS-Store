@@ -188,7 +188,6 @@ Item {
                 console.log( "====> startDate = ", startDate.toLocaleDateString( "dd/mm/yyyy" ))
                 console.log( "====> endDate = ", endDate.toLocaleDateString( "dd/mm/yyyy" ))
                 maDurationPicker.state = ""
-//                lblCalendar.text = periodString
                 pnControl.enabled = true
                 pnDetails.enabled = true
                 beAnalytics.getRetailStatus( startDate, endDate )
@@ -247,6 +246,24 @@ Item {
                 stack.pop()
                 stack.push( revenuePage )
             }
+
+            onNextClicked: {
+                stack.pop()
+                stack.push( topNPage )
+            }
+        }
+
+        RetailStatusTopN {
+            id: topNPage
+            width: parent.width
+            height: parent.height
+            x: parent.width
+            y: 0
+
+            onPrevClicked: {
+                stack.pop()
+                stack.push( profitPage )
+            }
         }
 
         StackView {
@@ -257,9 +274,9 @@ Item {
             pushEnter: Transition {
                 PropertyAnimation
                 {
-                    properties: "x"
-                    from: pnDetails.width
-                    to: 0
+                    properties: "opacity"
+                    from: 0
+                    to: 1
                     duration: 400
                 }
             }
@@ -267,9 +284,9 @@ Item {
             pushExit: Transition {
                 PropertyAnimation
                 {
-                    properties: "x"
-                    from: 0
-                    to: -pnDetails.width
+                    properties: "opacity"
+                    from: 1
+                    to: 0
                     duration: 400
                 }
             }
@@ -277,9 +294,9 @@ Item {
             popEnter: Transition {
                 PropertyAnimation
                 {
-                    properties: "x"
-                    from: -pnDetails.width
-                    to: 0
+                    properties: "opacity"
+                    from: 0
+                    to: 1
                     duration: 400
                 }
             }
@@ -287,9 +304,9 @@ Item {
             popExit: Transition {
                 PropertyAnimation
                 {
-                    properties: "x"
-                    from: 0
-                    to: pnDetails.width
+                    properties: "opacity"
+                    from: 1
+                    to: 0
                     duration: 400
                 }
             }

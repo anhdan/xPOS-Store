@@ -38,6 +38,7 @@ signals:
     void retailStatusComputed( QVariant _barSeries );
     void barSeriesChanged( QVariant );
     void pieSeriesChanged( QVariant );
+    void topNBestSellersChanged( QVariant );
     void kpiChanged( QVariant );
 
 public slots:
@@ -57,6 +58,7 @@ private:
     QVariantMap m_kpi;
     std::list<RetailStatusRecord> m_retailStatusRecords;
     std::list<xpos_store::SellingRecord> m_sellingRecords;
+    std::list<xpos_store::SellingRecord> m_topNList;
 };
 
 #endif // BACKENDANALYTICS_H

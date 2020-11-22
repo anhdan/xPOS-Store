@@ -45,6 +45,7 @@ public:
     xpError_t groupBillsByMonths( const uint64_t &_startTime, const uint64_t &_endTime, std::list<RetailStatusRecord> &_retailRecords );
 
     xpError_t groupSellingRecordsByCategory( const uint64_t &_startTime, const uint64_t &_endTime, std::list<SellingRecord> &_sellingRecords );
+    xpError_t groupSellingRecordsByBarcode( const uint64_t &_startTime, const uint64_t &_endTime, std::list<SellingRecord> &_sellingRecords );
 };
 
 }

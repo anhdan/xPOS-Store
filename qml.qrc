@@ -76,5 +76,7 @@
         <file>frontend/analytics/RetailStatusRevenue.qml</file>
         <file>frontend/gadgets/MenuForm.qml</file>
         <file>frontend/gadgets/MenuInstance.qml</file>
+        <file>frontend/analytics/RetailStatusTopN.qml</file>
+        <file>frontend/gadgets/CustomHorizontalBar.qml</file>
     </qresource>
 </RCC>

@@ -118,7 +118,7 @@ Item {
         }
         verticalAlignment: Text.AlignVCenter
         color: UIMaterials.grayDark
-        text: "Tỷ lệ lợi nhuận theo loại mặt hàng"
+        text: "Tỷ lệ doanh thu theo loại mặt hàng"
     }
 
     Rectangle {
@@ -186,7 +186,7 @@ Item {
     Button {
         id: btnNext
         width: 0.0877 * parent.width
-        height: height
+        height: width
         anchors.verticalCenter: titVariationChart.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: 0.0146 * parent.width
@@ -201,7 +201,7 @@ Item {
             font {
                 pixelSize: Math.min( 0.8*parent.width, 0.8*parent.height, UIMaterials.fontsizeM )
                 weight: Font.Bold
-                family: UIMaterials.fontRobotoLight
+                family: UIMaterials.solidFont
             }
             color: UIMaterials.colorTrueGray
             text: "\uf061"
