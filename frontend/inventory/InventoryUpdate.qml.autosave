@@ -290,6 +290,7 @@ Item {
                 onReleased: {
                     rectBtnSave.opacity = 1
                     var ret = beInventory.updateProduct( currItem )
+                    
                     if( noti.state === "visible" )
                     {
                         noti.state = "invisible"

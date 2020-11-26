@@ -5,7 +5,7 @@ import ".."
 
 Column {
     id: root
-    spacing: barHeight / 5
+    spacing: 0
 
     property alias barHeight: rectBar.height
     property alias barLenght: rectBar.width
@@ -22,6 +22,7 @@ Column {
         verticalAlignment: Text.AlignHCenter
         font {
             family: UIMaterials.fontRobotoLight
+            bold: true
         }
     }
 

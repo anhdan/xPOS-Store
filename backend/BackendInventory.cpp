@@ -176,3 +176,81 @@ QVariant BackendInventory::kpi()
 
     return QVariant::fromValue(map);
 }
+
+
+/**
+ * @brief BackendInventory::oosModel
+ */
+QVariant BackendInventory::oosModel()
+{
+    return QVariant::fromValue( m_oosModel );
+}
+
+
+/**
+ * @brief BackendInventory::outDateModel
+ */
+QVariant BackendInventory::outDateModel()
+{
+    return QVariant::fromValue( m_outDateModel );
+}
+
+
+/**
+ * @brief BackendInventory::slowSellingModel
+ */
+QVariant BackendInventory::slowSellingModel()
+{
+    return QVariant::fromValue( m_slowSellingModel );
+}
+
+
+/**
+ * @brief BackendInventory::getOOSProducts
+ * @return
+ */
+int BackendInventory::getOOSProducts()
+{
+    xpError_t xpErr = m_inventoryDB->searchLowQuantityProducts( 5000, m_oosLists );
+    if( xpErr != xpSuccess )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to search for low quantity products instock\n",
+                 xpErr, __FILE__, __LINE__ );
+        return xpErr;
+    }
+
+    std::list<xpos_store::Product>::iterator it = m_oosLists.begin();
+    m_oosModel.clear();
+    while (it != m_oosLists.end())
+    {
+        it->printInfo();
+        QVariantMap map;
+        map["barcode"] = QString::fromStdString( it->getBarcode() );
+        map["name"] = QString::fromStdString( it->getName() );
+        map["unit"] = QString::fromStdString( it->getUnit() );
+        map["quantity"] = it->getNumInstock();
+        map["selling_rate"] = "30 sp/tháng";
+        map["oos_date"] = "20/11/2020";
+        m_oosModel << QVariant::fromValue( map );
+        std::advance( it, 1 );
+    }
+    emit oosModelChanged( QVariant::fromValue(m_oosModel) );
+}
+
+
+/**
+ * @brief BackendInventory::getOutDateProducts
+ */
+int BackendInventory::getOutDateProducts()
+{
+
+}
+
+
+/**
+ * @brief BackendInventory::getSlowSellingProducts
+ */
+int BackendInventory::getSlowSellingProducts()
+{
+
+}

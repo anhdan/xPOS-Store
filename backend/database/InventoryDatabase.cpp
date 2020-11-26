@@ -48,6 +48,86 @@ static int kpiCallback( void *data, int fieldsNum, char **fieldVal, char **field
 
 
 /**
+ * @brief Product::searchCallBack
+ */
+static int searchCallBackMany(void *data, int fieldsNum, char **fieldVal, char **fieldName)
+{
+    if( data == nullptr )
+    {
+        return xpErrorNotAllocated;
+    }
+
+    std::list<Product>* products = (std::list<Product>*)data;
+    Product product;
+    for( int fieldId = 0; fieldId < fieldsNum; fieldId++ )
+    {
+        if( !strcmp(fieldName[fieldId], "BARCODE") )
+        {
+            product.setBarcode( fieldVal[fieldId] );
+        }
+        else if( !strcmp(fieldName[fieldId], "NAME") )
+        {
+            product.setName( fieldVal[fieldId] ? fieldVal[fieldId] : "Không có thông tin");
+        }
+        else if( !strcmp(fieldName[fieldId], "DESC") )
+        {
+            product.setDescription( fieldVal[fieldId] ? fieldVal[fieldId] : "Không có thông tin");
+        }
+        else if( !strcmp(fieldName[fieldId], "UNIT") )
+        {
+            product.setUnit( fieldVal[fieldId] ? fieldVal[fieldId] : "Không có thông tin" );
+        }
+        else if( !strcmp(fieldName[fieldId], "CATEGORY") )
+        {
+            product.setCategory( fieldVal[fieldId] ? (Category)atoi(fieldVal[fieldId]) : Category::NONE );
+        }
+        else if( !strcmp(fieldName[fieldId], "INPUT_PRICE") )
+        {
+            product.setInputPrice( fieldVal[fieldId] ? atof( fieldVal[fieldId] ) : 0.0 );
+        }
+        else if( !strcmp(fieldName[fieldId], "UNIT_PRICE") )
+        {
+            product.setUnitPrice( fieldVal[fieldId] ? atof( fieldVal[fieldId] ) : 0.0 );
+        }
+//        else if( !strcmp(fieldName[fieldId], "DISCOUNT_PRICE") )
+//        {
+////            product. = fieldVal[fieldId] ? atof( fieldVal[fieldId] ) : 0.0;
+//        }
+//        else if( !strcmp(fieldName[fieldId], "DISCOUNT_START") )
+//        {
+//            product.m_discountStart = fieldVal[fieldId] ? (time_t)atol( fieldVal[fieldId] ) : 0;
+//        }
+//        else if( !strcmp(fieldName[fieldId], "DISCOUNT_END") )
+//        {
+//            product.m_discountEnd = fieldVal[fieldId] ? (time_t)atol( fieldVal[fieldId] ) : 0;
+//        }
+        else if( !strcmp(fieldName[fieldId], "NUM_INSTOCK") )
+        {
+            product.setNumInstock( fieldVal[fieldId] ? (uint32_t)atoi( fieldVal[fieldId] ) : 0 );
+        }
+//        else if( !strcmp(fieldName[fieldId], "NUM_SOLD") )
+//        {
+//            product.sets = fieldVal[fieldId] ? (uint32_t)atoi( fieldVal[fieldId] ) : 0;
+//        }
+//        else if( !strcmp(fieldName[fieldId], "NUM_DISQUALIFIED") )
+//        {
+//            product.m_numDisqualified = fieldVal[fieldId] ? (uint32_t)atoi( fieldVal[fieldId] ) : 0;
+//        }
+        else
+        {
+            LOG_MSG( "[ERR:%d] %s:%d: Invalid field name\n", xpErrorProcessFailure, __FILE__, __LINE__ );
+            product.setDefault();
+            return xpErrorProcessFailure;
+        }
+    }
+
+    products->push_back( product );
+
+    return xpSuccess;
+}
+
+
+/**
  * @brief InventoryDatabase::InventoryDatabase
  */
 InventoryDatabase::InventoryDatabase(const InventoryDatabase &_db) : Database(_db)
@@ -118,6 +198,25 @@ xpError_t InventoryDatabase::create(const std::string &_dbPath)
     }
     else {
         LOG_MSG( "Created PRODUCT table successfully\n" );
+    }
+
+
+    sqliteCmd = "CREATE TABLE IF NOT EXISTS UPDATE_HISTORY (\n" \
+                "   BARCODE             TEXT        PRIMARY KEY,\n" \
+                "   UPDATE_DATE         INTEGER     NOT NULL,\n" \
+                "   EXPIRED_DATE        INTEGER     ,\n" \
+                "   QUANTITY            INTEGER     NOT NULL) WITHOUT ROWID;";
+    sqliteErr =sqlite3_exec( m_dbPtr, sqliteCmd.c_str(), nullptr, nullptr, &sqliteMsg );
+    if( sqliteErr )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Failed to excute SQLite command\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__ );
+        close();
+        sqlite3_free( sqliteMsg );
+        return xpErrorProcessFailure;
+    }
+    else {
+        LOG_MSG( "Created UPDATE_HISTORY table successfully\n" );
     }
 
 
@@ -300,6 +399,40 @@ xpError_t InventoryDatabase::updateProduct( Product &_productInfo , bool _isQuan
 
 
 /**
+ * @brief InventoryDatabase::insertUpdateRecord
+ */
+xpError_t InventoryDatabase::insertUpdateRecord(UpdateRecord &_record)
+{
+    if( _record.getBarcode() == "" )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: Invalid product info\n",
+                 xpErrorInvalidParameters, __FILE__, __LINE__ );
+        return xpErrorInvalidParameters;
+    }
+
+    std::string cmdFormat = "INSERT INTO UPDATE_RECORD (BARCODE, UPDATE_DATE, EXPIRED_DATE, QUANTITY) " \
+                            "VALUES('%s', %ld, %ld, %d);";
+    char sqliteCmd[1000];
+    sprintf( sqliteCmd, cmdFormat.c_str(),
+             _record.getBarcode().c_str(), _record.getUpdateDate(),
+             _record.getExpiredDate(), _record.getQuantity());
+    printf( "====> insert update reocord cmd: %s\n", sqliteCmd );
+
+    char *sqliteMsg;
+    xpError_t sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd, nullptr, nullptr, &sqliteMsg );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        return xpErrorProcessFailure;
+    }
+
+    return xpSuccess;
+}
+
+
+/**
  * @brief InventoryDatabase::summaryInventory
  */
 xpError_t InventoryDatabase::summaryInventory(InventoryKPI &kpi)
@@ -322,6 +455,30 @@ xpError_t InventoryDatabase::summaryInventory(InventoryKPI &kpi)
 
     char *sqliteMsg;
     xpError_t sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd.c_str(), kpiCallback, (void*)&kpi, &sqliteMsg );
+    if( sqliteErr != SQLITE_OK )
+    {
+        LOG_MSG( "[ERR:%d] %s:%d: %s\n",
+                 xpErrorProcessFailure, __FILE__, __LINE__, sqliteMsg );
+        sqlite3_free( sqliteMsg );
+        return xpErrorProcessFailure;
+    }
+
+    return xpSuccess;
+}
+
+
+/**
+ * @brief InventoryDatabase::searchLowQuantityProducts
+ */
+xpError_t InventoryDatabase::searchLowQuantityProducts(const int _upperBound, std::list<Product> &_products)
+{
+    std::string sqliteCmd =   "SELECT BARCODE, NAME, UNIT, NUM_INSTOCK\n" \
+                              "FROM PRODUCT\n" \
+                              "WHERE NUM_INSTOCK <= " + std::to_string(_upperBound) + ";";
+
+    char *sqliteMsg;
+    _products.clear();
+    xpError_t sqliteErr = sqlite3_exec( m_dbPtr, sqliteCmd.c_str(), searchCallBackMany, (void*)&_products, &sqliteMsg );
     if( sqliteErr != SQLITE_OK )
     {
         LOG_MSG( "[ERR:%d] %s:%d: %s\n",

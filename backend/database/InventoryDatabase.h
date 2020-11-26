@@ -4,6 +4,7 @@
 #include "backend/xPos.h"
 #include "backend/database/Database.h"
 #include "backend/containers/Product.h"
+#include "backend/containers/UpdateRecord.h"
 
 namespace xpos_store {
 
@@ -51,8 +52,10 @@ public:
     xpError_t insertProduct( Product &_product );
     xpError_t deleteProductByBarcode( const std::string &_barcode );
     xpError_t updateProduct( Product &_productInfo, bool _isQuantityOnly=true );
+    xpError_t insertUpdateRecord( UpdateRecord &_record );
 
     xpError_t summaryInventory( InventoryKPI &kpi );
+    xpError_t searchLowQuantityProducts( const int _upperBound, std::list<Product> &_products );
 };
 
 }

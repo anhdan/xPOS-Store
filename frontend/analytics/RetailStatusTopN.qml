@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import QtQml 2.2
 import QtQuick.Controls 2.2
-import QtCharts 2.3
+import QtCharts 2.0
 
 import ".."
 import "../gadgets"
@@ -13,6 +13,10 @@ Item {
     property real maxLen: 0
     property real minLen: 0
 
+    property color maxColor: UIMaterials.greenDark
+    property color minColor: UIMaterials.greenLight
+    property var deltaColor: [maxColor.r - minColor.r, maxColor.g - minColor.g, maxColor.b - minColor.b]
+
     signal prevClicked()
 
     Component.onCompleted: {
@@ -20,9 +24,17 @@ Item {
     }
 
     function updateBarChart( _barSeries ) {
+
+        barTop1.visible = false
+        barTop2.visible = false
+        barTop3.visible = false
+        barTop4.visible = false
+        barTop5.visible = false
+        lblGood.visible = false
         var finalIdx = 0
-        if( _barSeries.length < 0 )
+        if( _barSeries.length <= 0 )
         {
+            lblGood.visible = true
             return
         }
         else if( _barSeries.length > 4 )
@@ -31,26 +43,81 @@ Item {
         }
         else
         {
-            finalIdx = _barSeries.length
+            finalIdx = _barSeries.length-1
         }
+
+
+        var vietnam = Qt.locale()
 
         var bar =  _barSeries[0]
         var finalBar = _barSeries[finalIdx]
+        var deltaLen = barTop1.barLenght - barTop5.barLenght
         var deltaProfit = bar["profit"] - finalBar["profit"]
-        var deltaWidth = barTop1.barLenght - barTop5.barLenght
+        var factor = Number( deltaLen / deltaProfit )
+        var profitRate
 
         barTop1.label = bar["name"]
         barTop1.value = Number(bar["profit"]).toLocaleString( vietnam, 'f', 0 )  + " vnd"
+        barTop1.barColor = maxColor
+        barTop1.labelColor = barTop1.barColor
+        barTop1.visible = true
 
-        bar =  _barSeries[1]
-        barTop2.label = bar["name"]
-        barTop2.value = Number(bar["profit"]).toLocaleString( vietnam, 'f', 0 )  + " vnd"
-        barTop2.barLenght = (bar["profit"] - bar["profit"]) / deltaProfit * deltaWidth + barTop5.barLenght
+        if(finalIdx >= 1)
+        {
+            bar =  _barSeries[1]
+            profitRate = (bar["profit"] - finalBar["profit"]) / deltaProfit
+            barTop2.label = bar["name"]
+            barTop2.value = Number(bar["profit"]).toLocaleString( vietnam, 'f', 0 )  + " vnd"
+            barTop2.barLenght =  profitRate * deltaLen + barTop5.barLenght
+            barTop2.barColor = Qt.rgba(minColor.r + profitRate * deltaColor[0],
+                                       minColor.g + profitRate * deltaColor[1],
+                                       minColor.b + profitRate * deltaColor[2],
+                                       1)
+            barTop2.labelColor = barTop2.barColor
+            barTop2.visible = true
+        }
 
-        bar =  _barSeries[2]
-        barTop3.label = bar["name"]
-        barTop3.value = Number(bar["profit"]).toLocaleString( vietnam, 'f', 0 )  + " vnd"
-        barTop3.barLenght = (bar["profit"] - bar["profit"]) / deltaProfit * deltaWidth + barTop5.barLenght
+        if(finalIdx >= 2)
+        {
+            bar =  _barSeries[2]
+            profitRate = (bar["profit"] - finalBar["profit"]) / deltaProfit
+            barTop3.label = bar["name"]
+            barTop3.value = Number(bar["profit"]).toLocaleString( vietnam, 'f', 0 )  + " vnd"
+            barTop3.barLenght =  profitRate * deltaLen + barTop5.barLenght
+            barTop3.barColor = Qt.rgba(minColor.r + profitRate * deltaColor[0],
+                                       minColor.g + profitRate * deltaColor[1],
+                                       minColor.b + profitRate * deltaColor[2],
+                                       1)
+            barTop3.labelColor = barTop3.barColor
+            barTop3.visible = true
+        }
+
+        if(finalIdx >= 3)
+        {
+            bar =  _barSeries[3]
+            profitRate = (bar["profit"] - finalBar["profit"]) / deltaProfit
+            barTop4.label = bar["name"]
+            barTop4.value = Number(bar["profit"]).toLocaleString( vietnam, 'f', 0 )  + " vnd"
+            barTop4.barLenght =  profitRate * deltaLen + barTop5.barLenght
+            barTop4.barColor = Qt.rgba(minColor.r + profitRate * deltaColor[0],
+                                       minColor.g + profitRate * deltaColor[1],
+                                       minColor.b + profitRate * deltaColor[2],
+                                       1)
+            barTop4.labelColor = barTop4.barColor
+            barTop4.visible = true
+        }
+
+        if(finalIdx >= 4)
+        {
+            bar =  _barSeries[4]
+            profitRate = (bar["profit"] - finalBar["profit"]) / deltaProfit
+            barTop5.label = bar["name"]
+            barTop5.value = Number(bar["profit"]).toLocaleString( vietnam, 'f', 0 )  + " vnd"
+            barTop5.barLenght =  profitRate * deltaLen + barTop5.barLenght
+            barTop5.barColor = minColor
+            barTop5.labelColor = barTop5.barColor
+            barTop5.visible = true
+        }
     }
 
     Label {
@@ -75,7 +142,7 @@ Item {
         anchors.topMargin: 0.0847 * parent.height
         anchors.left: parent.left
         anchors.leftMargin: 0.073 * parent.width
-        spacing: barTop1.barHeight
+        spacing: barTop1.barHeight / 2
 
 
         CustomHorizontalBar {
@@ -84,7 +151,7 @@ Item {
             barHeight: 0.0565 * root.height
             barColor: UIMaterials.colorTaskBar
             fontSize: UIMaterials.fontsizeM
-            labelColor: UIMaterials.grayDark
+            labelColor: "black"
             valueColor: "white"
         }
 
@@ -128,6 +195,22 @@ Item {
             valueColor: barTop1.valueColor
         }
 
+    }
+
+
+    Label {
+        id: lblGood
+        anchors.centerIn: parent
+        visible: false
+
+        font{
+            pixelSize: UIMaterials.fontsizeM
+            family: UIMaterials.fontRobotoLight
+        }
+        verticalAlignment: Text.AlignVCenter
+        color: UIMaterials.colorTrueGray
+//        opacity: 0.8
+        text: "Không có mặt hàng nào được bán trong thời gian này"
     }
 
 

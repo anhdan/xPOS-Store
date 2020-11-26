@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import QtQml 2.2
 import QtQuick.Controls 2.2
-import QtCharts 2.3
+import QtCharts 2.0
 
 import ".."
 
@@ -97,7 +97,7 @@ Item {
                     id: yAxis
                     min: 0
                     max: 500000
-                    tickInterval: 100000
+//                    tickInterval: 100000
                 }
             }
         }

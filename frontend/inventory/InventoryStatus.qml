@@ -241,7 +241,7 @@ Item {
     TabView {
         id: tvInfo
         width: 0.668 * parent.width
-        height: parent.height
+        height: parent.height * 2 / 3
         x: pnControl.width
         y: pieChart.height
 
@@ -278,7 +278,7 @@ Item {
             tab: Rectangle {
                 id: rectTab
                 implicitWidth: tvInfo.width / 3
-                implicitHeight: 0.1130 * tvInfo.height
+                implicitHeight: 0.1695 * tvInfo.height
                 color: "white"
                 opacity: 0.4
                 state: styleData.selected ? "selected" : ""

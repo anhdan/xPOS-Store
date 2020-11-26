@@ -13,64 +13,34 @@ Rectangle {
     id: root
     color: "white"
 
-    Label {
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
-        anchors.topMargin: 0.0478 * parent.height
-        font {
-            pixelSize: UIMaterials.fontsizeM
-            bold: true
-            family: UIMaterials.fontRobotoLight
-        }
-        color: UIMaterials.colorAntLogo
-        text: "Danh sách sản phẩm sắp hết hạn sử dụng"
-    }
+//    Label {
+//        anchors.horizontalCenter: parent.horizontalCenter
+//        anchors.top: parent.top
+//        anchors.topMargin: 0.0478 * parent.height
+//        font {
+//            pixelSize: UIMaterials.fontsizeM
+//            bold: true
+//            family: UIMaterials.fontRobotoLight
+//        }
+//        color: UIMaterials.colorAntLogo
+//        text: "Danh sách sản phẩm sắp hết hạn sử dụng"
+//    }
 
     ListView {
         id: lvItemsList
         x: 0
-        y: 0.1274 * parent.height
+        anchors.top: parent.top
+        anchors.topMargin: 0.0422 * root.height
         width: root.width / 2
         height: parent.height - lvItemsList.y
         clip: true
         cacheBuffer: 50
-        model: itemModel
-
-        ListModel {
-            id: itemModel
-
-            ListElement {
-                name: "Cafe rang xay moka"
-                unit: "Goi"
-                barcode: "08342749827349"
-                import_quantity: 30
-                import_date: "1/1/2020"
-                expired_date: "20/10/2020"
-            }
-
-            ListElement {
-                name: "Den led coworking space"
-                unit: "Chiec"
-                barcode: "09733249879328"
-                import_quantity: 20
-                import_date: "19/9/2019"
-                expired_date: "22/11/2020"
-            }
-
-            ListElement {
-                name: "Be ca mini dat ban"
-                unit: "Chiec"
-                barcode: "05837328743823"
-                import_quantity: 10
-                import_date: "23/3/2018"
-                expired_date: "24/12/2020"
-            }
-        }
+        model: beInventory.outDateModel
 
         delegate: Rectangle {
             id: itemDelegate
             width: lvItemsList.width
-            height: 0.1274 * root.height
+            height: 0.1483 * root.height
             color: (lvItemsList.currentIndex === index) ? UIMaterials.colorNearWhite : "white"
 
             Label {
@@ -87,7 +57,7 @@ Rectangle {
                     family: UIMaterials.fontRobotoLight
                 }
                 color: (lvItemsList.currentIndex === index) ? UIMaterials.colorAntLogo : "black"
-                text: name + " @ " + unit
+                text: lvItemsList.model[index].name + " @ " + lvItemsList.model[index].unit
             }
 
             Label {
@@ -103,7 +73,7 @@ Rectangle {
                     family: UIMaterials.fontRobotoLight
                 }
                 color: (lvItemsList.currentIndex === index) ? UIMaterials.colorAntLogo : "black"
-                text: barcode
+                text: lvItemsList.model[index].barcode
             }
 
             Rectangle {
@@ -137,23 +107,23 @@ Rectangle {
             anchors.left: parent.left
             anchors.leftMargin: 0.0585 * parent.width
             width: parent.width - anchors.leftMargin
-            titleHeight: 0.0478 * root.height
-            infoHeight: 2 * titleHeight
+            titleHeight: 0.0636 * root.height
+            infoHeight: 1.5 * titleHeight
             editable: false
 
             titleFontSize: UIMaterials.fontsizeS
             titleColor: UIMaterials.grayDark
-            infoFontsize: UIMaterials.fontsizeL
+            infoFontsize: UIMaterials.fontsizeM
             infoColor: "black"
 
             titleText: "Ngày nhập kho"
-            infoText: itemModel.get(lvItemsList.currentIndex)["import_date"]
+            infoText: lvItemsList.model[lvItemsList.currentIndex]["import_date"]
         }
 
         InfoCard {
             id: icSellingRate
             anchors.top: icInstockQuantity.bottom
-            anchors.topMargin: 0.0637 * root.height
+            anchors.topMargin: 0.0423 * root.height
             anchors.left: icInstockQuantity.left
             width: icInstockQuantity.width
             titleHeight: icInstockQuantity.titleHeight
@@ -161,18 +131,18 @@ Rectangle {
 
             titleFontSize: UIMaterials.fontsizeS
             titleColor: icInstockQuantity.titleColor
-            infoFontsize: UIMaterials.fontsizeL
+            infoFontsize: UIMaterials.fontsizeM
             infoColor: "black"
             editable: false
 
             titleText: "Số lượng nhập"
-            infoText: itemModel.get(lvItemsList.currentIndex)["import_quantity"]
+            infoText: lvItemsList.model[lvItemsList.currentIndex]["import_quantity"]
         }
 
         InfoCard {
             id: icOOSDate
             anchors.top: icSellingRate.bottom
-            anchors.topMargin: 0.0637 * root.height
+            anchors.topMargin: 0.0423 * root.height
             anchors.left: icSellingRate.left
             width: icSellingRate.width
             titleHeight: icSellingRate.titleHeight
@@ -180,18 +150,18 @@ Rectangle {
 
             titleFontSize: UIMaterials.fontsizeS
             titleColor: icInstockQuantity.titleColor
-            infoFontsize: UIMaterials.fontsizeL
+            infoFontsize: UIMaterials.fontsizeM
             infoColor: "black"
             editable: false
 
             titleText: "Ngày hết hạn"
-            infoText: itemModel.get(lvItemsList.currentIndex)["expired_date"]
+            infoText: lvItemsList.model[lvItemsList.currentIndex]["expired_date"]
         }
 
         Button {
             id: btnRemove
             width: 0.3509 * parent.width
-            height: 0.0955 * root.height
+            height: 0.1271 * root.height
             anchors.bottom: parent.bottom
             anchors.bottomMargin: height / 5
             anchors.right: parent.horizontalCenter
