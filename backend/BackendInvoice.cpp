@@ -305,57 +305,57 @@ int BackendInvoice::completePayment( const QVariant &_qCustomer, const QVariant 
     }
 
     // add bill using firebase functions
-//    m_bill.toJSONString();
-//    firebase::functions::HttpsCallableReference fbFunction
-//            = m_fbFunc->GetHttpsCallable( "addNewBillCall" );
-//    firebase::Future<firebase::functions::HttpsCallableResult> future
-//            = fbFunction.Call( m_bill.toFirebaseVar() );
-//    float sWaitTime = 0;
-//    while( future.status() == firebase::kFutureStatusPending )
-//    {
-//        usleep( 100000 );   // wait for initialization complete
-//        sWaitTime += 0.1;
-//        if( sWaitTime > 5 ) // timeout
-//        {
-//            LOG_MSG( "[ERR:%d] %s:%d: Function invoking timeout\n",
-//                     xpErrorTimeout, __FILE__, __LINE__ );
-//            return xpErrorTimeout;
-//        }
-//    }
+    m_bill.toJSONString();
+    firebase::functions::HttpsCallableReference fbFunction
+            = m_fbFunc->GetHttpsCallable( "addNewBillCall" );
+    firebase::Future<firebase::functions::HttpsCallableResult> future
+            = fbFunction.Call( m_bill.toFirebaseVar() );
+    float sWaitTime = 0;
+    while( future.status() == firebase::kFutureStatusPending )
+    {
+        usleep( 100000 );   // wait for initialization complete
+        sWaitTime += 0.1;
+        if( sWaitTime > 5 ) // timeout
+        {
+            LOG_MSG( "[ERR:%d] %s:%d: Function invoking timeout\n",
+                     xpErrorTimeout, __FILE__, __LINE__ );
+            return xpErrorTimeout;
+        }
+    }
 
-//    if (future.error() != firebase::functions::kErrorNone) {
-//        LOG_MSG("[Err:%d] %s:%d: %s\n", xpErrorProcessFailure,
-//               __FILE__, __LINE__, future.error_message());
-//        return xpErrorProcessFailure;
-//    } else {
-//        firebase::Variant result = future.result()->data();
-//        if( result.is_map() )
-//        {
-//            std::map<firebase::Variant, firebase::Variant> retMap = result.map();
-//            if( retMap[firebase::Variant("status")].is_string() )
-//            {
-//                std::string retStatus = retMap[firebase::Variant("status")].string_value();
-//                if( retStatus != "200" )
-//                {
-//                    LOG_MSG("[Err:%d] %s:%d: Server error response status %s\n",
-//                           xpErrorProcessFailure, __FILE__, __LINE__, retStatus.c_str());
-//                    return xpErrorProcessFailure;
-//                }
-//            }
-//            else
-//            {
-//                LOG_MSG("[Err:%d] %s:%d: Invalid server response\n",
-//                       xpErrorInvalidParameters, __FILE__, __LINE__ );
-//                return xpErrorInvalidParameters;
-//            }
-//        }
-//        else
-//        {
-//            LOG_MSG("[Err:%d] %s:%d: Invalid server response\n",
-//                   xpErrorInvalidParameters, __FILE__, __LINE__ );
-//            return xpErrorInvalidParameters;
-//        }
-//    }
+    if (future.error() != firebase::functions::kErrorNone) {
+        LOG_MSG("[Err:%d] %s:%d: %s\n", xpErrorProcessFailure,
+               __FILE__, __LINE__, future.error_message());
+        return xpErrorProcessFailure;
+    } else {
+        firebase::Variant result = future.result()->data();
+        if( result.is_map() )
+        {
+            std::map<firebase::Variant, firebase::Variant> retMap = result.map();
+            if( retMap[firebase::Variant("status")].is_string() )
+            {
+                std::string retStatus = retMap[firebase::Variant("status")].string_value();
+                if( retStatus != "200" )
+                {
+                    LOG_MSG("[Err:%d] %s:%d: Server error response status %s\n",
+                           xpErrorProcessFailure, __FILE__, __LINE__, retStatus.c_str());
+                    return xpErrorProcessFailure;
+                }
+            }
+            else
+            {
+                LOG_MSG("[Err:%d] %s:%d: Invalid server response\n",
+                       xpErrorInvalidParameters, __FILE__, __LINE__ );
+                return xpErrorInvalidParameters;
+            }
+        }
+        else
+        {
+            LOG_MSG("[Err:%d] %s:%d: Invalid server response\n",
+                   xpErrorInvalidParameters, __FILE__, __LINE__ );
+            return xpErrorInvalidParameters;
+        }
+    }
 
     return xpErr;
 }

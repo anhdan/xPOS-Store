@@ -104,10 +104,12 @@ int BackendInventory::searchForProduct(QString _code)
 /**
  * @brief BackendInvoice::updateProduct
  */
-int BackendInventory::updateProduct( const QVariant &_product)
+int BackendInventory::updateProduct( const QVariant &_product, const QVariant &_updateRecord )
 {
     xpos_store::Product beProduct;
+    xpos_store::UpdateRecord beUpdateRecord;
     xpError_t xpErr = beProduct.fromQVariant( _product );
+    xpErr |= beUpdateRecord.fromQVariant( _updateRecord );
     if( xpErr != xpSuccess )
     {
         LOG_MSG( "[ERR:%d] %s:%d: Failed to convert Qvariant parameter to backend object\n",
@@ -129,6 +131,8 @@ int BackendInventory::updateProduct( const QVariant &_product)
         // Update info to already exist product
         xpErr = m_inventoryDB->updateProduct( beProduct, false );
     }
+    beUpdateRecord.printInfo();
+    xpErr |= m_inventoryDB->insertUpdateRecord( beUpdateRecord );
 
     if( xpErr != xpSuccess )
     {
@@ -235,6 +239,8 @@ int BackendInventory::getOOSProducts()
         std::advance( it, 1 );
     }
     emit oosModelChanged( QVariant::fromValue(m_oosModel) );
+
+    return xpSuccess;
 }
 
 
@@ -243,7 +249,7 @@ int BackendInventory::getOOSProducts()
  */
 int BackendInventory::getOutDateProducts()
 {
-
+    return xpSuccess;
 }
 
 
@@ -252,5 +258,5 @@ int BackendInventory::getOutDateProducts()
  */
 int BackendInventory::getSlowSellingProducts()
 {
-
+    return xpSuccess;
 }

@@ -12,7 +12,7 @@ Rectangle {
     id: root
     color: "white"
 
-//    property int oosNum: 0
+//    property alias oosNum: lvItemsList.model.count
 
     Component.onCompleted: {
         beInventory.getOOSProducts();
@@ -170,8 +170,9 @@ Rectangle {
             height: 0.1271 * root.height
             anchors.bottom: parent.bottom
             anchors.bottomMargin: height / 5
-            anchors.right: parent.horizontalCenter
-            anchors.rightMargin: 20
+            anchors.horizontalCenter: parent.horizontalCenter
+//            anchors.right: parent.horizontalCenter
+//            anchors.rightMargin: 20
 
             background: Rectangle {
                 id: rectBtnRemove
@@ -200,38 +201,38 @@ Rectangle {
             }
         }
 
-        Button {
-            id: btnBuy
-            width: btnRemove.width
-            height: btnRemove.height
-            anchors.top: btnRemove.top
-            anchors.left: parent.horizontalCenter
-            anchors.leftMargin: 20
+//        Button {
+//            id: btnBuy
+//            width: btnRemove.width
+//            height: btnRemove.height
+//            anchors.top: btnRemove.top
+//            anchors.left: parent.horizontalCenter
+//            anchors.leftMargin: 20
 
-            background: Rectangle {
-                id: rectBtnBuy
-                anchors.fill: parent
-                color: UIMaterials.greenPrimary
-                radius: 10
-            }
+//            background: Rectangle {
+//                id: rectBtnBuy
+//                anchors.fill: parent
+//                color: UIMaterials.greenPrimary
+//                radius: 10
+//            }
 
-            Text {
-                anchors.centerIn: parent
-                font {
-                    pixelSize: UIMaterials.fontsizeS
-                    family: UIMaterials.fontRobotoLight
-                }
-                color: "white"
-                text: "Đặt Hàng"
-            }
+//            Text {
+//                anchors.centerIn: parent
+//                font {
+//                    pixelSize: UIMaterials.fontsizeS
+//                    family: UIMaterials.fontRobotoLight
+//                }
+//                color: "white"
+//                text: "Đặt Hàng"
+//            }
 
-            onPressed: {
-                rectBtnBuy.opacity = 0.6
-            }
+//            onPressed: {
+//                rectBtnBuy.opacity = 0.6
+//            }
 
-            onReleased: {
-                rectBtnBuy.opacity = 1
-            }
-        }
+//            onReleased: {
+//                rectBtnBuy.opacity = 1
+//            }
+//        }
     }
 }

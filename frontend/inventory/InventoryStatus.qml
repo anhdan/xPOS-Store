@@ -254,8 +254,11 @@ Item {
         //----- II.1. Tab displaying soon out-of-stock products
         Tab {
             id: tabSoonOOS
-            title: tvInfo.numSoonOOS.toString()
+            title: ""
             source: "InventoryOOSList.qml"
+            onLoaded: {
+                title = beInventory.oosModel.length
+            }
         }
 
         //----- II.2. Tab displaying soon date expired products

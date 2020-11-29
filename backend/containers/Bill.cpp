@@ -288,19 +288,19 @@ firebase::Variant Bill::toFirebaseVar()
     bill["paying_amount"] = firebase::Variant( m_payment.getCustomerPayment() );
 
     std::vector<firebase::Variant> fbProducts;
-    std::map<std::string, firebase::Variant> fbProduct;
     std::list<xpos_store::Product>::iterator it = m_products.begin();
-    for( int id = 0; id < (int)m_products.size()-1; id++ )
+    for( int id = 0; id < (int)m_products.size(); id++ )
     {
+        std::map<std::string, firebase::Variant> fbProduct;
+        fbProduct["category"] = firebase::Variant( ((int)it->getCategory()+1) * 100 + 1 );
         fbProduct["code"] = firebase::Variant( it->getBarcode() );
         fbProduct["name"] = firebase::Variant( it->getName() + " @ " + it->getUnit() );
-        fbProduct["category"] = firebase::Variant((int)it->getCategory() );
         fbProduct["selling_price"] = firebase::Variant( it->getSellingPrice() );
         fbProduct["discount_percent"] = firebase::Variant( it->getDiscountPercent() );
         fbProduct["quantity"] = firebase::Variant( (int)it->getItemNum() );
+        fbProducts.push_back( firebase::Variant( fbProduct ) );
         std::advance( it, 1 );
     }
-    fbProducts.push_back( firebase::Variant( fbProduct ) );
     bill["products"] = firebase::Variant( fbProducts );
 
     return firebase::Variant( bill );

@@ -199,12 +199,13 @@ QString Product::toJSONString()
     double discountPercent = (m_unitPrice - sellingPrice) / m_unitPrice * 100;
     char cJSONStr[1000];
     sprintf( cJSONStr,  "{\n"\
+                        "\"category\": %d,\n" \
                         "\"code\": \"%s\",\n" \
                         "\"name\": \"%s\",\n" \
                         "\"selling_price\": %f,\n"\
                         "\"discount_percent\": %f,\n"\
                         "\"quantity\": %d\n" \
-                        "}", m_barcode.c_str(), m_name.c_str(),
+                        "}", ((int)m_category+1) * 100 + 1, m_barcode.c_str(), m_name.c_str(),
                         getSellingPrice(), discountPercent, m_itemNum );
     return QString::fromStdString( std::string(cJSONStr) );
 }

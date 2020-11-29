@@ -289,7 +289,7 @@ Item {
 
                 onReleased: {
                     rectBtnSave.opacity = 1
-                    var ret = beInventory.updateProduct( currItem )
+                    var ret = beInventory.updateProduct( currItem, updateRecord )
                     if( noti.state === "visible" )
                     {
                         noti.state = "invisible"
@@ -892,7 +892,13 @@ Item {
             }
 
             onUpdated: {
+                if( updateRecord === undefined )
+                {
+                    updateRecord = {}
+                }
+
                 updateRecord["barcode"] = currItem["barcode"]
+                updateRecord["staff_id"] = ""
                 updateRecord["update_date"] = new Date()
                 updateRecord["expired_date"] = expDate
                 updateRecord["quantity"] = quantityChange

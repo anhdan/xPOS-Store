@@ -35,7 +35,7 @@ signals:
 
 public slots:
     int searchForProduct( QString _code );
-    int updateProduct( const QVariant &_product );
+    int updateProduct( const QVariant &_product, const QVariant &_updateRecord );
 
     QVariant kpi();
     QVariant oosModel();

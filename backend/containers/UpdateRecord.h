@@ -27,6 +27,8 @@ public:
 public:
     void setBarcode( const std::string &_barcode );
     std::string getBarcode();
+    void setStaffId( const std::string &_staffId );
+    std::string getStaffId();
     void setUpdateDate( const uint64_t _updateDate );
     uint64_t getUpdateDate();
     void setExpiredDate( const uint64_t _expiredDate );
@@ -36,6 +38,7 @@ public:
 
 private:
     std::string m_barcode;
+    std::string m_staffId;
     uint64_t m_updateDate;
     uint64_t m_expiredDate;
     int m_quantity;

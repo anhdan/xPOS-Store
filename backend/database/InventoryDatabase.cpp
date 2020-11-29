@@ -410,11 +410,11 @@ xpError_t InventoryDatabase::insertUpdateRecord(UpdateRecord &_record)
         return xpErrorInvalidParameters;
     }
 
-    std::string cmdFormat = "INSERT INTO UPDATE_RECORD (BARCODE, UPDATE_DATE, EXPIRED_DATE, QUANTITY) " \
-                            "VALUES('%s', %ld, %ld, %d);";
+    std::string cmdFormat = "INSERT INTO UPDATE_HISTORY (BARCODE, STAFF_ID, UPDATE_DATE, EXPIRED_DATE, QUANTITY) " \
+                            "VALUES('%s', '%s', %ld, %ld, %d);";
     char sqliteCmd[1000];
-    sprintf( sqliteCmd, cmdFormat.c_str(),
-             _record.getBarcode().c_str(), _record.getUpdateDate(),
+    sprintf( sqliteCmd, cmdFormat.c_str(), _record.getBarcode().c_str(),
+             _record.getStaffId().c_str(), _record.getUpdateDate(),
              _record.getExpiredDate(), _record.getQuantity());
     printf( "====> insert update reocord cmd: %s\n", sqliteCmd );
 
